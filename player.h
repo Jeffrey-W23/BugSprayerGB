@@ -54,17 +54,16 @@ void UpdatePlayer(Player* ptrPlayer);
 // Params:
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //      nJoy: The Joypad for checking input.
-//      nPrevjoy: The previous joypad position.
 //--------------------------------------------------------------------------------------
-void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy, UINT8 nPrevJoy);
+void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy);
 
 //--------------------------------------------------------------------------------------
-// IsPlayerDead: Check if the player is currently dead from no health.
+// ShowSprayEffect: Show the spray sprite next to the player on enemy kills.
 //
 // Params:
-//      ptrPlayer: Pointer of the player object, for passing in the main player object.
+//      bShowSpray: To show the spray or not.
 //--------------------------------------------------------------------------------------
-BOOLEAN IsPlayerDead(Player* ptrPlayer);
+void ShowSprayEffect(BOOLEAN bShowSpray);
 
 // Close the Header.
 #endif

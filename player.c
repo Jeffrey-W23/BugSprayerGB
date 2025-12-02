@@ -35,7 +35,7 @@ void InitPlayer(Player* ptrPlayer)
     ptrPlayer->nX = 76; ptrPlayer->nY = 78;                 // X/Y Values
     ptrPlayer->nWidth = 16; ptrPlayer->nHeight = 16;        // Width/Height
     ptrPlayer->nDirection = 0; ptrPlayer->nDirCheck = 4;    // Direction
-    ptrPlayer->nHealth = 999; ptrPlayer->nScore = 0;        // Health/Score
+    ptrPlayer->nHealth = 998; ptrPlayer->nScore = 0;        // Health/Score
     ptrPlayer->bTakenDamage = FALSE;                        // Is Hurt
 
     // Prepare all the sprite tiles needed to show
@@ -96,9 +96,8 @@ void UpdatePlayer(Player* ptrPlayer)
 // Params:
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //      nJoy: The Joypad for checking input.
-//      nPrevjoy: The previous joypad position.
 //--------------------------------------------------------------------------------------
-void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy, UINT8 nPrevJoy) 
+void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy) 
 {
     // Update the players direction for updating sprites, 
     // the direction for checking enemies for killing,
@@ -177,20 +176,29 @@ void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy, UINT8 nPrevJoy)
         move_sprite(5, 80, 70);
     }
 
+    // Update the player sprites.
+    UpdatePlayer(ptrPlayer);
+}
+
+//--------------------------------------------------------------------------------------
+// ShowSprayEffect: Show the spray sprite next to the player on enemy kills.
+//
+// Params:
+//      bShowSpray: To show the spray or not.
+//--------------------------------------------------------------------------------------
+void ShowSprayEffect(BOOLEAN bShowSpray)
+{
     // On B button clicked, update the sprite of the
     // spray object, setting the sprite based on current
     // player direction, showing each different angle of 
     // the spray.
-    if ((nJoy & J_B) && !(nPrevJoy & J_B))
+    if (bShowSpray)
     {
         // Ensure we only update the spray when pressing, not holding B.
         if (!m_bButtonBPressed)
         {
             // Mark button as pressed.
             m_bButtonBPressed = TRUE;
-
-            // Increase shots taken count for grade calculation.
-            ptrPlayer->nTotalShotsTaken++;
 
             // Play the spray sound
             NR41_REG = 0x2D;
@@ -215,18 +223,4 @@ void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy, UINT8 nPrevJoy)
         // Set the spray to a blank object when not needed.
         set_sprite_tile(5, 95);
     }
-
-    // Update the player sprites.
-    UpdatePlayer(ptrPlayer);
-}
-
-//--------------------------------------------------------------------------------------
-// IsPlayerDead: Check if the player is currently dead from no health.
-//
-// Params:
-//      ptrPlayer: Pointer of the player object, for passing in the main player object.
-//--------------------------------------------------------------------------------------
-BOOLEAN IsPlayerDead(Player* ptrPlayer)
-{
-    return ptrPlayer->nHealth <= -1;
 }

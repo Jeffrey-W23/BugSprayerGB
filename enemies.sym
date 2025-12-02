@@ -1,0 +1,75 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+  0 _GetNextSpawnIndex                                              000000A4 GR
+  0 _GetSprite                                                      0000023A GR
+  0 _IncreaseDifficulty                                             0000060E GR
+  0 _InitEnemiesSpawnQueue                                          00000000 GR
+  0 _InitEnemy                                                      000000C7 GR
+  0 _IsEnemyAlive                                                   0000075D GR
+  0 _KillEnemy                                                      000005C6 GR
+  0 _SpawnEnemy                                                     00000107 GR
+  0 _SpawnNext                                                      00000770 GR
+  0 _TickSpawnTimer                                                 000007B3 GR
+  0 _UpdateEnemy                                                    00000261 GR
+    __modsint                                                       ******** GX
+    __moduchar                                                      ******** GX
+    __moduint                                                       ******** GX
+  7 __xinit__m_bMaxSpawnRateReached                                 0000000B R
+  7 __xinit__m_bMaxSpeedReached                                     0000000A R
+  7 __xinit__m_bPlayKillSoundEffect                                 00000010 R
+  7 __xinit__m_bShowSpray                                           00000011 R
+  7 __xinit__m_nCurrentSpeed                                        00000002 R
+  7 __xinit__m_nDamage                                              00000009 R
+  7 __xinit__m_nKillsForNextSpawnRate                               00000007 R
+  7 __xinit__m_nKillsForNextSpeed                                   00000005 R
+  7 __xinit__m_nLastSpawnRateKillCount                              0000000C R
+  7 __xinit__m_nNextSpriteID                                        00000000 R
+  7 __xinit__m_nSpawnDelay                                          0000000F R
+  7 __xinit__m_nSpawnQueuePos                                       00000001 R
+  7 __xinit__m_nSpawnTimer                                          0000000E R
+  7 __xinit__m_nTotalKilled                                         00000003 R
+  0 _m_anMovementDirX                                               00000094 R
+  0 _m_anMovementDirY                                               0000009C R
+  0 _m_anSpawnPositions                                             00000084 R
+  1 _m_anSpawnQueue                                                 000000D0 R
+  1 _m_aoEnemies                                                    00000000 GR
+  2 _m_bMaxSpawnRateReached                                         0000000B R
+  2 _m_bMaxSpeedReached                                             0000000A R
+  2 _m_bPlayKillSoundEffect                                         00000010 GR
+  2 _m_bShowSpray                                                   00000011 GR
+  2 _m_nCurrentSpeed                                                00000002 R
+  2 _m_nDamage                                                      00000009 R
+  2 _m_nKillsForNextSpawnRate                                       00000007 R
+  2 _m_nKillsForNextSpeed                                           00000005 R
+  2 _m_nLastSpawnRateKillCount                                      0000000C R
+  2 _m_nNextSpriteID                                                00000000 R
+  2 _m_nSpawnDelay                                                  0000000F GR
+  2 _m_nSpawnQueuePos                                               00000001 R
+  2 _m_nSpawnTimer                                                  0000000E GR
+  2 _m_nTotalKilled                                                 00000003 R
+    _rand                                                           ******** GX
+    _shadow_OAM                                                     ******** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size      7BB   flags    0
+   1 _DATA                                      size      110   flags    0
+   2 _INITIALIZED                               size       12   flags    0
+   3 _DABS                                      size        0   flags    8
+   4 _HOME                                      size        0   flags    0
+   5 _GSINIT                                    size        0   flags    0
+   6 _GSFINAL                                   size        0   flags    0
+   7 _INITIALIZER                               size       12   flags    0
+   8 _CABS                                      size        0   flags    8
+

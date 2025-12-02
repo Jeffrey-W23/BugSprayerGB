@@ -7,7 +7,6 @@
 // includes, using, etc
 #include <stdio.h>
 #include <stdlib.h>
-#include <gb/font.h>
 #include <gb/gb.h>
 #include <rand.h>
 
@@ -15,6 +14,7 @@
 #include "enemies.h"
 #include "hud.h"
 #include "player.h"
+#include "save.h"
 
 // includes for the splash screen
 #include "Sprite-Sheets/SplashTiles.c"
@@ -44,6 +44,12 @@ static UINT16 m_nPrevHealth = 9999; static UINT16 m_nPrevScore = 9999;
 
 // New unsigned int 8 for keeping track of background fading stages. 
 static UINT8 m_nFadeIndex;
+
+// New unsigned int 16 for the loaded saved score, representing the highscore.
+UINT16 m_nLoadedScore = 0;
+
+// New unsigned int 16 for the loaded saved shotsTaken, used to determine score grade.
+UINT16 m_nLoadedShotsTaken = 0;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -85,8 +91,8 @@ void PerformantDelay(UINT8 nLoops)
 }
 
 //--------------------------------------------------------------------------------------
-// FadeBackground: A universal function for fading in or out the background layer with
-// custom color choices and delay.
+// FadeDrawLayer: A universal function for fading in or out the background or sprite layer 
+// with custom color choices and delay.
 //
 // Helpful:
 //      00: White,
@@ -96,6 +102,7 @@ void PerformantDelay(UINT8 nLoops)
 //      Convert to hexadecimal: eg. 0x27 = 00 10 01 11
 //
 // Params:
+//      bLayer: 0 or 1 for Background or Sprite layer.
 //      bMode: 0 or 1 for Fade Out or Fade In.
 //      nValue1: The first color change in hexadecimal.
 //      nValue2: The second color change in hexadecimal.
@@ -103,7 +110,7 @@ void PerformantDelay(UINT8 nLoops)
 //      nValue4: The fourth color change in hexadecimal.
 //      nDelay: The amount of frames it takes to get through thr fade.
 //--------------------------------------------------------------------------------------
-void FadeBackground(BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UINT8 nValue4, UINT8 nDelay)
+void FadeDrawLayer(BYTE bLayer, BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UINT8 nValue4, UINT8 nDelay)
 {
     // The amount of times to loop, based
     // on if it is a fade out or fade in
@@ -126,25 +133,53 @@ void FadeBackground(BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UIN
     // Loop through however many colors are needed for the fade.
     for(m_nFadeIndex = 0; m_nFadeIndex < nLoopAmount; m_nFadeIndex++)
     {
-        // Switch statement for setting background color for each
-        // iteration through the for loop
-        switch(m_nFadeIndex)
+        // Check which layer to fade.
+        if (bLayer == 0)
         {
-            case 0:
-                BGP_REG = nValue1;
-            break;
+            // Switch statement for setting background color for each
+            // iteration through the for loop
+            switch(m_nFadeIndex)
+            {
+                case 0:
+                    BGP_REG = nValue1;
+                break;
 
-            case 1:
-                BGP_REG = nValue2;
-            break;
+                case 1:
+                    BGP_REG = nValue2;
+                break;
 
-            case 2:
-                BGP_REG = nValue3;
-            break;
+                case 2:
+                    BGP_REG = nValue3;
+                break;
 
-            case 3:
-                BGP_REG = nValue4;
-            break;
+                case 3:
+                    BGP_REG = nValue4;
+                break;
+            }
+        }
+
+        else
+        {
+            // Switch statement for setting sprite layer color for each
+            // iteration through the for loop
+            switch(m_nFadeIndex)
+            {
+                case 0:
+                    OBP0_REG = nValue1;
+                break;
+
+                case 1:
+                    OBP0_REG = nValue2;
+                break;
+
+                case 2:
+                    OBP0_REG = nValue3;
+                break;
+
+                case 3:
+                    OBP0_REG = nValue4;
+                break;
+            }
         }
 
         // Hold program, this is for the speed of the fade
@@ -155,7 +190,7 @@ void FadeBackground(BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UIN
 //--------------------------------------------------------------------------------------
 // DisplaySplashScreen: Set data and display everything needed for the Splash Screen.
 //--------------------------------------------------------------------------------------
-void DisplaySplashScreen()
+void DisplaySplashScreen(void)
 {
     // Change the colors to allow black 
     // to be the traparent color for the 
@@ -208,13 +243,13 @@ void DisplaySplashScreen()
 
     // Wait a few frames and then fade out splash screen
     PerformantDelay(135);
-    FadeBackground(1, 0x67, 0xBB, 0xFB, 0xFF, 15);
+    FadeDrawLayer(0, 1, 0x67, 0xBB, 0xFB, 0xFF, 15);
 }
 
 //--------------------------------------------------------------------------------------
 // DisplaySplashScreen: Set data and display everything needed for the Start Screen.
 //--------------------------------------------------------------------------------------
-void DisplayStartScreen()
+void DisplayStartScreen(void)
 {
     // Delcare Iterator needed 
     // for for loop in method.
@@ -225,7 +260,7 @@ void DisplayStartScreen()
     set_bkg_tiles(0, 0, 20, 18, m_caStartScreen);
 
     // Fade in the start screen from previous background
-    FadeBackground(0, 0xFB, 0xBB, 0xE4, 0x00, 15);
+    FadeDrawLayer(0, 0, 0xFB, 0xBB, 0xE4, 0x00, 15);
 
     // Pause
     PerformantDelay(25);
@@ -294,13 +329,17 @@ void DisplayStartScreen()
     PerformantDelay(10);
 
     // Fade out StartScreen.
-    FadeBackground(1, 0xE4, 0x90, 0x40, 0x00, 15);
+    FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
 }
 
 //--------------------------------------------------------------------------------------
 // ShowScoreGrade: Determine and show the grade based on the shots taken and kills.
+//
+// Params:
+//      nScore: The score value from player or highscore.
+//      nShotsTaken: Shots taken from player or highscore.
 //--------------------------------------------------------------------------------------
-void ShowScoreGrade(void)
+void ShowScoreGrade(UINT16 nScore, UINT16 nShotsTaken)
 {
     // Declare accuracy int
     UINT16 nAccuracy = 0;
@@ -310,10 +349,10 @@ void ShowScoreGrade(void)
     char cPlusMinus = ' ';
 
     // Ensure we dont divide by 0
-    if (m_oPlayer.nTotalShotsTaken != 0)
+    if (nShotsTaken != 0)
     {
         // Calculate the accuracy of shots.
-        nAccuracy = (m_oPlayer.nScore * 100) / m_oPlayer.nTotalShotsTaken;
+        nAccuracy = (nScore * 100) / nShotsTaken;
     }
 
     // Determine the grade based on the accuracy and return.
@@ -325,13 +364,13 @@ void ShowScoreGrade(void)
     else if (nAccuracy >= 50) { cGrade = 'E'; cPlusMinus = nAccuracy >= 55 ? '+' : (nAccuracy <= 52 ? '-' : ' ') ; }
 
     // print the results to screen.
-    printf("   GRADE:   %c%c", cGrade, cPlusMinus);
+    printf("%c%c", cGrade, cPlusMinus);
 }
 
 //--------------------------------------------------------------------------------------
 // DisplayGameOverScreen: Set data and display everything needed for the GameOver Screen.
 //--------------------------------------------------------------------------------------
-void DisplayGameOverScreen()
+void DisplayGameOverScreen(void)
 {
     // Small delay for affect.
     PerformantDelay(10);
@@ -343,28 +382,16 @@ void DisplayGameOverScreen()
     PerformantDelay(50);
     
     // Change screen color to indicate defeat.
-    FadeBackground(1, 0xE4, 0x90, 0x40, 0x00, 15);
+    FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
 
     // Print various bits of text to make the game over screen.
-    printf(" \n"); printf(" \n"); printf(" \n");
-    printf("     GAME  OVER     \n"); printf(" \n"); printf(" \n"); printf(" \n"); 
-    printf(" \n");printf(" \n");printf(" \n"); printf(" \n"); printf("    SCORE:  ");
+    printf(" \n"); printf(" \n"); printf(" \n"); printf(" \n");
+    printf("     GAME  OVER     \n"); printf(" \n"); 
+    printf(" \n");printf(" \n");printf(" \n"); printf(" \n");
     
-    // Show score, seperating each digit for nice centering.
-    printf("%u%u%u%u     ", m_oPlayer.nScore / 1000, 
-        (m_oPlayer.nScore / 100) % 10, (m_oPlayer.nScore / 10) % 10, 
-        m_oPlayer.nScore % 10);
-    
-    // Show the accuracy grade.
-    ShowScoreGrade();
-
-    // Show the press start text
-    printf(" \n"); printf(" \n");
-    printf("    PRESS  START     \n");
-
     // Fade back in the gameover screen.
     PerformantDelay(20);
-    FadeBackground(1, 0x00, 0x40, 0x90, 0xE4, 1);
+    FadeDrawLayer(0, 1, 0x00, 0x40, 0x90, 0xE4, 1);
 
     // Play the gameover jingle note by note.
     
@@ -398,7 +425,48 @@ void DisplayGameOverScreen()
     
     // Note #8
     NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85;
-    PerformantDelay(20);
+    PerformantDelay(60);
+
+    // Fade out the sprite layer
+    FadeDrawLayer(1, 1, 0xE4, 0x90, 0x40, 0x00, 15);
+    PerformantDelay(2);
+    HIDE_SPRITES;
+
+    // Wait a little and then scroll up the scores
+    PerformantDelay(100);
+
+    // Print various bits of text to make the game over screen.
+
+    // Score title and spacing.
+    printf(" \n");printf(" \n");printf(" \n");printf(" \n");
+    printf(" \n");printf(" \n");printf("     SCORE:");
+
+    // Show the current score with 0 to ensure we show all 4 digits.
+    printf("%u%u%u%u     ", m_oPlayer.nScore / 1000, 
+        (m_oPlayer.nScore / 100) % 10, (m_oPlayer.nScore / 10) % 10, 
+        m_oPlayer.nScore % 10);
+        
+    // Grade title with spacing.
+    printf(" \n"); printf("      GRADE:");
+        
+    // Show the current score accuracy grade.
+    ShowScoreGrade(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+
+    // Highscore title and spacing.
+    printf(" \n"); printf(" \n"); printf(" \n");printf(" \n");
+    printf("    HIGH  SCORE: ");printf(" \n");printf(" \n");
+
+    // Show the highscore with 0 to ensure we show all 4 digits.
+    printf("      %u%u%u%u  ", m_nLoadedScore / 1000, 
+        (m_nLoadedScore / 100) % 10, (m_nLoadedScore / 10) % 10, 
+        m_nLoadedScore % 10);
+    
+    // Show the highscore accuracy grade.
+    ShowScoreGrade(m_nLoadedScore, m_nLoadedShotsTaken);
+    
+    // Press start title with spacing.
+    printf("      \n"); printf(" \n");printf(" \n");
+    printf("    PRESS  START     \n");
 
     // Wait for Start button press
     waitpad(J_START);
@@ -417,9 +485,26 @@ void DisplayGameOverScreen()
 }
 
 //--------------------------------------------------------------------------------------
+// LoadHighScoreData: Load highscore data from previous game sessions.
+//--------------------------------------------------------------------------------------
+void LoadHighScoreData(void) 
+{
+    // Delcare temp vars for setting.
+    UINT16 nLoadedScore = 0;
+    UINT16 nLoadedShotsTaken = 0;
+
+    // Load the game data from memory
+    LoadGameData(&nLoadedScore, &nLoadedShotsTaken);
+
+    // Set the load values in the main.c
+    m_nLoadedScore = nLoadedScore;
+    m_nLoadedShotsTaken = nLoadedShotsTaken;
+}
+
+//--------------------------------------------------------------------------------------
 // Initialize: Prepare the application for launch.
 //--------------------------------------------------------------------------------------
-void Initialize()
+void Initialize(void)
 {
     // Delcare Iterator needed 
     // for for loop in method.
@@ -429,6 +514,9 @@ void Initialize()
     NR52_REG = 0x80; // Turn on the sound.
     NR50_REG = 0x77; // Set the volume of the left and right channel
     NR51_REG = 0xFF; // Set usage to both channels
+
+    // Load highscore data
+    LoadHighScoreData();
 
     // Display the splash screen background
     DisplaySplashScreen();
@@ -492,7 +580,7 @@ void Initialize()
 
     // Show the background again, fading in nicely.
     SHOW_BKG;
-    FadeBackground(0, 0x00, 0x40, 0x90, 0xE4, 8);
+    FadeDrawLayer(0, 0, 0x00, 0x40, 0x90, 0xE4, 8);
 
     // Set the current palette  color
     BGP_REG = 0xE4;
@@ -501,7 +589,7 @@ void Initialize()
 //--------------------------------------------------------------------------------------
 // main: base function of the program where all code will be run.
 //--------------------------------------------------------------------------------------
-void main() 
+void main(void) 
 {    
     // Delcare Iterator needed 
     // for for loop in method.
@@ -554,7 +642,7 @@ void main()
         if (!bPaused)
         {
             // Check for player input, and update player sprites.
-            HandlePlayerInput(&m_oPlayer, m_nJoy, m_nPrevJoy);
+            HandlePlayerInput(&m_oPlayer, m_nJoy);
 
             // Tick the spawn timer each frame. 
             TickSpawnTimer();
@@ -576,16 +664,19 @@ void main()
                 if (IsEnemyAlive(o)) 
                 {
                     // Update enemy, moving position, checking for input, etc..
-                    UpdateEnemy(o, m_nJoy, m_nPrevJoy, &m_oPlayer);
+                    UpdateEnemy(o, &m_oPlayer);
                 }
             }
 
             // Check/Increase game difficulty
             IncreaseDifficulty();
+
+            // Show the spray effect if an enemy is killed.
+            ShowSprayEffect(m_bShowSpray);
             
             // Check if an enemy sound effect is needed.
             // Play once per frame instead of every enemy.
-            if (m_bPlayKillSoundEffect)
+            if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
             {
                 // Play enemy death sound.
                 NR21_REG = 0x84;
@@ -600,6 +691,9 @@ void main()
 
                 // Mark sound as played for next request.
                 m_bPlayKillSoundEffect = FALSE;
+
+                // Mark spary as used.
+                m_bShowSpray = FALSE;
             }
 
             // Prepare score and health for displaying.
@@ -610,11 +704,11 @@ void main()
             if (m_oPlayer.bTakenDamage)
             {
                 // Play damage sounmd for player.
-                NR30_REG = 0x80;
-                NR31_REG = 0xFF;
-                NR32_REG = 0x60;
-                NR33_REG = 0x9E;
-                NR34_REG = 0xC1;
+                NR10_REG = 0x0D;
+                NR11_REG = 0xC2;
+                NR12_REG = 0x54;
+                NR13_REG = 0x63;
+                NR14_REG = 0x82;
 
                 // Mark damage false again.
                 m_oPlayer.bTakenDamage = FALSE;
@@ -641,10 +735,18 @@ void main()
             }
 
             // Check for game over condition.
-            if (m_oPlayer.nHealth <= 19)
+            if (m_oPlayer.nHealth == 0)
             {
                 // Set in case not quite 0.
                 SetHealth(0);
+
+                // Check if the previous highscore was beat
+                if (m_oPlayer.nScore > m_nLoadedScore) 
+                {
+                    // Save the new score data and reload.
+                    SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                    LoadHighScoreData();
+                }
 
                 // Show the game over screen.
                 DisplayGameOverScreen();

@@ -7,6 +7,7 @@
         "hud.h": "c",
         "player.h": "c",
         "enemies.h": "c",
-        "gb.h": "c"
+        "gb.h": "c",
+        "save.h": "c"
     }
 }

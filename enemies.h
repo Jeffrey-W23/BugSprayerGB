@@ -19,7 +19,7 @@
 #define MAX_ENEMIES 16
 #define NUM_SPAWNPOINTS 8
 #define SPAWN_QUEUE_SIZE 64
-#define MAX_SPEED 11
+#define MAX_SPEED 8
 
 // New unsigned int 8 for keeping track of the current spawn tick.
 extern UINT8 m_nSpawnTimer;
@@ -29,6 +29,9 @@ extern UINT8 m_nSpawnDelay;
 
 // New bool value for if the kill auido has been requested for playing.
 extern BOOLEAN m_bPlayKillSoundEffect;
+
+// New bool value for if we need to show the spray affect from the player.
+extern BOOLEAN m_bShowSpray;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -100,11 +103,9 @@ INT8 GetSprite(INT8 nRandNumber);
 //
 // Params:
 //      nEnemyIndex: The position of the enemy in the enemies array.
-//      nJoy: The Joypad for checking input.
-//      nPrevjoy: The previous joypad position.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void UpdateEnemy(UINT8 nEnemyIndex, UINT8 nJoy, UINT8 nPrevjoy, Player* ptrPlayer);
+void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer);
 
 //--------------------------------------------------------------------------------------
 // KillEnemy: Kill an Enemy object, marking its position in the array as free.

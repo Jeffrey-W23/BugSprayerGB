@@ -24,13 +24,19 @@ static UINT8 m_anSpawnQueue[SPAWN_QUEUE_SIZE];
 static UINT8 m_nSpawnQueuePos = 0;
 
 // New unsigned int 8 for the current speed of all enemies in the game.
-static UINT8 m_nCurrentSpeed = 1;
+static UINT8 m_nCurrentSpeed = 11;
 
 // New unsigned int 16 for tracking the total enemies killed in the game.
 static UINT16 m_nTotalKilled = 0;
 
 // New Unsigned int 8 for keeping track of kill requirements for speed increase
-static UINT8 m_nKillsForNextSpeed = 15;
+static UINT16 m_nKillsForNextSpeed = 15;
+
+// New unsigned int 8 for keeping track of the kill requirements for spawn increase
+static UINT16 m_nKillsForNextSpawnRate = 15;
+
+// New signed int 8 for damage an enemy does to the player on hit.
+static UINT8 m_nDamage = 25;
 
 // New bool value for marking of the max speed has been reached.
 static BOOLEAN m_bMaxSpeedReached = FALSE;
@@ -67,10 +73,13 @@ static const INT8 m_anMovementDirY[8] = {1,  1,  1,  0,  0, -1, -1, -1};
 UINT8 m_nSpawnTimer = 0;
 
 // New unsigned int 8 for keeping track of the current spawn delay for all enemies.
-UINT8 m_nSpawnDelay = 100;
+UINT8 m_nSpawnDelay = 8;
 
 // New bool value for if the kill auido has been requested for playing.
 BOOLEAN m_bPlayKillSoundEffect = FALSE;
+
+// New bool value for if we need to show the spray affect from the player.
+BOOLEAN m_bShowSpray = FALSE;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -288,11 +297,9 @@ INT8 GetSprite(INT8 nRandNumber)
 //
 // Params:
 //      nEnemyIndex: The position of the enemy in the enemies array.
-//      nJoy: The Joypad for checking input.
-//      nPrevjoy: The previous joypad position.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void UpdateEnemy(UINT8 nEnemyIndex, UINT8 nJoy, UINT8 nPrevjoy, Player* ptrPlayer) 
+void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer) 
 {  
     // Get the current enemy being updated.
     Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
@@ -347,38 +354,49 @@ void UpdateEnemy(UINT8 nEnemyIndex, UINT8 nJoy, UINT8 nPrevjoy, Player* ptrPlaye
     else
     {
         // Drop health of the player.
-        ptrPlayer->nHealth -= 5;
+        ptrPlayer->nHealth -= m_nDamage;
         ptrPlayer->bTakenDamage = TRUE;
+
+        // Increase shots taken count for grade calculation.
+        ptrPlayer->nTotalShotsTaken++;
+
+        // Kill the enemy.
+        KillEnemy(ptrEnemy, ptrPlayer);
+
+        // Make sure we keep the health capped
+        // limit the possibility of overflow.
+        ptrPlayer->nHealth = (ptrPlayer->nHealth < m_nDamage) ? 0 : ptrPlayer->nHealth - m_nDamage;
+        
+        // Break out of update      
+        // No need to keep updating
+        // now that enemy is dead.
+        return;
     }
     
-    // Check for B button click
-    if ((nJoy & J_B) && !(nPrevjoy & J_B)) 
+    // Ensure the enemy is moving.
+    if (!ptrEnemy->bCantMove)
     {
-        // Ensure the player is moving.
-        if (!ptrEnemy->bCantMove)
+        // Check the enemy direction against player direction.
+        // We only want to kill the enemy the player faces.
+        if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
         {
-            // Check the enemy direction against player direction.
-            // We only want to kill the enemy the player faces.
-            if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
+            // Check if the enemy is in kill range of the player.
+            if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
             {
-                // Check if the enemy is in kill range of the player.
-                if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
-                {
-                    // Kill the enemy.
-                    KillEnemy(ptrEnemy, ptrPlayer);
-                    return;
-                }
-            }
-        }
+                // Increase shots taken count for grade calculation.
+                ptrPlayer->nTotalShotsTaken++;
 
-        // If not moving then kill anyway,
-        // bascially this mean the bug is touching
-        // the player, the direction no longer maters
-        else
-        {
-            // Kill the enemy.
-            KillEnemy(ptrEnemy, ptrPlayer);
-            return;
+                // Kill the enemy.
+                KillEnemy(ptrEnemy, ptrPlayer);
+                
+                // Show the spray affect
+                m_bShowSpray = TRUE;
+                
+                // Break out of update
+                // No need to keep updating
+                // now that enemy is dead.
+                return;
+            }
         }
     }
 
@@ -418,13 +436,17 @@ void IncreaseDifficulty(void)
     // Check if the amount of kills required to increase the speed has been hit.
     if (!m_bMaxSpeedReached)
     {
+        // Increase the speed and calculate the 
+        // next speed increase requirement.
         if (m_nTotalKilled >= m_nKillsForNextSpeed) 
         {
-            // Increase the speed and calculate the 
-            // next speed increase requirement.
             m_nCurrentSpeed++;
-            m_nKillsForNextSpeed = m_nTotalKilled + (m_nKillsForNextSpeed * 3 / 4);
-            
+            if (m_nCurrentSpeed == 2) m_nKillsForNextSpeed = 50;
+            else if (m_nCurrentSpeed == 3) m_nKillsForNextSpeed = 125;
+            else if (m_nCurrentSpeed == 4) m_nKillsForNextSpeed = 250;
+            else if (m_nCurrentSpeed == 5) m_nKillsForNextSpeed = 400;
+            else m_nKillsForNextSpeed += 150;  // Gradual increase after
+
             // Check if the speed hits the max.
             if (m_nCurrentSpeed >= MAX_SPEED) 
             {
@@ -437,7 +459,7 @@ void IncreaseDifficulty(void)
     }
 
     // Only make calculation checks when needed.
-    if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % 15 == 0)
+    if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % m_nKillsForNextSpawnRate == 0)
     {
         // Only update once per kill count objective reached.
         if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
@@ -445,14 +467,14 @@ void IncreaseDifficulty(void)
             // Change the spawnRate depending on how many total kills.
             if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
             else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
-            else if (m_nTotalKilled < 800) m_nSpawnDelay -= 1;
+            else m_nSpawnDelay -= 1;
 
-            // If the spawn rate max is reached, keep the spawn rate at 8.
-            if (m_nSpawnDelay <= 10)
-            {
-                m_nSpawnDelay = 8;
-                m_bMaxSpawnRateReached = TRUE;
-            }
+            // Change the kills required to change the kill rate. really want to slow it down.
+            if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
+            else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; m_nDamage = 40; }
+            else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; m_nDamage = 50; }
+            else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
+            else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
 
             // Save last processed kill count
             m_nLastSpawnRateKillCount = m_nTotalKilled;
