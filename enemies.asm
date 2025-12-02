@@ -1763,7 +1763,7 @@ __xinit__m_nNextSpriteID:
 __xinit__m_nSpawnQueuePos:
 	.db #0x00	; 0
 __xinit__m_nCurrentSpeed:
-	.db #0x0b	; 11
+	.db #0x01	; 1
 __xinit__m_nTotalKilled:
 	.dw #0x0000
 __xinit__m_nKillsForNextSpeed:
@@ -1781,7 +1781,7 @@ __xinit__m_nLastSpawnRateKillCount:
 __xinit__m_nSpawnTimer:
 	.db #0x00	; 0
 __xinit__m_nSpawnDelay:
-	.db #0x08	; 8
+	.db #0x64	; 100	'd'
 __xinit__m_bPlayKillSoundEffect:
 	.db #0x00	;  0
 __xinit__m_bShowSpray:

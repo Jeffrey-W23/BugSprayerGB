@@ -386,8 +386,7 @@ void DisplayGameOverScreen(void)
 
     // Print various bits of text to make the game over screen.
     printf(" \n"); printf(" \n"); printf(" \n"); printf(" \n");
-    printf("     GAME  OVER     \n"); printf(" \n"); 
-    printf(" \n");printf(" \n");printf(" \n"); printf(" \n");
+    printf("     GAME  OVER     \n"); printf(" \n"); printf(" \n");
     
     // Fade back in the gameover screen.
     PerformantDelay(20);
@@ -438,8 +437,7 @@ void DisplayGameOverScreen(void)
     // Print various bits of text to make the game over screen.
 
     // Score title and spacing.
-    printf(" \n");printf(" \n");printf(" \n");printf(" \n");
-    printf(" \n");printf(" \n");printf("     SCORE:");
+    printf("     SCORE:");
 
     // Show the current score with 0 to ensure we show all 4 digits.
     printf("%u%u%u%u     ", m_oPlayer.nScore / 1000, 
@@ -447,25 +445,25 @@ void DisplayGameOverScreen(void)
         m_oPlayer.nScore % 10);
         
     // Grade title with spacing.
-    printf(" \n"); printf("      GRADE:");
+    //printf(" \n"); printf("      GRADE:");
         
     // Show the current score accuracy grade.
-    ShowScoreGrade(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+    //ShowScoreGrade(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
 
     // Highscore title and spacing.
-    printf(" \n"); printf(" \n"); printf(" \n");printf(" \n");
+    printf(" \n"); printf(" \n"); printf(" \n");
     printf("    HIGH  SCORE: ");printf(" \n");printf(" \n");
 
     // Show the highscore with 0 to ensure we show all 4 digits.
-    printf("      %u%u%u%u  ", m_nLoadedScore / 1000, 
+    printf("        %u%u%u%u  ", m_nLoadedScore / 1000, 
         (m_nLoadedScore / 100) % 10, (m_nLoadedScore / 10) % 10, 
         m_nLoadedScore % 10);
     
     // Show the highscore accuracy grade.
-    ShowScoreGrade(m_nLoadedScore, m_nLoadedShotsTaken);
+    //ShowScoreGrade(m_nLoadedScore, m_nLoadedShotsTaken);
     
     // Press start title with spacing.
-    printf("      \n"); printf(" \n");printf(" \n");
+    printf("      \n"); printf(" \n");
     printf("    PRESS  START     \n");
 
     // Wait for Start button press
@@ -611,7 +609,25 @@ void main(void)
 
     // Create the main game loop of the application
     while(1) 
-    {   
+    { 
+        // Check for game over condition.
+        if (m_oPlayer.nHealth == 0)
+        {
+            // Set in case not quite 0.
+            SetHealth(0);
+
+            // Check if the previous highscore was beat
+            if (m_oPlayer.nScore > m_nLoadedScore) 
+            {
+                // Save the new score data and reload.
+                SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                LoadHighScoreData();
+            }
+
+            // Show the game over screen.
+            DisplayGameOverScreen();
+        }
+
         // Get the joypad inputs.
         m_nJoy = joypad();
 
@@ -732,24 +748,6 @@ void main(void)
 
                 // Update the previous score for next frames check.
                 m_nPrevScore = nCurrentScore;
-            }
-
-            // Check for game over condition.
-            if (m_oPlayer.nHealth == 0)
-            {
-                // Set in case not quite 0.
-                SetHealth(0);
-
-                // Check if the previous highscore was beat
-                if (m_oPlayer.nScore > m_nLoadedScore) 
-                {
-                    // Save the new score data and reload.
-                    SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
-                    LoadHighScoreData();
-                }
-
-                // Show the game over screen.
-                DisplayGameOverScreen();
             }
         }
 

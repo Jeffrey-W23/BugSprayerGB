@@ -1763,7 +1763,7 @@
     00000001                       1763 __xinit__m_nSpawnQueuePos:
     00000001 00                    1764 	.db #0x00	; 0
     00000002                       1765 __xinit__m_nCurrentSpeed:
-    00000002 0B                    1766 	.db #0x0b	; 11
+    00000002 01                    1766 	.db #0x01	; 1
     00000003                       1767 __xinit__m_nTotalKilled:
     00000003 00 00                 1768 	.dw #0x0000
     00000005                       1769 __xinit__m_nKillsForNextSpeed:
@@ -1781,7 +1781,7 @@
     0000000E                       1781 __xinit__m_nSpawnTimer:
     0000000E 00                    1782 	.db #0x00	; 0
     0000000F                       1783 __xinit__m_nSpawnDelay:
-    0000000F 08                    1784 	.db #0x08	; 8
+    0000000F 64                    1784 	.db #0x64	; 100	'd'
     00000010                       1785 __xinit__m_bPlayKillSoundEffect:
     00000010 00                    1786 	.db #0x00	;  0
     00000011                       1787 __xinit__m_bShowSpray:

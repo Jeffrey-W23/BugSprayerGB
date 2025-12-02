@@ -19,12 +19,12 @@ Symbol Table
     _InitEnemy                                                      ******** GX
     _InitHud                                                        ******** GX
     _InitPlayer                                                     ******** GX
-  0 _Initialize                                                     000026CE GR
+  0 _Initialize                                                     0000267A GR
     _IsEnemyAlive                                                   ******** GX
     _LCDC_REG                                                       ******** GX
     _LY_REG                                                         ******** GX
     _LoadGameData                                                   ******** GX
-  0 _LoadHighScoreData                                              0000269E GR
+  0 _LoadHighScoreData                                              0000264A GR
     _NR10_REG                                                       ******** GX
     _NR11_REG                                                       ******** GX
     _NR12_REG                                                       ******** GX
@@ -57,21 +57,19 @@ Symbol Table
     _WX_REG                                                         ******** GX
     _WY_REG                                                         ******** GX
   0 ___str_0                                                        00002383 R
-  0 ___str_19                                                       00002600 R
+  0 ___str_10                                                       000025C1 R
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
 Hexadecimal [32-Bits]
 
 Symbol Table
 
-  0 ___str_2                                                        000025FE R
-  0 ___str_20                                                       0000260C R
-  0 ___str_22                                                       0000261A R
-  0 ___str_27                                                       00002627 R
-  0 ___str_30                                                       00002639 R
-  0 ___str_37                                                       0000264A R
-  0 ___str_39                                                       0000264E R
-  0 ___str_45                                                       00002656 R
-  0 ___str_48                                                       0000267D R
+  0 ___str_11                                                       000025CD R
+  0 ___str_15                                                       000025DB R
+  0 ___str_18                                                       000025ED R
+  0 ___str_24                                                       00002600 R
+  0 ___str_25                                                       00002604 R
+  0 ___str_29                                                       0000260A R
+  0 ___str_31                                                       0000262B R
     __divuint                                                       ******** GX
     __moduchar                                                      ******** GX
     __moduint                                                       ******** GX
@@ -100,7 +98,7 @@ Symbol Table
     _m_nSpawnDelay                                                  ******** GX
     _m_nSpawnTimer                                                  ******** GX
   1 _m_oPlayer                                                      00000000 R
-  0 _main                                                           000027D5 GR
+  0 _main                                                           00002781 GR
     _printf                                                         ******** GX
     _puts                                                           ******** GX
     _reset                                                          ******** GX
@@ -118,7 +116,7 @@ Hexadecimal [32-Bits]
 
 Area Table
 
-   0 _CODE                                      size     29D1   flags    0
+   0 _CODE                                      size     2962   flags    0
    1 _DATA                                      size       1C   flags    0
    2 _INITIALIZED                               size        8   flags    0
    3 _DABS                                      size        0   flags    8
