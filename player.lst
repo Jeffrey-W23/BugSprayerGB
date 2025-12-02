@@ -1,0 +1,1846 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.2.1 Tue Dec 02 13:43:48 2025
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module lcc320920
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _move_sprite
+                             12 	.globl _set_sprite_tile
+                             13 	.globl _IsPlayerDead
+                             14 	.globl _HandlePlayerInput
+                             15 	.globl _UpdatePlayer
+                             16 	.globl _InitPlayer
+                             17 ;--------------------------------------------------------
+                             18 ; Externals used
+                             19 ;--------------------------------------------------------
+                             20 	.globl _IE_REG
+                             21 	.globl _SVBK_REG
+                             22 	.globl _OCPD_REG
+                             23 	.globl _OCPS_REG
+                             24 	.globl _BCPD_REG
+                             25 	.globl _BCPS_REG
+                             26 	.globl _RP_REG
+                             27 	.globl _HDMA5_REG
+                             28 	.globl _HDMA4_REG
+                             29 	.globl _HDMA3_REG
+                             30 	.globl _HDMA2_REG
+                             31 	.globl _HDMA1_REG
+                             32 	.globl _VBK_REG
+                             33 	.globl _KEY1_REG
+                             34 	.globl _WX_REG
+                             35 	.globl _WY_REG
+                             36 	.globl _OBP1_REG
+                             37 	.globl _OBP0_REG
+                             38 	.globl _BGP_REG
+                             39 	.globl _DMA_REG
+                             40 	.globl _LYC_REG
+                             41 	.globl _LY_REG
+                             42 	.globl _SCX_REG
+                             43 	.globl _SCY_REG
+                             44 	.globl _STAT_REG
+                             45 	.globl _LCDC_REG
+                             46 	.globl _NR52_REG
+                             47 	.globl _NR51_REG
+                             48 	.globl _NR50_REG
+                             49 	.globl _NR44_REG
+                             50 	.globl _NR43_REG
+                             51 	.globl _NR42_REG
+                             52 	.globl _NR41_REG
+                             53 	.globl _NR34_REG
+                             54 	.globl _NR33_REG
+                             55 	.globl _NR32_REG
+                             56 	.globl _NR31_REG
+                             57 	.globl _NR30_REG
+                             58 	.globl _NR24_REG
+                             59 	.globl _NR23_REG
+                             60 	.globl _NR22_REG
+                             61 	.globl _NR21_REG
+                             62 	.globl _NR14_REG
+                             63 	.globl _NR13_REG
+                             64 	.globl _NR12_REG
+                             65 	.globl _NR11_REG
+                             66 	.globl _NR10_REG
+                             67 	.globl _IF_REG
+                             68 	.globl _TAC_REG
+                             69 	.globl _TMA_REG
+                             70 	.globl _TIMA_REG
+                             71 	.globl _DIV_REG
+                             72 	.globl _SC_REG
+                             73 	.globl _SB_REG
+                             74 	.globl _P1_REG
+                             75 	.globl __io_out
+                             76 	.globl __io_in
+                             77 	.globl __io_status
+                             78 	.globl _sys_time
+                             79 	.globl __cpu
+                             80 ;--------------------------------------------------------
+                             81 ; special function registers
+                             82 ;--------------------------------------------------------
+                             83 ;--------------------------------------------------------
+                             84 ; special function bits 
+                             85 ;--------------------------------------------------------
+                             86 ;--------------------------------------------------------
+                             87 ; internal ram data
+                             88 ;--------------------------------------------------------
+                             89 	.area _DATA
+   0000                      90 _m_nSprayIndex:
+   0000                      91 	.ds 1
+   0001                      92 _m_bButtonBPressed:
+   0001                      93 	.ds 1
+                             94 ;--------------------------------------------------------
+                             95 ; overlayable items in internal ram 
+                             96 ;--------------------------------------------------------
+                             97 	.area _OVERLAY
+                             98 ;--------------------------------------------------------
+                             99 ; indirectly addressable internal ram data
+                            100 ;--------------------------------------------------------
+                            101 	.area _ISEG
+                            102 ;--------------------------------------------------------
+                            103 ; bit data
+                            104 ;--------------------------------------------------------
+                            105 	.area _BSEG
+                            106 ;--------------------------------------------------------
+                            107 ; external ram data
+                            108 ;--------------------------------------------------------
+                            109 	.area _XSEG
+                            110 ;--------------------------------------------------------
+                            111 ; global & static initialisations
+                            112 ;--------------------------------------------------------
+                            113 	.area _GSINIT
+                            114 	.area _GSFINAL
+                            115 	.area _GSINIT
+                            116 ;	player.c 233
+                            117 ; genAssign
+                            118 ; AOP_HL for _m_nSprayIndex
+   0000 21 00 00            119 	ld	hl,#_m_nSprayIndex + 0
+   0003 36 00               120 	ld	(hl),#0x00
+                            121 ;	player.c 233
+                            122 ; genAssign
+                            123 ; AOP_HL for _m_bButtonBPressed
+   0005 21 01 00            124 	ld	hl,#_m_bButtonBPressed + 0
+   0008 36 00               125 	ld	(hl),#0x00
+                            126 ;--------------------------------------------------------
+                            127 ; Home
+                            128 ;--------------------------------------------------------
+                            129 	.area _HOME
+                            130 	.area _CODE
+                            131 ;--------------------------------------------------------
+                            132 ; code
+                            133 ;--------------------------------------------------------
+                            134 	.area _CODE
+                            135 ;	player.c 25
+                            136 ; genLabel
+                            137 ; genFunction
+                            138 ;	---------------------------------
+                            139 ; Function InitPlayer
+                            140 ; ---------------------------------
+   0000                     141 ___InitPlayer_start:
+   0000                     142 _InitPlayer:
+   0000 C5                  143 	push	bc
+   0001 E8 EF               144 	lda	sp,-17(sp)
+                            145 ;	player.c 32
+                            146 ; genAddrOf
+                            147 ; AOP_STK for _InitPlayer_sloc0_1_0
+   0003 F8 08               148 	lda	hl,8(sp)
+   0005 54                  149 	ld	d,h
+   0006 5D                  150 	ld	e,l
+   0007 F8 06               151 	lda	hl,6(sp)
+   0009 73                  152 	ld	(hl),e
+   000A 23                  153 	inc	hl
+   000B 72                  154 	ld	(hl),d
+                            155 ; genAssign (pointer)
+                            156 ; AOP_STK for _InitPlayer_sloc0_1_0
+   000C 2B                  157 	dec	hl
+   000D 5E                  158 	ld	e,(hl)
+   000E 23                  159 	inc	hl
+   000F 56                  160 	ld	d,(hl)
+   0010 3E 00               161 	ld	a,#0x00
+   0012 12                  162 	ld	(de),a
+                            163 ; genPlus
+                            164 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            165 ; genPlusIncr
+   0013 2B                  166 	dec	hl
+   0014 5E                  167 	ld	e,(hl)
+   0015 23                  168 	inc	hl
+   0016 56                  169 	ld	d,(hl)
+   0017 13                  170 	inc	de
+                            171 ; genAssign (pointer)
+   0018 3E 04               172 	ld	a,#0x04
+   001A 12                  173 	ld	(de),a
+                            174 ; genPlus
+                            175 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            176 ; genPlusIncr
+   001B 2B                  177 	dec	hl
+   001C 5E                  178 	ld	e,(hl)
+   001D 23                  179 	inc	hl
+   001E 56                  180 	ld	d,(hl)
+   001F 13                  181 	inc	de
+   0020 13                  182 	inc	de
+                            183 ; genAssign (pointer)
+   0021 3E 08               184 	ld	a,#0x08
+   0023 12                  185 	ld	(de),a
+                            186 ; genPlus
+                            187 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            188 ; genPlusIncr
+                            189 ;	genPlusIncr failed
+   0024 2B                  190 	dec	hl
+   0025 5E                  191 	ld	e,(hl)
+   0026 23                  192 	inc	hl
+   0027 56                  193 	ld	d,(hl)
+   0028 21 03 00            194 	ld	hl,#0x0003
+   002B 19                  195 	add	hl,de
+   002C 5D                  196 	ld	e,l
+   002D 54                  197 	ld	d,h
+                            198 ; genAssign (pointer)
+   002E 3E 0C               199 	ld	a,#0x0C
+   0030 12                  200 	ld	(de),a
+                            201 ; genPlus
+                            202 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            203 ; genPlusIncr
+                            204 ;	genPlusIncr failed
+   0031 F8 06               205 	lda	hl,6(sp)
+   0033 5E                  206 	ld	e,(hl)
+   0034 23                  207 	inc	hl
+   0035 56                  208 	ld	d,(hl)
+   0036 21 04 00            209 	ld	hl,#0x0004
+   0039 19                  210 	add	hl,de
+   003A 5D                  211 	ld	e,l
+   003B 54                  212 	ld	d,h
+                            213 ; genAssign (pointer)
+   003C 3E 10               214 	ld	a,#0x10
+   003E 12                  215 	ld	(de),a
+                            216 ; genPlus
+                            217 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            218 ; genPlusIncr
+                            219 ;	genPlusIncr failed
+   003F F8 06               220 	lda	hl,6(sp)
+   0041 5E                  221 	ld	e,(hl)
+   0042 23                  222 	inc	hl
+   0043 56                  223 	ld	d,(hl)
+   0044 21 05 00            224 	ld	hl,#0x0005
+   0047 19                  225 	add	hl,de
+   0048 5D                  226 	ld	e,l
+   0049 54                  227 	ld	d,h
+                            228 ; genAssign (pointer)
+   004A 3E 14               229 	ld	a,#0x14
+   004C 12                  230 	ld	(de),a
+                            231 ; genPlus
+                            232 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            233 ; genPlusIncr
+                            234 ;	genPlusIncr failed
+   004D F8 06               235 	lda	hl,6(sp)
+   004F 5E                  236 	ld	e,(hl)
+   0050 23                  237 	inc	hl
+   0051 56                  238 	ld	d,(hl)
+   0052 21 06 00            239 	ld	hl,#0x0006
+   0055 19                  240 	add	hl,de
+   0056 5D                  241 	ld	e,l
+   0057 54                  242 	ld	d,h
+                            243 ; genAssign (pointer)
+   0058 3E 18               244 	ld	a,#0x18
+   005A 12                  245 	ld	(de),a
+                            246 ; genPlus
+                            247 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            248 ; genPlusIncr
+                            249 ;	genPlusIncr failed
+   005B F8 06               250 	lda	hl,6(sp)
+   005D 5E                  251 	ld	e,(hl)
+   005E 23                  252 	inc	hl
+   005F 56                  253 	ld	d,(hl)
+   0060 21 07 00            254 	ld	hl,#0x0007
+   0063 19                  255 	add	hl,de
+   0064 5D                  256 	ld	e,l
+   0065 54                  257 	ld	d,h
+                            258 ; genAssign (pointer)
+   0066 3E 1C               259 	ld	a,#0x1C
+   0068 12                  260 	ld	(de),a
+                            261 ;	player.c 35
+                            262 ; genAssign
+                            263 ; AOP_STK for 
+                            264 ; AOP_STK for _InitPlayer_sloc1_1_0
+   0069 F8 15               265 	lda	hl,21(sp)
+   006B 2A                  266 	ld	a,(hl+)
+   006C 5E                  267 	ld	e,(hl)
+   006D F8 04               268 	lda	hl,4(sp)
+   006F 22                  269 	ld	(hl+),a
+   0070 73                  270 	ld	(hl),e
+                            271 ; genPlus
+                            272 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            273 ; genPlusIncr
+                            274 ;	genPlusIncr failed
+   0071 2B                  275 	dec	hl
+   0072 5E                  276 	ld	e,(hl)
+   0073 23                  277 	inc	hl
+   0074 56                  278 	ld	d,(hl)
+   0075 21 04 00            279 	ld	hl,#0x0004
+   0078 19                  280 	add	hl,de
+   0079 5D                  281 	ld	e,l
+   007A 54                  282 	ld	d,h
+                            283 ; genAssign (pointer)
+   007B 3E 4C               284 	ld	a,#0x4C
+   007D 12                  285 	ld	(de),a
+                            286 ; genPlus
+                            287 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            288 ; genPlusIncr
+                            289 ;	genPlusIncr failed
+   007E F8 04               290 	lda	hl,4(sp)
+   0080 5E                  291 	ld	e,(hl)
+   0081 23                  292 	inc	hl
+   0082 56                  293 	ld	d,(hl)
+   0083 21 05 00            294 	ld	hl,#0x0005
+   0086 19                  295 	add	hl,de
+   0087 5D                  296 	ld	e,l
+   0088 54                  297 	ld	d,h
+                            298 ; genAssign (pointer)
+   0089 3E 4E               299 	ld	a,#0x4E
+   008B 12                  300 	ld	(de),a
+                            301 ;	player.c 36
+                            302 ; genPlus
+                            303 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            304 ; genPlusIncr
+                            305 ;	genPlusIncr failed
+   008C F8 04               306 	lda	hl,4(sp)
+   008E 5E                  307 	ld	e,(hl)
+   008F 23                  308 	inc	hl
+   0090 56                  309 	ld	d,(hl)
+   0091 21 06 00            310 	ld	hl,#0x0006
+   0094 19                  311 	add	hl,de
+   0095 5D                  312 	ld	e,l
+   0096 54                  313 	ld	d,h
+                            314 ; genAssign (pointer)
+   0097 3E 10               315 	ld	a,#0x10
+   0099 12                  316 	ld	(de),a
+                            317 ; genPlus
+                            318 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            319 ; genPlusIncr
+                            320 ;	genPlusIncr failed
+   009A F8 04               321 	lda	hl,4(sp)
+   009C 5E                  322 	ld	e,(hl)
+   009D 23                  323 	inc	hl
+   009E 56                  324 	ld	d,(hl)
+   009F 21 07 00            325 	ld	hl,#0x0007
+   00A2 19                  326 	add	hl,de
+   00A3 5D                  327 	ld	e,l
+   00A4 54                  328 	ld	d,h
+                            329 ; genAssign (pointer)
+   00A5 3E 10               330 	ld	a,#0x10
+   00A7 12                  331 	ld	(de),a
+                            332 ;	player.c 37
+                            333 ; genPlus
+                            334 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            335 ; genPlusIncr
+                            336 ;	genPlusIncr failed
+   00A8 F8 04               337 	lda	hl,4(sp)
+   00AA 5E                  338 	ld	e,(hl)
+   00AB 23                  339 	inc	hl
+   00AC 56                  340 	ld	d,(hl)
+   00AD 21 08 00            341 	ld	hl,#0x0008
+   00B0 19                  342 	add	hl,de
+   00B1 5D                  343 	ld	e,l
+   00B2 54                  344 	ld	d,h
+                            345 ; genAssign (pointer)
+   00B3 3E 00               346 	ld	a,#0x00
+   00B5 12                  347 	ld	(de),a
+                            348 ; genPlus
+                            349 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            350 ; genPlusIncr
+                            351 ;	genPlusIncr failed
+   00B6 F8 04               352 	lda	hl,4(sp)
+   00B8 5E                  353 	ld	e,(hl)
+   00B9 23                  354 	inc	hl
+   00BA 56                  355 	ld	d,(hl)
+   00BB 21 13 00            356 	ld	hl,#0x0013
+   00BE 19                  357 	add	hl,de
+   00BF 5D                  358 	ld	e,l
+   00C0 54                  359 	ld	d,h
+                            360 ; genAssign (pointer)
+   00C1 3E 04               361 	ld	a,#0x04
+   00C3 12                  362 	ld	(de),a
+                            363 ;	player.c 38
+                            364 ; genPlus
+                            365 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            366 ; genPlusIncr
+                            367 ;	genPlusIncr failed
+   00C4 F8 04               368 	lda	hl,4(sp)
+   00C6 5E                  369 	ld	e,(hl)
+   00C7 23                  370 	inc	hl
+   00C8 56                  371 	ld	d,(hl)
+   00C9 21 11 00            372 	ld	hl,#0x0011
+   00CC 19                  373 	add	hl,de
+   00CD 5D                  374 	ld	e,l
+   00CE 54                  375 	ld	d,h
+                            376 ; genAssign (pointer)
+   00CF 3E E7               377 	ld	a,#0xE7
+   00D1 12                  378 	ld	(de),a
+   00D2 13                  379 	inc	de
+   00D3 3E 03               380 	ld	a,#0x03
+   00D5 12                  381 	ld	(de),a
+                            382 ; genPlus
+                            383 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            384 ; genPlusIncr
+                            385 ;	genPlusIncr failed
+   00D6 F8 04               386 	lda	hl,4(sp)
+   00D8 5E                  387 	ld	e,(hl)
+   00D9 23                  388 	inc	hl
+   00DA 56                  389 	ld	d,(hl)
+   00DB 21 14 00            390 	ld	hl,#0x0014
+   00DE 19                  391 	add	hl,de
+   00DF 5D                  392 	ld	e,l
+   00E0 54                  393 	ld	d,h
+                            394 ; genAssign (pointer)
+   00E1 3E 00               395 	ld	a,#0x00
+   00E3 12                  396 	ld	(de),a
+   00E4 13                  397 	inc	de
+   00E5 3E 00               398 	ld	a,#0x00
+   00E7 12                  399 	ld	(de),a
+                            400 ;	player.c 39
+                            401 ; genPlus
+                            402 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            403 ; genPlusIncr
+                            404 ;	genPlusIncr failed
+   00E8 F8 04               405 	lda	hl,4(sp)
+   00EA 5E                  406 	ld	e,(hl)
+   00EB 23                  407 	inc	hl
+   00EC 56                  408 	ld	d,(hl)
+   00ED 21 18 00            409 	ld	hl,#0x0018
+   00F0 19                  410 	add	hl,de
+   00F1 5D                  411 	ld	e,l
+   00F2 54                  412 	ld	d,h
+                            413 ; genAssign (pointer)
+   00F3 3E 00               414 	ld	a,#0x00
+   00F5 12                  415 	ld	(de),a
+                            416 ;	player.c 44
+                            417 ; genAssign
+                            418 ; AOP_STK for _InitPlayer_i_1_1
+   00F6 F8 10               419 	lda	hl,16(sp)
+   00F8 36 00               420 	ld	(hl),#0x00
+                            421 ; genPlus
+                            422 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            423 ; AOP_STK for _InitPlayer_sloc3_1_0
+                            424 ; genPlusIncr
+                            425 ;	genPlusIncr failed
+   00FA F8 04               426 	lda	hl,4(sp)
+   00FC 5E                  427 	ld	e,(hl)
+   00FD 23                  428 	inc	hl
+   00FE 56                  429 	ld	d,(hl)
+   00FF 21 09 00            430 	ld	hl,#0x0009
+   0102 19                  431 	add	hl,de
+   0103 7D                  432 	ld	a,l
+   0104 54                  433 	ld	d,h
+   0105 F8 00               434 	lda	hl,0(sp)
+   0107 22                  435 	ld	(hl+),a
+   0108 72                  436 	ld	(hl),d
+                            437 ; genLabel
+   0109                     438 00101$:
+                            439 ; genCmpLt
+                            440 ; AOP_STK for _InitPlayer_i_1_1
+   0109 F8 10               441 	lda	hl,16(sp)
+   010B 7E                  442 	ld	a,(hl)
+   010C FE 08               443 	cp	#0x08
+   010E D2 3E 01            444 	jp	nc,00104$
+                            445 ;	player.c 46
+                            446 ; genPlus
+                            447 ; AOP_STK for _InitPlayer_sloc3_1_0
+                            448 ; AOP_STK for _InitPlayer_i_1_1
+                            449 ; AOP_STK for _InitPlayer_sloc2_1_0
+                            450 ;	genPlusIncr failed
+   0111 F8 00               451 	lda	hl,0(sp)
+   0113 5E                  452 	ld	e,(hl)
+   0114 23                  453 	inc	hl
+   0115 56                  454 	ld	d,(hl)
+   0116 F8 10               455 	lda	hl,16(sp)
+   0118 6E                  456 	ld	l,(hl)
+   0119 26 00               457 	ld	h,#0x00
+   011B 19                  458 	add	hl,de
+   011C 7D                  459 	ld	a,l
+   011D 54                  460 	ld	d,h
+   011E F8 02               461 	lda	hl,2(sp)
+   0120 22                  462 	ld	(hl+),a
+   0121 72                  463 	ld	(hl),d
+                            464 ; genPlus
+                            465 ; AOP_STK for _InitPlayer_sloc0_1_0
+                            466 ; AOP_STK for _InitPlayer_i_1_1
+                            467 ;	genPlusIncr failed
+   0122 F8 06               468 	lda	hl,6(sp)
+   0124 5E                  469 	ld	e,(hl)
+   0125 23                  470 	inc	hl
+   0126 56                  471 	ld	d,(hl)
+   0127 F8 10               472 	lda	hl,16(sp)
+   0129 6E                  473 	ld	l,(hl)
+   012A 26 00               474 	ld	h,#0x00
+   012C 19                  475 	add	hl,de
+   012D 5D                  476 	ld	e,l
+   012E 54                  477 	ld	d,h
+                            478 ; genPointerGet
+   012F 1A                  479 	ld	a,(de)
+   0130 4F                  480 	ld	c,a
+                            481 ; genAssign (pointer)
+                            482 ; AOP_STK for _InitPlayer_sloc2_1_0
+   0131 F8 02               483 	lda	hl,2(sp)
+   0133 5E                  484 	ld	e,(hl)
+   0134 23                  485 	inc	hl
+   0135 56                  486 	ld	d,(hl)
+   0136 79                  487 	ld	a,c
+   0137 12                  488 	ld	(de),a
+                            489 ;	player.c 44
+                            490 ; genPlus
+                            491 ; AOP_STK for _InitPlayer_i_1_1
+                            492 ; genPlusIncr
+   0138 F8 10               493 	lda	hl,16(sp)
+   013A 34                  494 	inc	(hl)
+                            495 ; genGoto
+   013B C3 09 01            496 	jp	00101$
+                            497 ; genLabel
+   013E                     498 00104$:
+                            499 ;	player.c 50
+                            500 ; genAssign
+                            501 ; AOP_STK for _InitPlayer_i_1_1
+   013E F8 10               502 	lda	hl,16(sp)
+   0140 36 00               503 	ld	(hl),#0x00
+                            504 ; genPlus
+                            505 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            506 ; AOP_STK for _InitPlayer_sloc3_1_0
+                            507 ; genPlusIncr
+                            508 ;	genPlusIncr failed
+   0142 F8 04               509 	lda	hl,4(sp)
+   0144 5E                  510 	ld	e,(hl)
+   0145 23                  511 	inc	hl
+   0146 56                  512 	ld	d,(hl)
+   0147 21 09 00            513 	ld	hl,#0x0009
+   014A 19                  514 	add	hl,de
+   014B 7D                  515 	ld	a,l
+   014C 54                  516 	ld	d,h
+   014D F8 00               517 	lda	hl,0(sp)
+   014F 22                  518 	ld	(hl+),a
+   0150 72                  519 	ld	(hl),d
+                            520 ; genLabel
+   0151                     521 00105$:
+                            522 ; genCmpLt
+                            523 ; AOP_STK for _InitPlayer_i_1_1
+   0151 F8 10               524 	lda	hl,16(sp)
+   0153 7E                  525 	ld	a,(hl)
+   0154 FE 04               526 	cp	#0x04
+   0156 D2 85 01            527 	jp	nc,00108$
+                            528 ;	player.c 52
+                            529 ; genPlus
+                            530 ; AOP_STK for _InitPlayer_sloc1_1_0
+                            531 ; AOP_STK for _InitPlayer_i_1_1
+                            532 ;	genPlusIncr failed
+   0159 F8 04               533 	lda	hl,4(sp)
+   015B 5E                  534 	ld	e,(hl)
+   015C 23                  535 	inc	hl
+   015D 56                  536 	ld	d,(hl)
+   015E F8 10               537 	lda	hl,16(sp)
+   0160 6E                  538 	ld	l,(hl)
+   0161 26 00               539 	ld	h,#0x00
+   0163 19                  540 	add	hl,de
+   0164 5D                  541 	ld	e,l
+   0165 54                  542 	ld	d,h
+                            543 ; genAssign (pointer)
+                            544 ; AOP_STK for _InitPlayer_i_1_1
+   0166 F8 10               545 	lda	hl,16(sp)
+   0168 7E                  546 	ld	a,(hl)
+   0169 12                  547 	ld	(de),a
+                            548 ;	player.c 53
+                            549 ; genPointerGet
+                            550 ; AOP_STK for _InitPlayer_sloc3_1_0
+   016A F8 00               551 	lda	hl,0(sp)
+   016C 5E                  552 	ld	e,(hl)
+   016D 23                  553 	inc	hl
+   016E 56                  554 	ld	d,(hl)
+   016F 1A                  555 	ld	a,(de)
+                            556 ; genPlus
+                            557 ; AOP_STK for _InitPlayer_i_1_1
+                            558 ;	genPlusIncr failed
+   0170 F8 10               559 	lda	hl,16(sp)
+   0172 86                  560 	add	a,(hl)
+   0173 4F                  561 	ld	c,a
+                            562 ; genIpush
+   0174 79                  563 	ld	a,c
+   0175 F5                  564 	push	af
+   0176 33                  565 	inc	sp
+                            566 ; genIpush
+                            567 ; AOP_STK for _InitPlayer_i_1_1
+   0177 7E                  568 	ld	a,(hl)
+   0178 F5                  569 	push	af
+   0179 33                  570 	inc	sp
+                            571 ; genCall
+   017A CD 00 00            572 	call	_set_sprite_tile
+   017D E8 02               573 	lda	sp,2(sp)
+                            574 ;	player.c 50
+                            575 ; genPlus
+                            576 ; AOP_STK for _InitPlayer_i_1_1
+                            577 ; genPlusIncr
+   017F F8 10               578 	lda	hl,16(sp)
+   0181 34                  579 	inc	(hl)
+                            580 ; genGoto
+   0182 C3 51 01            581 	jp	00105$
+                            582 ; genLabel
+   0185                     583 00108$:
+                            584 ;	player.c 57
+                            585 ; genIpush
+   0185 3E 5F               586 	ld	a,#0x5F
+   0187 F5                  587 	push	af
+   0188 33                  588 	inc	sp
+                            589 ; genIpush
+   0189 3E 05               590 	ld	a,#0x05
+   018B F5                  591 	push	af
+   018C 33                  592 	inc	sp
+                            593 ; genCall
+   018D CD 00 00            594 	call	_set_sprite_tile
+   0190 E8 02               595 	lda	sp,2(sp)
+                            596 ;	player.c 58
+                            597 ; genIpush
+   0192 3E 52               598 	ld	a,#0x52
+   0194 F5                  599 	push	af
+   0195 33                  600 	inc	sp
+                            601 ; genIpush
+   0196 3E 5C               602 	ld	a,#0x5C
+   0198 F5                  603 	push	af
+   0199 33                  604 	inc	sp
+                            605 ; genIpush
+   019A 3E 05               606 	ld	a,#0x05
+   019C F5                  607 	push	af
+   019D 33                  608 	inc	sp
+                            609 ; genCall
+   019E CD 00 00            610 	call	_move_sprite
+   01A1 E8 03               611 	lda	sp,3(sp)
+                            612 ;	player.c 59
+                            613 ; genAssign
+                            614 ; AOP_HL for _m_nSprayIndex
+   01A3 21 00 00            615 	ld	hl,#_m_nSprayIndex + 0
+   01A6 36 23               616 	ld	(hl),#0x23
+                            617 ; genLabel
+   01A8                     618 00109$:
+                            619 ; genEndFunction
+   01A8 E8 11               620 	lda	sp,17(sp)
+   01AA C1                  621 	pop	bc
+   01AB C9                  622 	ret
+   01AC                     623 ___InitPlayer_end:
+                            624 ;	player.c 69
+                            625 ; genLabel
+                            626 ; genFunction
+                            627 ;	---------------------------------
+                            628 ; Function UpdatePlayer
+                            629 ; ---------------------------------
+   01AC                     630 ___UpdatePlayer_start:
+   01AC                     631 _UpdatePlayer:
+   01AC C5                  632 	push	bc
+   01AD E8 F9               633 	lda	sp,-7(sp)
+                            634 ;	player.c 72
+                            635 ; genAssign
+                            636 ; AOP_STK for 
+                            637 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+   01AF F8 0B               638 	lda	hl,11(sp)
+   01B1 2A                  639 	ld	a,(hl+)
+   01B2 5E                  640 	ld	e,(hl)
+   01B3 F8 02               641 	lda	hl,2(sp)
+   01B5 22                  642 	ld	(hl+),a
+   01B6 73                  643 	ld	(hl),e
+                            644 ; genPlus
+                            645 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            646 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+                            647 ; genPlusIncr
+                            648 ;	genPlusIncr failed
+   01B7 2B                  649 	dec	hl
+   01B8 5E                  650 	ld	e,(hl)
+   01B9 23                  651 	inc	hl
+   01BA 56                  652 	ld	d,(hl)
+   01BB 21 09 00            653 	ld	hl,#0x0009
+   01BE 19                  654 	add	hl,de
+   01BF 7D                  655 	ld	a,l
+   01C0 54                  656 	ld	d,h
+   01C1 F8 04               657 	lda	hl,4(sp)
+   01C3 22                  658 	ld	(hl+),a
+   01C4 72                  659 	ld	(hl),d
+                            660 ; genPlus
+                            661 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            662 ; genPlusIncr
+                            663 ;	genPlusIncr failed
+   01C5 F8 02               664 	lda	hl,2(sp)
+   01C7 5E                  665 	ld	e,(hl)
+   01C8 23                  666 	inc	hl
+   01C9 56                  667 	ld	d,(hl)
+   01CA 21 08 00            668 	ld	hl,#0x0008
+   01CD 19                  669 	add	hl,de
+   01CE 5D                  670 	ld	e,l
+   01CF 54                  671 	ld	d,h
+                            672 ; genPointerGet
+   01D0 1A                  673 	ld	a,(de)
+   01D1 4F                  674 	ld	c,a
+                            675 ; genPlus
+                            676 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+                            677 ;	genPlusIncr failed
+   01D2 F8 04               678 	lda	hl,4(sp)
+   01D4 5E                  679 	ld	e,(hl)
+   01D5 23                  680 	inc	hl
+   01D6 56                  681 	ld	d,(hl)
+   01D7 69                  682 	ld	l,c
+   01D8 26 00               683 	ld	h,#0x00
+   01DA 19                  684 	add	hl,de
+   01DB 5D                  685 	ld	e,l
+   01DC 54                  686 	ld	d,h
+                            687 ; genPointerGet
+                            688 ; AOP_STK for _UpdatePlayer_nTile_1_1
+   01DD 1A                  689 	ld	a,(de)
+   01DE F8 06               690 	lda	hl,6(sp)
+   01E0 77                  691 	ld	(hl),a
+                            692 ;	player.c 77
+                            693 ; genPlus
+                            694 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            695 ; genPlusIncr
+                            696 ;	genPlusIncr failed
+   01E1 F8 02               697 	lda	hl,2(sp)
+   01E3 5E                  698 	ld	e,(hl)
+   01E4 23                  699 	inc	hl
+   01E5 56                  700 	ld	d,(hl)
+   01E6 21 05 00            701 	ld	hl,#0x0005
+   01E9 19                  702 	add	hl,de
+   01EA 5D                  703 	ld	e,l
+   01EB 54                  704 	ld	d,h
+                            705 ; genPointerGet
+   01EC 1A                  706 	ld	a,(de)
+   01ED 47                  707 	ld	b,a
+                            708 ; genPlus
+                            709 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            710 ; genPlusIncr
+                            711 ;	genPlusIncr failed
+   01EE F8 02               712 	lda	hl,2(sp)
+   01F0 5E                  713 	ld	e,(hl)
+   01F1 23                  714 	inc	hl
+   01F2 56                  715 	ld	d,(hl)
+   01F3 21 04 00            716 	ld	hl,#0x0004
+   01F6 19                  717 	add	hl,de
+   01F7 5D                  718 	ld	e,l
+   01F8 54                  719 	ld	d,h
+                            720 ; genPointerGet
+                            721 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+   01F9 1A                  722 	ld	a,(de)
+   01FA F8 04               723 	lda	hl,4(sp)
+   01FC 77                  724 	ld	(hl),a
+                            725 ; genPointerGet
+                            726 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+   01FD 2B                  727 	dec	hl
+   01FE 2B                  728 	dec	hl
+   01FF 5E                  729 	ld	e,(hl)
+   0200 23                  730 	inc	hl
+   0201 56                  731 	ld	d,(hl)
+   0202 1A                  732 	ld	a,(de)
+   0203 4F                  733 	ld	c,a
+                            734 ; genIpush
+   0204 78                  735 	ld	a,b
+   0205 F5                  736 	push	af
+   0206 33                  737 	inc	sp
+                            738 ; genIpush
+                            739 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+   0207 23                  740 	inc	hl
+   0208 7E                  741 	ld	a,(hl)
+   0209 F5                  742 	push	af
+   020A 33                  743 	inc	sp
+                            744 ; genIpush
+   020B 79                  745 	ld	a,c
+   020C F5                  746 	push	af
+   020D 33                  747 	inc	sp
+                            748 ; genCall
+   020E CD 00 00            749 	call	_move_sprite
+   0211 E8 03               750 	lda	sp,3(sp)
+                            751 ;	player.c 78
+                            752 ; genIpush
+                            753 ; AOP_STK for _UpdatePlayer_nTile_1_1
+   0213 F8 06               754 	lda	hl,6(sp)
+   0215 7E                  755 	ld	a,(hl)
+   0216 F5                  756 	push	af
+   0217 33                  757 	inc	sp
+                            758 ; genIpush
+   0218 79                  759 	ld	a,c
+   0219 F5                  760 	push	af
+   021A 33                  761 	inc	sp
+                            762 ; genCall
+   021B CD 00 00            763 	call	_set_sprite_tile
+   021E E8 02               764 	lda	sp,2(sp)
+                            765 ;	player.c 81
+                            766 ; genPlus
+                            767 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+                            768 ; AOP_STK for _UpdatePlayer_sloc2_1_0
+                            769 ; genPlusIncr
+                            770 ;	genPlusIncr failed
+   0220 F8 04               771 	lda	hl,4(sp)
+   0222 7E                  772 	ld	a,(hl)
+   0223 C6 08               773 	add	a,#0x08
+   0225 F8 01               774 	lda	hl,1(sp)
+                            775 ; genPlus
+                            776 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            777 ; genPlusIncr
+   0227 22                  778 	ld	(hl+),a
+   0228 5E                  779 	ld	e,(hl)
+   0229 23                  780 	inc	hl
+   022A 56                  781 	ld	d,(hl)
+   022B 13                  782 	inc	de
+                            783 ; genPointerGet
+                            784 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   022C 1A                  785 	ld	a,(de)
+   022D F8 00               786 	lda	hl,0(sp)
+   022F 77                  787 	ld	(hl),a
+                            788 ; genIpush
+   0230 78                  789 	ld	a,b
+   0231 F5                  790 	push	af
+   0232 33                  791 	inc	sp
+                            792 ; genIpush
+                            793 ; AOP_STK for _UpdatePlayer_sloc2_1_0
+   0233 23                  794 	inc	hl
+   0234 7E                  795 	ld	a,(hl)
+   0235 F5                  796 	push	af
+   0236 33                  797 	inc	sp
+                            798 ; genIpush
+                            799 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   0237 2B                  800 	dec	hl
+   0238 7E                  801 	ld	a,(hl)
+   0239 F5                  802 	push	af
+   023A 33                  803 	inc	sp
+                            804 ; genCall
+   023B CD 00 00            805 	call	_move_sprite
+   023E E8 03               806 	lda	sp,3(sp)
+                            807 ;	player.c 82
+                            808 ; genPlus
+                            809 ; AOP_STK for _UpdatePlayer_nTile_1_1
+                            810 ; genPlusIncr
+                            811 ;	genPlusIncr failed
+   0240 F8 06               812 	lda	hl,6(sp)
+   0242 7E                  813 	ld	a,(hl)
+   0243 C6 01               814 	add	a,#0x01
+   0245 4F                  815 	ld	c,a
+                            816 ; genIpush
+   0246 79                  817 	ld	a,c
+   0247 F5                  818 	push	af
+   0248 33                  819 	inc	sp
+                            820 ; genIpush
+                            821 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   0249 F8 01               822 	lda	hl,1(sp)
+   024B 7E                  823 	ld	a,(hl)
+   024C F5                  824 	push	af
+   024D 33                  825 	inc	sp
+                            826 ; genCall
+   024E CD 00 00            827 	call	_set_sprite_tile
+   0251 E8 02               828 	lda	sp,2(sp)
+                            829 ;	player.c 85
+                            830 ; genPlus
+                            831 ; genPlusIncr
+                            832 ;	genPlusIncr failed
+   0253 78                  833 	ld	a,b
+   0254 C6 08               834 	add	a,#0x08
+   0256 47                  835 	ld	b,a
+                            836 ; genPlus
+                            837 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            838 ; genPlusIncr
+   0257 F8 02               839 	lda	hl,2(sp)
+   0259 5E                  840 	ld	e,(hl)
+   025A 23                  841 	inc	hl
+   025B 56                  842 	ld	d,(hl)
+   025C 13                  843 	inc	de
+   025D 13                  844 	inc	de
+                            845 ; genPointerGet
+                            846 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   025E 1A                  847 	ld	a,(de)
+   025F F8 00               848 	lda	hl,0(sp)
+   0261 77                  849 	ld	(hl),a
+                            850 ; genIpush
+   0262 78                  851 	ld	a,b
+   0263 F5                  852 	push	af
+   0264 33                  853 	inc	sp
+                            854 ; genIpush
+                            855 ; AOP_STK for _UpdatePlayer_sloc0_1_0
+   0265 F8 05               856 	lda	hl,5(sp)
+   0267 7E                  857 	ld	a,(hl)
+   0268 F5                  858 	push	af
+   0269 33                  859 	inc	sp
+                            860 ; genIpush
+                            861 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   026A F8 02               862 	lda	hl,2(sp)
+   026C 7E                  863 	ld	a,(hl)
+   026D F5                  864 	push	af
+   026E 33                  865 	inc	sp
+                            866 ; genCall
+   026F CD 00 00            867 	call	_move_sprite
+   0272 E8 03               868 	lda	sp,3(sp)
+                            869 ;	player.c 86
+                            870 ; genPlus
+                            871 ; AOP_STK for _UpdatePlayer_nTile_1_1
+                            872 ; genPlusIncr
+                            873 ;	genPlusIncr failed
+   0274 F8 06               874 	lda	hl,6(sp)
+   0276 7E                  875 	ld	a,(hl)
+   0277 C6 02               876 	add	a,#0x02
+   0279 4F                  877 	ld	c,a
+                            878 ; genIpush
+   027A 79                  879 	ld	a,c
+   027B F5                  880 	push	af
+   027C 33                  881 	inc	sp
+                            882 ; genIpush
+                            883 ; AOP_STK for _UpdatePlayer_sloc3_1_0
+   027D F8 01               884 	lda	hl,1(sp)
+   027F 7E                  885 	ld	a,(hl)
+   0280 F5                  886 	push	af
+   0281 33                  887 	inc	sp
+                            888 ; genCall
+   0282 CD 00 00            889 	call	_set_sprite_tile
+   0285 E8 02               890 	lda	sp,2(sp)
+                            891 ;	player.c 89
+                            892 ; genPlus
+                            893 ; AOP_STK for _UpdatePlayer_sloc1_1_0
+                            894 ; genPlusIncr
+                            895 ;	genPlusIncr failed
+   0287 F8 02               896 	lda	hl,2(sp)
+   0289 5E                  897 	ld	e,(hl)
+   028A 23                  898 	inc	hl
+   028B 56                  899 	ld	d,(hl)
+   028C 21 03 00            900 	ld	hl,#0x0003
+   028F 19                  901 	add	hl,de
+   0290 5D                  902 	ld	e,l
+   0291 54                  903 	ld	d,h
+                            904 ; genPointerGet
+   0292 1A                  905 	ld	a,(de)
+   0293 4F                  906 	ld	c,a
+                            907 ; genIpush
+   0294 78                  908 	ld	a,b
+   0295 F5                  909 	push	af
+   0296 33                  910 	inc	sp
+                            911 ; genIpush
+                            912 ; AOP_STK for _UpdatePlayer_sloc2_1_0
+   0297 F8 02               913 	lda	hl,2(sp)
+   0299 7E                  914 	ld	a,(hl)
+   029A F5                  915 	push	af
+   029B 33                  916 	inc	sp
+                            917 ; genIpush
+   029C 79                  918 	ld	a,c
+   029D F5                  919 	push	af
+   029E 33                  920 	inc	sp
+                            921 ; genCall
+   029F CD 00 00            922 	call	_move_sprite
+   02A2 E8 03               923 	lda	sp,3(sp)
+                            924 ;	player.c 90
+                            925 ; genPlus
+                            926 ; AOP_STK for _UpdatePlayer_nTile_1_1
+                            927 ; genPlusIncr
+                            928 ;	genPlusIncr failed
+   02A4 F8 06               929 	lda	hl,6(sp)
+   02A6 7E                  930 	ld	a,(hl)
+   02A7 C6 03               931 	add	a,#0x03
+   02A9 47                  932 	ld	b,a
+                            933 ; genIpush
+   02AA 78                  934 	ld	a,b
+   02AB F5                  935 	push	af
+   02AC 33                  936 	inc	sp
+                            937 ; genIpush
+   02AD 79                  938 	ld	a,c
+   02AE F5                  939 	push	af
+   02AF 33                  940 	inc	sp
+                            941 ; genCall
+   02B0 CD 00 00            942 	call	_set_sprite_tile
+   02B3 E8 02               943 	lda	sp,2(sp)
+                            944 ; genLabel
+   02B5                     945 00101$:
+                            946 ; genEndFunction
+   02B5 E8 07               947 	lda	sp,7(sp)
+   02B7 C1                  948 	pop	bc
+   02B8 C9                  949 	ret
+   02B9                     950 ___UpdatePlayer_end:
+                            951 ;	player.c 101
+                            952 ; genLabel
+                            953 ; genFunction
+                            954 ;	---------------------------------
+                            955 ; Function HandlePlayerInput
+                            956 ; ---------------------------------
+   02B9                     957 ___HandlePlayerInput_start:
+   02B9                     958 _HandlePlayerInput:
+   02B9 C5                  959 	push	bc
+   02BA E8 F9               960 	lda	sp,-7(sp)
+                            961 ;	player.c 108
+                            962 ; genAnd
+                            963 ; AOP_STK for 
+                            964 ; AOP_STK for _HandlePlayerInput_sloc0_1_0
+   02BC F8 0D               965 	lda	hl,13(sp)
+   02BE 7E                  966 	ld	a,(hl)
+   02BF E6 01               967 	and	a,#0x01
+   02C1 F8 06               968 	lda	hl,6(sp)
+   02C3 77                  969 	ld	(hl),a
+                            970 ; genIfx
+                            971 ; AOP_STK for _HandlePlayerInput_sloc0_1_0
+                            972 ; Removed redundent or a,a
+   02C4 AF                  973 	xor	a,a
+   02C5 B6                  974 	or	a,(hl)
+   02C6 CA 05 03            975 	jp	z,00125$
+                            976 ; genAnd
+                            977 ; AOP_STK for 
+   02C9 F8 0D               978 	lda	hl,13(sp)
+   02CB 7E                  979 	ld	a,(hl)
+   02CC CB 5F               980 	bit	3,a
+   02CE CA 05 03            981 	jp	z,00125$
+                            982 ;	player.c 110
+                            983 ; genAssign
+                            984 ; AOP_STK for 
+   02D1 2B                  985 	dec	hl
+   02D2 2B                  986 	dec	hl
+   02D3 46                  987 	ld	b,(hl)
+   02D4 23                  988 	inc	hl
+   02D5 4E                  989 	ld	c,(hl)
+                            990 ; genPlus
+                            991 ; genPlusIncr
+                            992 ;	genPlusIncr failed
+   02D6 78                  993 	ld	a,b
+   02D7 C6 08               994 	add	a,#0x08
+   02D9 5F                  995 	ld	e,a
+   02DA 79                  996 	ld	a,c
+   02DB CE 00               997 	adc	a,#0x00
+   02DD 57                  998 	ld	d,a
+                            999 ; genAssign (pointer)
+   02DE 3E 01              1000 	ld	a,#0x01
+   02E0 12                 1001 	ld	(de),a
+                           1002 ;	player.c 111
+                           1003 ; genPlus
+                           1004 ; genPlusIncr
+                           1005 ;	genPlusIncr failed
+   02E1 78                 1006 	ld	a,b
+   02E2 C6 13              1007 	add	a,#0x13
+   02E4 5F                 1008 	ld	e,a
+   02E5 79                 1009 	ld	a,c
+   02E6 CE 00              1010 	adc	a,#0x00
+   02E8 57                 1011 	ld	d,a
+                           1012 ; genAssign (pointer)
+   02E9 3E 07              1013 	ld	a,#0x07
+   02EB 12                 1014 	ld	(de),a
+                           1015 ;	player.c 112
+                           1016 ; genAssign
+                           1017 ; AOP_HL for _m_nSprayIndex
+   02EC 21 00 00           1018 	ld	hl,#_m_nSprayIndex + 0
+   02EF 36 24              1019 	ld	(hl),#0x24
+                           1020 ;	player.c 113
+                           1021 ; genIpush
+   02F1 3E 5C              1022 	ld	a,#0x5C
+   02F3 F5                 1023 	push	af
+   02F4 33                 1024 	inc	sp
+                           1025 ; genIpush
+   02F5 3E 5A              1026 	ld	a,#0x5A
+   02F7 F5                 1027 	push	af
+   02F8 33                 1028 	inc	sp
+                           1029 ; genIpush
+   02F9 3E 05              1030 	ld	a,#0x05
+   02FB F5                 1031 	push	af
+   02FC 33                 1032 	inc	sp
+                           1033 ; genCall
+   02FD CD 00 00           1034 	call	_move_sprite
+   0300 E8 03              1035 	lda	sp,3(sp)
+                           1036 ; genGoto
+   0302 C3 C8 04           1037 	jp	00126$
+                           1038 ; genLabel
+   0305                    1039 00125$:
+                           1040 ;	player.c 117
+                           1041 ; genAnd
+                           1042 ; AOP_STK for 
+                           1043 ; AOP_STK for _HandlePlayerInput_sloc1_1_0
+   0305 F8 0D              1044 	lda	hl,13(sp)
+   0307 7E                 1045 	ld	a,(hl)
+   0308 E6 08              1046 	and	a,#0x08
+   030A F8 05              1047 	lda	hl,5(sp)
+   030C 77                 1048 	ld	(hl),a
+                           1049 ; genIfx
+                           1050 ; AOP_STK for _HandlePlayerInput_sloc1_1_0
+                           1051 ; Removed redundent or a,a
+   030D AF                 1052 	xor	a,a
+   030E B6                 1053 	or	a,(hl)
+   030F CA 4E 03           1054 	jp	z,00121$
+                           1055 ; genAnd
+                           1056 ; AOP_STK for 
+   0312 F8 0D              1057 	lda	hl,13(sp)
+   0314 7E                 1058 	ld	a,(hl)
+   0315 CB 4F              1059 	bit	1,a
+   0317 CA 4E 03           1060 	jp	z,00121$
+                           1061 ;	player.c 119
+                           1062 ; genAssign
+                           1063 ; AOP_STK for 
+   031A 2B                 1064 	dec	hl
+   031B 2B                 1065 	dec	hl
+   031C 46                 1066 	ld	b,(hl)
+   031D 23                 1067 	inc	hl
+   031E 4E                 1068 	ld	c,(hl)
+                           1069 ; genPlus
+                           1070 ; genPlusIncr
+                           1071 ;	genPlusIncr failed
+   031F 78                 1072 	ld	a,b
+   0320 C6 08              1073 	add	a,#0x08
+   0322 5F                 1074 	ld	e,a
+   0323 79                 1075 	ld	a,c
+   0324 CE 00              1076 	adc	a,#0x00
+   0326 57                 1077 	ld	d,a
+                           1078 ; genAssign (pointer)
+   0327 3E 03              1079 	ld	a,#0x03
+   0329 12                 1080 	ld	(de),a
+                           1081 ;	player.c 120
+                           1082 ; genPlus
+                           1083 ; genPlusIncr
+                           1084 ;	genPlusIncr failed
+   032A 78                 1085 	ld	a,b
+   032B C6 13              1086 	add	a,#0x13
+   032D 5F                 1087 	ld	e,a
+   032E 79                 1088 	ld	a,c
+   032F CE 00              1089 	adc	a,#0x00
+   0331 57                 1090 	ld	d,a
+                           1091 ; genAssign (pointer)
+   0332 3E 05              1092 	ld	a,#0x05
+   0334 12                 1093 	ld	(de),a
+                           1094 ;	player.c 121
+                           1095 ; genAssign
+                           1096 ; AOP_HL for _m_nSprayIndex
+   0335 21 00 00           1097 	ld	hl,#_m_nSprayIndex + 0
+   0338 36 26              1098 	ld	(hl),#0x26
+                           1099 ;	player.c 122
+                           1100 ; genIpush
+   033A 3E 5C              1101 	ld	a,#0x5C
+   033C F5                 1102 	push	af
+   033D 33                 1103 	inc	sp
+                           1104 ; genIpush
+   033E 3E 46              1105 	ld	a,#0x46
+   0340 F5                 1106 	push	af
+   0341 33                 1107 	inc	sp
+                           1108 ; genIpush
+   0342 3E 05              1109 	ld	a,#0x05
+   0344 F5                 1110 	push	af
+   0345 33                 1111 	inc	sp
+                           1112 ; genCall
+   0346 CD 00 00           1113 	call	_move_sprite
+   0349 E8 03              1114 	lda	sp,3(sp)
+                           1115 ; genGoto
+   034B C3 C8 04           1116 	jp	00126$
+                           1117 ; genLabel
+   034E                    1118 00121$:
+                           1119 ;	player.c 126
+                           1120 ; genAnd
+                           1121 ; AOP_STK for 
+                           1122 ; AOP_STK for _HandlePlayerInput_sloc2_1_0
+   034E F8 0D              1123 	lda	hl,13(sp)
+   0350 7E                 1124 	ld	a,(hl)
+   0351 E6 02              1125 	and	a,#0x02
+   0353 F8 04              1126 	lda	hl,4(sp)
+   0355 77                 1127 	ld	(hl),a
+                           1128 ; genIfx
+                           1129 ; AOP_STK for _HandlePlayerInput_sloc2_1_0
+                           1130 ; Removed redundent or a,a
+   0356 AF                 1131 	xor	a,a
+   0357 B6                 1132 	or	a,(hl)
+   0358 CA 97 03           1133 	jp	z,00117$
+                           1134 ; genAnd
+                           1135 ; AOP_STK for 
+   035B F8 0D              1136 	lda	hl,13(sp)
+   035D 7E                 1137 	ld	a,(hl)
+   035E CB 57              1138 	bit	2,a
+   0360 CA 97 03           1139 	jp	z,00117$
+                           1140 ;	player.c 128
+                           1141 ; genAssign
+                           1142 ; AOP_STK for 
+   0363 2B                 1143 	dec	hl
+   0364 2B                 1144 	dec	hl
+   0365 46                 1145 	ld	b,(hl)
+   0366 23                 1146 	inc	hl
+   0367 4E                 1147 	ld	c,(hl)
+                           1148 ; genPlus
+                           1149 ; genPlusIncr
+                           1150 ;	genPlusIncr failed
+   0368 78                 1151 	ld	a,b
+   0369 C6 08              1152 	add	a,#0x08
+   036B 5F                 1153 	ld	e,a
+   036C 79                 1154 	ld	a,c
+   036D CE 00              1155 	adc	a,#0x00
+   036F 57                 1156 	ld	d,a
+                           1157 ; genAssign (pointer)
+   0370 3E 05              1158 	ld	a,#0x05
+   0372 12                 1159 	ld	(de),a
+                           1160 ;	player.c 129
+                           1161 ; genPlus
+                           1162 ; genPlusIncr
+                           1163 ;	genPlusIncr failed
+   0373 78                 1164 	ld	a,b
+   0374 C6 13              1165 	add	a,#0x13
+   0376 5F                 1166 	ld	e,a
+   0377 79                 1167 	ld	a,c
+   0378 CE 00              1168 	adc	a,#0x00
+   037A 57                 1169 	ld	d,a
+                           1170 ; genAssign (pointer)
+   037B 3E 00              1171 	ld	a,#0x00
+   037D 12                 1172 	ld	(de),a
+                           1173 ;	player.c 130
+                           1174 ; genAssign
+                           1175 ; AOP_HL for _m_nSprayIndex
+   037E 21 00 00           1176 	ld	hl,#_m_nSprayIndex + 0
+   0381 36 28              1177 	ld	(hl),#0x28
+                           1178 ;	player.c 131
+                           1179 ; genIpush
+   0383 3E 48              1180 	ld	a,#0x48
+   0385 F5                 1181 	push	af
+   0386 33                 1182 	inc	sp
+                           1183 ; genIpush
+   0387 3E 46              1184 	ld	a,#0x46
+   0389 F5                 1185 	push	af
+   038A 33                 1186 	inc	sp
+                           1187 ; genIpush
+   038B 3E 05              1188 	ld	a,#0x05
+   038D F5                 1189 	push	af
+   038E 33                 1190 	inc	sp
+                           1191 ; genCall
+   038F CD 00 00           1192 	call	_move_sprite
+   0392 E8 03              1193 	lda	sp,3(sp)
+                           1194 ; genGoto
+   0394 C3 C8 04           1195 	jp	00126$
+                           1196 ; genLabel
+   0397                    1197 00117$:
+                           1198 ;	player.c 135
+                           1199 ; genIfx
+                           1200 ; AOP_STK for _HandlePlayerInput_sloc0_1_0
+   0397 AF                 1201 	xor	a,a
+   0398 F8 06              1202 	lda	hl,6(sp)
+   039A B6                 1203 	or	a,(hl)
+   039B B7                 1204 	or	a,a
+   039C CA DB 03           1205 	jp	z,00113$
+                           1206 ; genAnd
+                           1207 ; AOP_STK for 
+   039F F8 0D              1208 	lda	hl,13(sp)
+   03A1 7E                 1209 	ld	a,(hl)
+   03A2 CB 57              1210 	bit	2,a
+   03A4 CA DB 03           1211 	jp	z,00113$
+                           1212 ;	player.c 137
+                           1213 ; genAssign
+                           1214 ; AOP_STK for 
+   03A7 2B                 1215 	dec	hl
+   03A8 2B                 1216 	dec	hl
+   03A9 4E                 1217 	ld	c,(hl)
+   03AA 23                 1218 	inc	hl
+   03AB 46                 1219 	ld	b,(hl)
+                           1220 ; genPlus
+                           1221 ; genPlusIncr
+                           1222 ;	genPlusIncr failed
+   03AC 79                 1223 	ld	a,c
+   03AD C6 08              1224 	add	a,#0x08
+   03AF 5F                 1225 	ld	e,a
+   03B0 78                 1226 	ld	a,b
+   03B1 CE 00              1227 	adc	a,#0x00
+   03B3 57                 1228 	ld	d,a
+                           1229 ; genAssign (pointer)
+   03B4 3E 07              1230 	ld	a,#0x07
+   03B6 12                 1231 	ld	(de),a
+                           1232 ;	player.c 138
+                           1233 ; genPlus
+                           1234 ; genPlusIncr
+                           1235 ;	genPlusIncr failed
+   03B7 79                 1236 	ld	a,c
+   03B8 C6 13              1237 	add	a,#0x13
+   03BA 5F                 1238 	ld	e,a
+   03BB 78                 1239 	ld	a,b
+   03BC CE 00              1240 	adc	a,#0x00
+   03BE 57                 1241 	ld	d,a
+                           1242 ; genAssign (pointer)
+   03BF 3E 02              1243 	ld	a,#0x02
+   03C1 12                 1244 	ld	(de),a
+                           1245 ;	player.c 139
+                           1246 ; genAssign
+                           1247 ; AOP_HL for _m_nSprayIndex
+   03C2 21 00 00           1248 	ld	hl,#_m_nSprayIndex + 0
+   03C5 36 22              1249 	ld	(hl),#0x22
+                           1250 ;	player.c 140
+                           1251 ; genIpush
+   03C7 3E 48              1252 	ld	a,#0x48
+   03C9 F5                 1253 	push	af
+   03CA 33                 1254 	inc	sp
+                           1255 ; genIpush
+   03CB 3E 5A              1256 	ld	a,#0x5A
+   03CD F5                 1257 	push	af
+   03CE 33                 1258 	inc	sp
+                           1259 ; genIpush
+   03CF 3E 05              1260 	ld	a,#0x05
+   03D1 F5                 1261 	push	af
+   03D2 33                 1262 	inc	sp
+                           1263 ; genCall
+   03D3 CD 00 00           1264 	call	_move_sprite
+   03D6 E8 03              1265 	lda	sp,3(sp)
+                           1266 ; genGoto
+   03D8 C3 C8 04           1267 	jp	00126$
+                           1268 ; genLabel
+   03DB                    1269 00113$:
+                           1270 ;	player.c 144
+                           1271 ; genIfx
+                           1272 ; AOP_STK for _HandlePlayerInput_sloc0_1_0
+   03DB AF                 1273 	xor	a,a
+   03DC F8 06              1274 	lda	hl,6(sp)
+   03DE B6                 1275 	or	a,(hl)
+   03DF B7                 1276 	or	a,a
+   03E0 CA 17 04           1277 	jp	z,00110$
+                           1278 ;	player.c 146
+                           1279 ; genAssign
+                           1280 ; AOP_STK for 
+   03E3 F8 0B              1281 	lda	hl,11(sp)
+   03E5 4E                 1282 	ld	c,(hl)
+   03E6 23                 1283 	inc	hl
+   03E7 46                 1284 	ld	b,(hl)
+                           1285 ; genPlus
+                           1286 ; genPlusIncr
+                           1287 ;	genPlusIncr failed
+   03E8 79                 1288 	ld	a,c
+   03E9 C6 08              1289 	add	a,#0x08
+   03EB 5F                 1290 	ld	e,a
+   03EC 78                 1291 	ld	a,b
+   03ED CE 00              1292 	adc	a,#0x00
+   03EF 57                 1293 	ld	d,a
+                           1294 ; genAssign (pointer)
+   03F0 3E 00              1295 	ld	a,#0x00
+   03F2 12                 1296 	ld	(de),a
+                           1297 ;	player.c 147
+                           1298 ; genPlus
+                           1299 ; genPlusIncr
+                           1300 ;	genPlusIncr failed
+   03F3 79                 1301 	ld	a,c
+   03F4 C6 13              1302 	add	a,#0x13
+   03F6 5F                 1303 	ld	e,a
+   03F7 78                 1304 	ld	a,b
+   03F8 CE 00              1305 	adc	a,#0x00
+   03FA 57                 1306 	ld	d,a
+                           1307 ; genAssign (pointer)
+   03FB 3E 04              1308 	ld	a,#0x04
+   03FD 12                 1309 	ld	(de),a
+                           1310 ;	player.c 148
+                           1311 ; genAssign
+                           1312 ; AOP_HL for _m_nSprayIndex
+   03FE 21 00 00           1313 	ld	hl,#_m_nSprayIndex + 0
+   0401 36 23              1314 	ld	(hl),#0x23
+                           1315 ;	player.c 149
+                           1316 ; genIpush
+   0403 3E 52              1317 	ld	a,#0x52
+   0405 F5                 1318 	push	af
+   0406 33                 1319 	inc	sp
+                           1320 ; genIpush
+   0407 3E 5C              1321 	ld	a,#0x5C
+   0409 F5                 1322 	push	af
+   040A 33                 1323 	inc	sp
+                           1324 ; genIpush
+   040B 3E 05              1325 	ld	a,#0x05
+   040D F5                 1326 	push	af
+   040E 33                 1327 	inc	sp
+                           1328 ; genCall
+   040F CD 00 00           1329 	call	_move_sprite
+   0412 E8 03              1330 	lda	sp,3(sp)
+                           1331 ; genGoto
+   0414 C3 C8 04           1332 	jp	00126$
+                           1333 ; genLabel
+   0417                    1334 00110$:
+                           1335 ;	player.c 153
+                           1336 ; genIfx
+                           1337 ; AOP_STK for _HandlePlayerInput_sloc1_1_0
+   0417 AF                 1338 	xor	a,a
+   0418 F8 05              1339 	lda	hl,5(sp)
+   041A B6                 1340 	or	a,(hl)
+   041B B7                 1341 	or	a,a
+   041C CA 53 04           1342 	jp	z,00107$
+                           1343 ;	player.c 155
+                           1344 ; genAssign
+                           1345 ; AOP_STK for 
+   041F F8 0B              1346 	lda	hl,11(sp)
+   0421 4E                 1347 	ld	c,(hl)
+   0422 23                 1348 	inc	hl
+   0423 46                 1349 	ld	b,(hl)
+                           1350 ; genPlus
+                           1351 ; genPlusIncr
+                           1352 ;	genPlusIncr failed
+   0424 79                 1353 	ld	a,c
+   0425 C6 08              1354 	add	a,#0x08
+   0427 5F                 1355 	ld	e,a
+   0428 78                 1356 	ld	a,b
+   0429 CE 00              1357 	adc	a,#0x00
+   042B 57                 1358 	ld	d,a
+                           1359 ; genAssign (pointer)
+   042C 3E 02              1360 	ld	a,#0x02
+   042E 12                 1361 	ld	(de),a
+                           1362 ;	player.c 156
+                           1363 ; genPlus
+                           1364 ; genPlusIncr
+                           1365 ;	genPlusIncr failed
+   042F 79                 1366 	ld	a,c
+   0430 C6 13              1367 	add	a,#0x13
+   0432 5F                 1368 	ld	e,a
+   0433 78                 1369 	ld	a,b
+   0434 CE 00              1370 	adc	a,#0x00
+   0436 57                 1371 	ld	d,a
+                           1372 ; genAssign (pointer)
+   0437 3E 06              1373 	ld	a,#0x06
+   0439 12                 1374 	ld	(de),a
+                           1375 ;	player.c 157
+                           1376 ; genAssign
+                           1377 ; AOP_HL for _m_nSprayIndex
+   043A 21 00 00           1378 	ld	hl,#_m_nSprayIndex + 0
+   043D 36 25              1379 	ld	(hl),#0x25
+                           1380 ;	player.c 158
+                           1381 ; genIpush
+   043F 3E 5E              1382 	ld	a,#0x5E
+   0441 F5                 1383 	push	af
+   0442 33                 1384 	inc	sp
+                           1385 ; genIpush
+   0443 3E 50              1386 	ld	a,#0x50
+   0445 F5                 1387 	push	af
+   0446 33                 1388 	inc	sp
+                           1389 ; genIpush
+   0447 3E 05              1390 	ld	a,#0x05
+   0449 F5                 1391 	push	af
+   044A 33                 1392 	inc	sp
+                           1393 ; genCall
+   044B CD 00 00           1394 	call	_move_sprite
+   044E E8 03              1395 	lda	sp,3(sp)
+                           1396 ; genGoto
+   0450 C3 C8 04           1397 	jp	00126$
+                           1398 ; genLabel
+   0453                    1399 00107$:
+                           1400 ;	player.c 162
+                           1401 ; genIfx
+                           1402 ; AOP_STK for _HandlePlayerInput_sloc2_1_0
+   0453 AF                 1403 	xor	a,a
+   0454 F8 04              1404 	lda	hl,4(sp)
+   0456 B6                 1405 	or	a,(hl)
+   0457 B7                 1406 	or	a,a
+   0458 CA 8F 04           1407 	jp	z,00104$
+                           1408 ;	player.c 164
+                           1409 ; genAssign
+                           1410 ; AOP_STK for 
+   045B F8 0B              1411 	lda	hl,11(sp)
+   045D 4E                 1412 	ld	c,(hl)
+   045E 23                 1413 	inc	hl
+   045F 46                 1414 	ld	b,(hl)
+                           1415 ; genPlus
+                           1416 ; genPlusIncr
+                           1417 ;	genPlusIncr failed
+   0460 79                 1418 	ld	a,c
+   0461 C6 08              1419 	add	a,#0x08
+   0463 5F                 1420 	ld	e,a
+   0464 78                 1421 	ld	a,b
+   0465 CE 00              1422 	adc	a,#0x00
+   0467 57                 1423 	ld	d,a
+                           1424 ; genAssign (pointer)
+   0468 3E 04              1425 	ld	a,#0x04
+   046A 12                 1426 	ld	(de),a
+                           1427 ;	player.c 165
+                           1428 ; genPlus
+                           1429 ; genPlusIncr
+                           1430 ;	genPlusIncr failed
+   046B 79                 1431 	ld	a,c
+   046C C6 13              1432 	add	a,#0x13
+   046E 5F                 1433 	ld	e,a
+   046F 78                 1434 	ld	a,b
+   0470 CE 00              1435 	adc	a,#0x00
+   0472 57                 1436 	ld	d,a
+                           1437 ; genAssign (pointer)
+   0473 3E 03              1438 	ld	a,#0x03
+   0475 12                 1439 	ld	(de),a
+                           1440 ;	player.c 166
+                           1441 ; genAssign
+                           1442 ; AOP_HL for _m_nSprayIndex
+   0476 21 00 00           1443 	ld	hl,#_m_nSprayIndex + 0
+   0479 36 27              1444 	ld	(hl),#0x27
+                           1445 ;	player.c 167
+                           1446 ; genIpush
+   047B 3E 52              1447 	ld	a,#0x52
+   047D F5                 1448 	push	af
+   047E 33                 1449 	inc	sp
+                           1450 ; genIpush
+   047F 3E 44              1451 	ld	a,#0x44
+   0481 F5                 1452 	push	af
+   0482 33                 1453 	inc	sp
+                           1454 ; genIpush
+   0483 3E 05              1455 	ld	a,#0x05
+   0485 F5                 1456 	push	af
+   0486 33                 1457 	inc	sp
+                           1458 ; genCall
+   0487 CD 00 00           1459 	call	_move_sprite
+   048A E8 03              1460 	lda	sp,3(sp)
+                           1461 ; genGoto
+   048C C3 C8 04           1462 	jp	00126$
+                           1463 ; genLabel
+   048F                    1464 00104$:
+                           1465 ;	player.c 172
+                           1466 ; genAnd
+                           1467 ; AOP_STK for 
+   048F F8 0D              1468 	lda	hl,13(sp)
+   0491 7E                 1469 	ld	a,(hl)
+   0492 CB 57              1470 	bit	2,a
+   0494 CA C8 04           1471 	jp	z,00126$
+                           1472 ;	player.c 174
+                           1473 ; genAssign
+                           1474 ; AOP_STK for 
+   0497 2B                 1475 	dec	hl
+   0498 2B                 1476 	dec	hl
+   0499 4E                 1477 	ld	c,(hl)
+   049A 23                 1478 	inc	hl
+   049B 46                 1479 	ld	b,(hl)
+                           1480 ; genPlus
+                           1481 ; genPlusIncr
+                           1482 ;	genPlusIncr failed
+   049C 79                 1483 	ld	a,c
+   049D C6 08              1484 	add	a,#0x08
+   049F 5F                 1485 	ld	e,a
+   04A0 78                 1486 	ld	a,b
+   04A1 CE 00              1487 	adc	a,#0x00
+   04A3 57                 1488 	ld	d,a
+                           1489 ; genAssign (pointer)
+   04A4 3E 06              1490 	ld	a,#0x06
+   04A6 12                 1491 	ld	(de),a
+                           1492 ;	player.c 175
+                           1493 ; genPlus
+                           1494 ; genPlusIncr
+                           1495 ;	genPlusIncr failed
+   04A7 79                 1496 	ld	a,c
+   04A8 C6 13              1497 	add	a,#0x13
+   04AA 5F                 1498 	ld	e,a
+   04AB 78                 1499 	ld	a,b
+   04AC CE 00              1500 	adc	a,#0x00
+   04AE 57                 1501 	ld	d,a
+                           1502 ; genAssign (pointer)
+   04AF 3E 01              1503 	ld	a,#0x01
+   04B1 12                 1504 	ld	(de),a
+                           1505 ;	player.c 176
+                           1506 ; genAssign
+                           1507 ; AOP_HL for _m_nSprayIndex
+   04B2 21 00 00           1508 	ld	hl,#_m_nSprayIndex + 0
+   04B5 36 21              1509 	ld	(hl),#0x21
+                           1510 ;	player.c 177
+                           1511 ; genIpush
+   04B7 3E 46              1512 	ld	a,#0x46
+   04B9 F5                 1513 	push	af
+   04BA 33                 1514 	inc	sp
+                           1515 ; genIpush
+   04BB 3E 50              1516 	ld	a,#0x50
+   04BD F5                 1517 	push	af
+   04BE 33                 1518 	inc	sp
+                           1519 ; genIpush
+   04BF 3E 05              1520 	ld	a,#0x05
+   04C1 F5                 1521 	push	af
+   04C2 33                 1522 	inc	sp
+                           1523 ; genCall
+   04C3 CD 00 00           1524 	call	_move_sprite
+   04C6 E8 03              1525 	lda	sp,3(sp)
+                           1526 ; genLabel
+   04C8                    1527 00126$:
+                           1528 ;	player.c 184
+                           1529 ; genAnd
+                           1530 ; AOP_STK for 
+   04C8 F8 0D              1531 	lda	hl,13(sp)
+   04CA 7E                 1532 	ld	a,(hl)
+   04CB CB 6F              1533 	bit	5,a
+   04CD CA 3D 05           1534 	jp	z,00131$
+                           1535 ; genAnd
+                           1536 ; AOP_STK for 
+   04D0 23                 1537 	inc	hl
+   04D1 7E                 1538 	ld	a,(hl)
+   04D2 CB 6F              1539 	bit	5,a
+   04D4 C2 3D 05           1540 	jp	nz,00131$
+                           1541 ;	player.c 187
+                           1542 ; genIfx
+                           1543 ; AOP_HL for _m_bButtonBPressed
+   04D7 AF                 1544 	xor	a,a
+   04D8 21 01 00           1545 	ld	hl,#_m_bButtonBPressed + 0
+   04DB B6                 1546 	or	a,(hl)
+   04DC B7                 1547 	or	a,a
+   04DD C2 2D 05           1548 	jp	nz,00129$
+                           1549 ;	player.c 190
+                           1550 ; genAssign
+                           1551 ; AOP_HL for _m_bButtonBPressed
+   04E0 36 01              1552 	ld	(hl),#0x01
+                           1553 ;	player.c 193
+                           1554 ; genAssign
+                           1555 ; AOP_STK for 
+   04E2 F8 0B              1556 	lda	hl,11(sp)
+   04E4 4E                 1557 	ld	c,(hl)
+   04E5 23                 1558 	inc	hl
+   04E6 46                 1559 	ld	b,(hl)
+                           1560 ; genPlus
+                           1561 ; AOP_STK for _HandlePlayerInput_sloc4_1_0
+                           1562 ; genPlusIncr
+                           1563 ;	genPlusIncr failed
+   04E7 21 16 00           1564 	ld	hl,#0x0016
+   04EA 09                 1565 	add	hl,bc
+   04EB 7D                 1566 	ld	a,l
+   04EC 54                 1567 	ld	d,h
+   04ED F8 00              1568 	lda	hl,0(sp)
+   04EF 22                 1569 	ld	(hl+),a
+   04F0 72                 1570 	ld	(hl),d
+                           1571 ; genPointerGet
+                           1572 ; AOP_STK for _HandlePlayerInput_sloc4_1_0
+                           1573 ; AOP_STK for _HandlePlayerInput_sloc3_1_0
+   04F1 2B                 1574 	dec	hl
+   04F2 5E                 1575 	ld	e,(hl)
+   04F3 23                 1576 	inc	hl
+   04F4 56                 1577 	ld	d,(hl)
+   04F5 1A                 1578 	ld	a,(de)
+   04F6 23                 1579 	inc	hl
+   04F7 77                 1580 	ld	(hl),a
+   04F8 13                 1581 	inc	de
+   04F9 1A                 1582 	ld	a,(de)
+   04FA 23                 1583 	inc	hl
+   04FB 77                 1584 	ld	(hl),a
+                           1585 ; genPlus
+                           1586 ; AOP_STK for _HandlePlayerInput_sloc3_1_0
+                           1587 ; genPlusIncr
+   04FC 2B                 1588 	dec	hl
+   04FD 4E                 1589 	ld	c,(hl)
+   04FE 23                 1590 	inc	hl
+   04FF 46                 1591 	ld	b,(hl)
+   0500 03                 1592 	inc	bc
+                           1593 ; genAssign (pointer)
+                           1594 ; AOP_STK for _HandlePlayerInput_sloc4_1_0
+   0501 F8 00              1595 	lda	hl,0(sp)
+   0503 5E                 1596 	ld	e,(hl)
+   0504 23                 1597 	inc	hl
+   0505 56                 1598 	ld	d,(hl)
+   0506 79                 1599 	ld	a,c
+   0507 12                 1600 	ld	(de),a
+   0508 13                 1601 	inc	de
+   0509 78                 1602 	ld	a,b
+   050A 12                 1603 	ld	(de),a
+                           1604 ;	player.c 196
+                           1605 ; genAssign
+                           1606 ; AOP_SFR for _NR41_REG
+   050B 3E 2D              1607 	ld	a,#0x2D
+   050D E0 00              1608 	ldh	(_NR41_REG+0),a
+                           1609 ;	player.c 197
+                           1610 ; genAssign
+                           1611 ; AOP_SFR for _NR42_REG
+   050F 3E 81              1612 	ld	a,#0x81
+   0511 E0 00              1613 	ldh	(_NR42_REG+0),a
+                           1614 ;	player.c 198
+                           1615 ; genAssign
+                           1616 ; AOP_SFR for _NR43_REG
+   0513 3E 10              1617 	ld	a,#0x10
+   0515 E0 00              1618 	ldh	(_NR43_REG+0),a
+                           1619 ;	player.c 199
+                           1620 ; genAssign
+                           1621 ; AOP_SFR for _NR44_REG
+   0517 3E 80              1622 	ld	a,#0x80
+   0519 E0 00              1623 	ldh	(_NR44_REG+0),a
+                           1624 ;	player.c 202
+                           1625 ; genIpush
+                           1626 ; AOP_HL for _m_nSprayIndex
+   051B 21 00 00           1627 	ld	hl,#_m_nSprayIndex + 0
+   051E 7E                 1628 	ld	a,(hl)
+   051F F5                 1629 	push	af
+   0520 33                 1630 	inc	sp
+                           1631 ; genIpush
+   0521 3E 05              1632 	ld	a,#0x05
+   0523 F5                 1633 	push	af
+   0524 33                 1634 	inc	sp
+                           1635 ; genCall
+   0525 CD 00 00           1636 	call	_set_sprite_tile
+   0528 E8 02              1637 	lda	sp,2(sp)
+                           1638 ;	player.c 203
+                           1639 ; genRet
+   052A C3 5A 05           1640 	jp	00134$
+                           1641 ; genLabel
+   052D                    1642 00129$:
+                           1643 ;	player.c 207
+                           1644 ; genIpush
+   052D 3E 5F              1645 	ld	a,#0x5F
+   052F F5                 1646 	push	af
+   0530 33                 1647 	inc	sp
+                           1648 ; genIpush
+   0531 3E 05              1649 	ld	a,#0x05
+   0533 F5                 1650 	push	af
+   0534 33                 1651 	inc	sp
+                           1652 ; genCall
+   0535 CD 00 00           1653 	call	_set_sprite_tile
+   0538 E8 02              1654 	lda	sp,2(sp)
+                           1655 ; genGoto
+   053A C3 4F 05           1656 	jp	00132$
+                           1657 ; genLabel
+   053D                    1658 00131$:
+                           1659 ;	player.c 213
+                           1660 ; genAssign
+                           1661 ; AOP_HL for _m_bButtonBPressed
+   053D 21 01 00           1662 	ld	hl,#_m_bButtonBPressed + 0
+   0540 36 00              1663 	ld	(hl),#0x00
+                           1664 ;	player.c 216
+                           1665 ; genIpush
+   0542 3E 5F              1666 	ld	a,#0x5F
+   0544 F5                 1667 	push	af
+   0545 33                 1668 	inc	sp
+                           1669 ; genIpush
+   0546 3E 05              1670 	ld	a,#0x05
+   0548 F5                 1671 	push	af
+   0549 33                 1672 	inc	sp
+                           1673 ; genCall
+   054A CD 00 00           1674 	call	_set_sprite_tile
+   054D E8 02              1675 	lda	sp,2(sp)
+                           1676 ; genLabel
+   054F                    1677 00132$:
+                           1678 ;	player.c 220
+                           1679 ; genIpush
+                           1680 ; AOP_STK for 
+   054F F8 0B              1681 	lda	hl,11(sp)
+   0551 2A                 1682 	ld	a,(hl+)
+   0552 66                 1683 	ld	h,(hl)
+   0553 6F                 1684 	ld	l,a
+   0554 E5                 1685 	push	hl
+                           1686 ; genCall
+   0555 CD AC 01           1687 	call	_UpdatePlayer
+   0558 E8 02              1688 	lda	sp,2(sp)
+                           1689 ; genLabel
+   055A                    1690 00134$:
+                           1691 ; genEndFunction
+   055A E8 07              1692 	lda	sp,7(sp)
+   055C C1                 1693 	pop	bc
+   055D C9                 1694 	ret
+   055E                    1695 ___HandlePlayerInput_end:
+                           1696 ;	player.c 229
+                           1697 ; genLabel
+                           1698 ; genFunction
+                           1699 ;	---------------------------------
+                           1700 ; Function IsPlayerDead
+                           1701 ; ---------------------------------
+   055E                    1702 ___IsPlayerDead_start:
+   055E                    1703 _IsPlayerDead:
+   055E C5                 1704 	push	bc
+                           1705 	
+                           1706 ;	player.c 231
+                           1707 ; genAssign
+                           1708 ; AOP_STK for 
+   055F F8 04              1709 	lda	hl,4(sp)
+   0561 4E                 1710 	ld	c,(hl)
+   0562 23                 1711 	inc	hl
+   0563 46                 1712 	ld	b,(hl)
+                           1713 ; genPlus
+                           1714 ; genPlusIncr
+                           1715 ;	genPlusIncr failed
+   0564 79                 1716 	ld	a,c
+   0565 C6 11              1717 	add	a,#0x11
+   0567 5F                 1718 	ld	e,a
+   0568 78                 1719 	ld	a,b
+   0569 CE 00              1720 	adc	a,#0x00
+   056B 57                 1721 	ld	d,a
+                           1722 ; genPointerGet
+                           1723 ; Removed redundent load
+                           1724 ; Removed redundent load
+   056C 1A                 1725 	ld	a,(de)
+   056D 4F                 1726 	ld	c,a
+   056E 13                 1727 	inc	de
+   056F 1A                 1728 	ld	a,(de)
+   0570 47                 1729 	ld	b,a
+                           1730 ; genCmpGt
+   0571 21 01 00           1731 	ld	hl,#0x0001
+   0574 09                 1732 	add	hl,bc
+   0575 3E 00              1733 	ld	a,#0x00
+   0577 17                 1734 	rla
+   0578 4F                 1735 	ld	c,a
+                           1736 ; genNot
+   0579 AF                 1737 	xor	a,a
+   057A B1                 1738 	or	a,c
+   057B D6 01              1739 	sub	a,#0x01
+   057D 3E 00              1740 	ld	a,#0x00
+   057F 17                 1741 	rla
+   0580 4F                 1742 	ld	c,a
+                           1743 ; genRet
+   0581 59                 1744 	ld	e,c
+                           1745 ; genLabel
+   0582                    1746 00101$:
+                           1747 ; genEndFunction
+                           1748 	
+   0582 C1                 1749 	pop	bc
+   0583 C9                 1750 	ret
+   0584                    1751 ___IsPlayerDead_end:
+                           1752 	.area _CODE
+ASxxxx Assembler V01.75  (GameBoy Z80-like CPU), page 1.
+
+Symbol Table
+
+    _BCPD_REG                          **** GX
+    _BCPS_REG                          **** GX
+    _BGP_REG                           **** GX
+    _DIV_REG                           **** GX
+    _DMA_REG                           **** GX
+    _HDMA1_REG                         **** GX
+    _HDMA2_REG                         **** GX
+    _HDMA3_REG                         **** GX
+    _HDMA4_REG                         **** GX
+    _HDMA5_REG                         **** GX
+  0 _HandlePlayerInput                 02B9 GR
+    _IE_REG                            **** GX
+    _IF_REG                            **** GX
+  0 _InitPlayer                        0000 GR
+  0 _IsPlayerDead                      055E GR
+    _KEY1_REG                          **** GX
+    _LCDC_REG                          **** GX
+    _LYC_REG                           **** GX
+    _LY_REG                            **** GX
+    _NR10_REG                          **** GX
+    _NR11_REG                          **** GX
+    _NR12_REG                          **** GX
+    _NR13_REG                          **** GX
+    _NR14_REG                          **** GX
+    _NR21_REG                          **** GX
+    _NR22_REG                          **** GX
+    _NR23_REG                          **** GX
+    _NR24_REG                          **** GX
+    _NR30_REG                          **** GX
+    _NR31_REG                          **** GX
+    _NR32_REG                          **** GX
+    _NR33_REG                          **** GX
+    _NR34_REG                          **** GX
+    _NR41_REG                          **** GX
+    _NR42_REG                          **** GX
+    _NR43_REG                          **** GX
+    _NR44_REG                          **** GX
+    _NR50_REG                          **** GX
+    _NR51_REG                          **** GX
+    _NR52_REG                          **** GX
+    _OBP0_REG                          **** GX
+    _OBP1_REG                          **** GX
+    _OCPD_REG                          **** GX
+    _OCPS_REG                          **** GX
+    _P1_REG                            **** GX
+    _RP_REG                            **** GX
+    _SB_REG                            **** GX
+    _SCX_REG                           **** GX
+    _SCY_REG                           **** GX
+    _SC_REG                            **** GX
+    _STAT_REG                          **** GX
+    _SVBK_REG                          **** GX
+    _TAC_REG                           **** GX
+    _TIMA_REG                          **** GX
+    _TMA_REG                           **** GX
+  0 _UpdatePlayer                      01AC GR
+    _VBK_REG                           **** GX
+    _WX_REG                            **** GX
+    _WY_REG                            **** GX
+  0 ___HandlePlayerInput_end           055E R
+  0 ___HandlePlayerInput_start         02B9 R
+  0 ___InitPlayer_end                  01AC R
+  0 ___InitPlayer_start                0000 R
+  0 ___IsPlayerDead_end                0584 R
+  0 ___IsPlayerDead_start              055E R
+  0 ___UpdatePlayer_end                02B9 R
+  0 ___UpdatePlayer_start              01AC R
+    __cpu                              **** GX
+    __io_in                            **** GX
+    __io_out                           **** GX
+    __io_status                        **** GX
+  1 _m_bButtonBPressed                 0001 R
+  1 _m_nSprayIndex                     0000 R
+    _move_sprite                       **** GX
+    _set_sprite_tile                   **** GX
+    _sys_time                          **** GX
+
+ASxxxx Assembler V01.75  (GameBoy Z80-like CPU), page 2.
+
+Area Table
+
+   0 _CODE                              size  584   flags 0
+   1 _DATA                              size    2   flags 0
+   2 _OVERLAY                           size    0   flags 0
+   3 _ISEG                              size    0   flags 0
+   4 _BSEG                              size    0   flags 0
+   5 _XSEG                              size    0   flags 0
+   6 _GSINIT                            size    A   flags 0
+   7 _GSFINAL                           size    0   flags 0
+   8 _HOME                              size    0   flags 0

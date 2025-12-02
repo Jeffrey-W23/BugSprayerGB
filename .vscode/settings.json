@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "font.h": "c",
+        "health.h": "c",
+        "player.c": "cpp",
+        "hud.h": "c",
+        "player.h": "c",
+        "enemies.h": "c",
+        "gb.h": "c"
+    }
+}
