@@ -24,7 +24,7 @@ static UINT8 m_anSpawnQueue[SPAWN_QUEUE_SIZE];
 static UINT8 m_nSpawnQueuePos = 0;
 
 // New unsigned int 8 for the current speed of all enemies in the game.
-static UINT8 m_nCurrentSpeed = 11;
+static UINT8 m_nCurrentSpeed = 1;
 
 // New unsigned int 16 for tracking the total enemies killed in the game.
 static UINT16 m_nTotalKilled = 0;
@@ -73,7 +73,7 @@ static const INT8 m_anMovementDirY[8] = {1,  1,  1,  0,  0, -1, -1, -1};
 UINT8 m_nSpawnTimer = 0;
 
 // New unsigned int 8 for keeping track of the current spawn delay for all enemies.
-UINT8 m_nSpawnDelay = 8;
+UINT8 m_nSpawnDelay = 100;
 
 // New bool value for if the kill auido has been requested for playing.
 BOOLEAN m_bPlayKillSoundEffect = FALSE;
