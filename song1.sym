@@ -9,32 +9,31 @@ Symbol Table
     .__.H$L.                                                    =   00000000 L
   0 _P0                                                             00000001 R
   0 _P1                                                             000000C1 R
-  0 _P10                                                            00000601 R
-  0 _P11                                                            000006C1 R
-  0 _P12                                                            00000781 R
-  0 _P13                                                            00000841 R
-  0 _P14                                                            00000901 R
-  0 _P15                                                            000009C1 R
+  0 _P10                                                            00000541 R
+  0 _P11                                                            00000601 R
+  0 _P12                                                            000006C1 R
+  0 _P13                                                            00000781 R
+  0 _P14                                                            00000841 R
+  0 _P15                                                            00000901 R
   0 _P2                                                             00000181 R
-  0 _P20                                                            00000A81 R
-  0 _P21                                                            00000B41 R
-  0 _P22                                                            00000C01 R
-  0 _P23                                                            00000CC1 R
-  0 _P4                                                             00000241 R
-  0 _P5                                                             00000301 R
-  0 _P6                                                             000003C1 R
-  0 _P8                                                             00000481 R
-  0 _P9                                                             00000541 R
-  0 _duty_instruments                                               00000DA9 R
-  0 _noise_instruments                                              00000DE5 R
-  0 _order1                                                         00000D81 R
-  0 _order2                                                         00000D8B R
-  0 _order3                                                         00000D95 R
-  0 _order4                                                         00000D9F R
+  0 _P20                                                            000009C1 R
+  0 _P21                                                            00000A81 R
+  0 _P22                                                            00000B41 R
+  0 _P23                                                            00000C01 R
+  0 _P5                                                             00000241 R
+  0 _P6                                                             00000301 R
+  0 _P8                                                             000003C1 R
+  0 _P9                                                             00000481 R
+  0 _duty_instruments                                               00000CE9 R
+  0 _noise_instruments                                              00000D25 R
+  0 _order1                                                         00000CC1 R
+  0 _order2                                                         00000CCB R
+  0 _order3                                                         00000CD5 R
+  0 _order4                                                         00000CDF R
   0 _order_cnt                                                      00000000 R
-  0 _song1                                                          00000E59 GR
-  0 _wave_instruments                                               00000DC7 R
-  0 _waves                                                          00000E09 R
+  0 _song1                                                          00000D99 GR
+  0 _wave_instruments                                               00000D07 R
+  0 _waves                                                          00000D49 R
 
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
@@ -42,7 +41,7 @@ Hexadecimal [32-Bits]
 
 Area Table
 
-   0 _CODE                                      size      E6E   flags    0
+   0 _CODE                                      size      DAE   flags    0
    1 _DATA                                      size        0   flags    0
    2 _INITIALIZED                               size        0   flags    0
    3 _DABS                                      size        0   flags    8
