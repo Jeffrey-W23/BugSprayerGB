@@ -9671,396 +9671,433 @@
                                    9661 ; Function main
                                    9662 ; ---------------------------------
     00002795                       9663 _main::
-    00002795 E8 FA            [16] 9664 	add	sp, #-6
+    00002795 E8 F8            [16] 9664 	add	sp, #-8
                                    9665 ;main.c:620: BOOLEAN bPaused = FALSE;
-    00002797 F8 02            [12] 9666 	ldhl	sp,	#2
-                                   9667 ;main.c:621: UINT8 nBlinkTimer = 0;
-    00002799 AF               [ 4] 9668 	xor	a, a
-    0000279A 22               [ 8] 9669 	ld	(hl+), a
-    0000279B 23               [ 8] 9670 	inc	hl
+    00002797 F8 00            [12] 9666 	ldhl	sp,	#0
+    00002799 36 00            [12] 9667 	ld	(hl), #0x00
+                                   9668 ;main.c:621: UINT8 nBlinkTimer = 0;
+    0000279B F8 07            [12] 9669 	ldhl	sp,	#7
+    0000279D 36 00            [12] 9670 	ld	(hl), #0x00
                                    9671 ;main.c:622: UINT8 nBlinkState = 0;  
-    0000279C AF               [ 4] 9672 	xor	a, a
-    0000279D 32               [ 8] 9673 	ld	(hl-), a
-    0000279E 77               [ 8] 9674 	ld	(hl), a
-                                   9675 ;main.c:626: Initialize();
-    0000279F CDr8Er26         [24] 9676 	call	_Initialize
-                                   9677 ;main.c:629: while(1) 
-    000027A2                       9678 00135$:
-                                   9679 ;main.c:632: if (m_oPlayer.nHealth == 0)
-    000027A2 21r11r00         [12] 9680 	ld	hl, #(_m_oPlayer + 17)
-    000027A5 2A               [ 8] 9681 	ld	a, (hl+)
-                                   9682 ;main.c:638: if (m_oPlayer.nScore > m_nLoadedScore) 
-                                   9683 ;main.c:632: if (m_oPlayer.nHealth == 0)
-    000027A6 B6               [ 8] 9684 	or	a, (hl)
-    000027A7 20 2C            [12] 9685 	jr	NZ, 00104$
-                                   9686 ;main.c:635: SetHealth(0);
-    000027A9 11 00 00         [12] 9687 	ld	de, #0x0000
-    000027AC CDr00r00         [24] 9688 	call	_SetHealth
-                                   9689 ;main.c:638: if (m_oPlayer.nScore > m_nLoadedScore) 
-    000027AF 11r14r00         [12] 9690 	ld	de, #(_m_oPlayer + 20)
-    000027B2 1A               [ 8] 9691 	ld	a, (de)
-    000027B3 F8 00            [12] 9692 	ldhl	sp,	#0
-    000027B5 22               [ 8] 9693 	ld	(hl+), a
-    000027B6 13               [ 8] 9694 	inc	de
-    000027B7 1A               [ 8] 9695 	ld	a, (de)
-    000027B8 32               [ 8] 9696 	ld	(hl-), a
-    000027B9 11r04r00         [12] 9697 	ld	de, #_m_nLoadedScore
-    000027BC 1A               [ 8] 9698 	ld	a, (de)
-    000027BD 13               [ 8] 9699 	inc	de
-    000027BE 96               [ 8] 9700 	sub	a, (hl)
-    000027BF 23               [ 8] 9701 	inc	hl
-    000027C0 1A               [ 8] 9702 	ld	a, (de)
-    000027C1 9E               [ 8] 9703 	sbc	a, (hl)
-    000027C2 30 0E            [12] 9704 	jr	NC, 00102$
-                                   9705 ;main.c:641: SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
-    000027C4 21r16r00         [12] 9706 	ld	hl, #_m_oPlayer + 22
-    000027C7 2A               [ 8] 9707 	ld	a, (hl+)
-    000027C8 4F               [ 4] 9708 	ld	c, a
-    000027C9 46               [ 8] 9709 	ld	b, (hl)
-    000027CA D1               [12] 9710 	pop	de
-    000027CB D5               [16] 9711 	push	de
-    000027CC CDr00r00         [24] 9712 	call	_SaveGameData
-                                   9713 ;main.c:642: LoadHighScoreData();
-    000027CF CDr5Er26         [24] 9714 	call	_LoadHighScoreData
-    000027D2                       9715 00102$:
-                                   9716 ;main.c:646: DisplayGameOverScreen();
-    000027D2 CDr9Cr23         [24] 9717 	call	_DisplayGameOverScreen
-    000027D5                       9718 00104$:
-                                   9719 ;main.c:650: m_nJoy = joypad();
-    000027D5 CDr00r00         [24] 9720 	call	_joypad
-    000027D8 21r19r00         [12] 9721 	ld	hl, #_m_nJoy
-    000027DB 77               [ 8] 9722 	ld	(hl), a
-                                   9723 ;main.c:653: if ((m_nJoy & J_START) && !(m_nPrevJoy & J_START))
-    000027DC 7E               [ 8] 9724 	ld	a, (hl)
-    000027DD 07               [ 4] 9725 	rlca
-    000027DE D2r6Cr28         [16] 9726 	jp	NC, 00109$
-    000027E1 FAr1Ar00         [16] 9727 	ld	a, (_m_nPrevJoy)
-    000027E4 07               [ 4] 9728 	rlca
-    000027E5 DAr6Cr28         [16] 9729 	jp	C, 00109$
-                                   9730 ;main.c:658: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xD6; NR14_REG = 0x86;
-    000027E8 3E 78            [ 8] 9731 	ld	a, #0x78
-    000027EA E0r00            [12] 9732 	ldh	(_NR10_REG + 0), a
-    000027EC 3E 82            [ 8] 9733 	ld	a, #0x82
-    000027EE E0r00            [12] 9734 	ldh	(_NR11_REG + 0), a
-    000027F0 3E 44            [ 8] 9735 	ld	a, #0x44
-    000027F2 E0r00            [12] 9736 	ldh	(_NR12_REG + 0), a
-    000027F4 3E D6            [ 8] 9737 	ld	a, #0xd6
-    000027F6 E0r00            [12] 9738 	ldh	(_NR13_REG + 0), a
-    000027F8 3E 86            [ 8] 9739 	ld	a, #0x86
-    000027FA E0r00            [12] 9740 	ldh	(_NR14_REG + 0), a
-                                   9741 ;main.c:659: PerformantDelay(3);
-    000027FC 3E 03            [ 8] 9742 	ld	a, #0x03
-    000027FE CDr86r1F         [24] 9743 	call	_PerformantDelay
-                                   9744 ;main.c:662: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x54; NR14_REG = 0x86;
-    00002801 3E 78            [ 8] 9745 	ld	a, #0x78
-    00002803 E0r00            [12] 9746 	ldh	(_NR10_REG + 0), a
-    00002805 3E 82            [ 8] 9747 	ld	a, #0x82
-    00002807 E0r00            [12] 9748 	ldh	(_NR11_REG + 0), a
-    00002809 3E 44            [ 8] 9749 	ld	a, #0x44
-    0000280B E0r00            [12] 9750 	ldh	(_NR12_REG + 0), a
-    0000280D 3E 54            [ 8] 9751 	ld	a, #0x54
-    0000280F E0r00            [12] 9752 	ldh	(_NR13_REG + 0), a
-    00002811 3E 86            [ 8] 9753 	ld	a, #0x86
-    00002813 E0r00            [12] 9754 	ldh	(_NR14_REG + 0), a
-                                   9755 ;main.c:663: PerformantDelay(3);
-    00002815 3E 03            [ 8] 9756 	ld	a, #0x03
-    00002817 CDr86r1F         [24] 9757 	call	_PerformantDelay
-                                   9758 ;main.c:666: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x9D; NR14_REG = 0x86;
-    0000281A 3E 78            [ 8] 9759 	ld	a, #0x78
-    0000281C E0r00            [12] 9760 	ldh	(_NR10_REG + 0), a
-    0000281E 3E 82            [ 8] 9761 	ld	a, #0x82
-    00002820 E0r00            [12] 9762 	ldh	(_NR11_REG + 0), a
-    00002822 3E 44            [ 8] 9763 	ld	a, #0x44
-    00002824 E0r00            [12] 9764 	ldh	(_NR12_REG + 0), a
-    00002826 3E 9D            [ 8] 9765 	ld	a, #0x9d
-    00002828 E0r00            [12] 9766 	ldh	(_NR13_REG + 0), a
-    0000282A 3E 86            [ 8] 9767 	ld	a, #0x86
-    0000282C E0r00            [12] 9768 	ldh	(_NR14_REG + 0), a
-                                   9769 ;main.c:669: bPaused = !bPaused;
-    0000282E F8 02            [12] 9770 	ldhl	sp,	#2
-    00002830 7E               [ 8] 9771 	ld	a, (hl)
-    00002831 D6 01            [ 8] 9772 	sub	a, #0x01
-    00002833 3E 00            [ 8] 9773 	ld	a, #0x00
-    00002835 17               [ 4] 9774 	rla
-                                   9775 ;main.c:670: nBlinkTimer = 0;
-    00002836 22               [ 8] 9776 	ld	(hl+), a
-    00002837 23               [ 8] 9777 	inc	hl
-                                   9778 ;main.c:671: nBlinkState = 0;
-    00002838 AF               [ 4] 9779 	xor	a, a
-    00002839 32               [ 8] 9780 	ld	(hl-), a
-                                   9781 ;main.c:672: BGP_REG = 0xE4;
-                                   9782 ;main.c:675: if (bPaused)
-    0000283A 32               [ 8] 9783 	ld	(hl-), a
-    0000283B 3E E4            [ 8] 9784 	ld	a, #0xe4
-    0000283D E0r00            [12] 9785 	ldh	(_BGP_REG + 0), a
-    0000283F 7E               [ 8] 9786 	ld	a, (hl)
-    00002840 B7               [ 4] 9787 	or	a, a
-    00002841 28 16            [12] 9788 	jr	Z, 00106$
-                                   9789 ;main.c:677: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
-    00002843 1E 01            [ 8] 9790 	ld	e, #0x01
-    00002845 AF               [ 4] 9791 	xor	a, a
-    00002846 CDr00r00         [24] 9792 	call	_hUGE_mute_channel
-                                   9793 ;main.c:678: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
-    00002849 1E 01            [ 8] 9794 	ld	e, #0x01
-    0000284B 3E 02            [ 8] 9795 	ld	a, #0x02
-    0000284D CDr00r00         [24] 9796 	call	_hUGE_mute_channel
-                                   9797 ;main.c:679: hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
-    00002850 1E 01            [ 8] 9798 	ld	e, #0x01
-    00002852 3E 03            [ 8] 9799 	ld	a, #0x03
-    00002854 CDr00r00         [24] 9800 	call	_hUGE_mute_channel
-    00002857 18 13            [12] 9801 	jr	00109$
-    00002859                       9802 00106$:
-                                   9803 ;main.c:683: hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
-    00002859 AF               [ 4] 9804 	xor	a, a
-    0000285A 5F               [ 4] 9805 	ld	e, a
-    0000285B CDr00r00         [24] 9806 	call	_hUGE_mute_channel
-                                   9807 ;main.c:684: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
-    0000285E 1E 00            [ 8] 9808 	ld	e, #0x00
-    00002860 3E 02            [ 8] 9809 	ld	a, #0x02
-    00002862 CDr00r00         [24] 9810 	call	_hUGE_mute_channel
-                                   9811 ;main.c:685: hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
-    00002865 1E 00            [ 8] 9812 	ld	e, #0x00
-    00002867 3E 03            [ 8] 9813 	ld	a, #0x03
-    00002869 CDr00r00         [24] 9814 	call	_hUGE_mute_channel
-    0000286C                       9815 00109$:
-                                   9816 ;main.c:690: if (!bPaused)
-    0000286C F8 02            [12] 9817 	ldhl	sp,	#2
-    0000286E 7E               [ 8] 9818 	ld	a, (hl)
-    0000286F B7               [ 4] 9819 	or	a, a
-    00002870 C2r5Fr29         [16] 9820 	jp	NZ, 00132$
-                                   9821 ;main.c:693: HandlePlayerInput(&m_oPlayer, m_nJoy);
-    00002873 FAr19r00         [16] 9822 	ld	a, (_m_nJoy)
-    00002876 11r00r00         [12] 9823 	ld	de, #_m_oPlayer
-    00002879 CDr00r00         [24] 9824 	call	_HandlePlayerInput
-                                   9825 ;main.c:696: TickSpawnTimer();
-    0000287C CDr00r00         [24] 9826 	call	_TickSpawnTimer
-                                   9827 ;main.c:699: if (m_nSpawnTimer <= 0) 
-    0000287F FAr00r00         [16] 9828 	ld	a, (#_m_nSpawnTimer)
-    00002882 B7               [ 4] 9829 	or	a, a
-    00002883 20 09            [12] 9830 	jr	NZ, 00149$
-                                   9831 ;main.c:702: SpawnNext();
-    00002885 CDr00r00         [24] 9832 	call	_SpawnNext
-                                   9833 ;main.c:705: m_nSpawnTimer = m_nSpawnDelay;
-    00002888 FAr00r00         [16] 9834 	ld	a, (#_m_nSpawnDelay)
-    0000288B EAr00r00         [16] 9835 	ld	(#_m_nSpawnTimer),a
-                                   9836 ;main.c:709: for (o = 0; o < MAX_ENEMIES; o++) 
-    0000288E                       9837 00149$:
-    0000288E F8 05            [12] 9838 	ldhl	sp,	#5
-    00002890 36 00            [12] 9839 	ld	(hl), #0x00
-    00002892                       9840 00137$:
-                                   9841 ;main.c:712: if (IsEnemyAlive(o)) 
-    00002892 F8 05            [12] 9842 	ldhl	sp,	#5
-    00002894 7E               [ 8] 9843 	ld	a, (hl)
-    00002895 CDr00r00         [24] 9844 	call	_IsEnemyAlive
-    00002898 B7               [ 4] 9845 	or	a, a
-    00002899 28 09            [12] 9846 	jr	Z, 00138$
-                                   9847 ;main.c:715: UpdateEnemy(o, &m_oPlayer);
-    0000289B 11r00r00         [12] 9848 	ld	de, #_m_oPlayer
-    0000289E F8 05            [12] 9849 	ldhl	sp,	#5
-    000028A0 7E               [ 8] 9850 	ld	a, (hl)
-    000028A1 CDr00r00         [24] 9851 	call	_UpdateEnemy
-    000028A4                       9852 00138$:
-                                   9853 ;main.c:709: for (o = 0; o < MAX_ENEMIES; o++) 
-    000028A4 F8 05            [12] 9854 	ldhl	sp,	#5
-    000028A6 34               [12] 9855 	inc	(hl)
-    000028A7 7E               [ 8] 9856 	ld	a, (hl)
-    000028A8 D6 10            [ 8] 9857 	sub	a, #0x10
-    000028AA 38 E6            [12] 9858 	jr	C, 00137$
-                                   9859 ;main.c:720: IncreaseDifficulty();
-    000028AC CDr00r00         [24] 9860 	call	_IncreaseDifficulty
-                                   9861 ;main.c:723: ShowSprayEffect(m_bShowSpray);
-    000028AF FAr00r00         [16] 9862 	ld	a, (_m_bShowSpray)
-    000028B2 CDr00r00         [24] 9863 	call	_ShowSprayEffect
-                                   9864 ;main.c:727: if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
-    000028B5 21r00r00         [12] 9865 	ld	hl, #_m_bPlayKillSoundEffect
-    000028B8 7E               [ 8] 9866 	ld	a, (hl)
-    000028B9 B7               [ 4] 9867 	or	a, a
-    000028BA 28 2C            [12] 9868 	jr	Z, 00117$
-    000028BC FAr18r00         [16] 9869 	ld	a, (#(_m_oPlayer + 24) + 0)
-    000028BF B7               [ 4] 9870 	or	a, a
-    000028C0 20 26            [12] 9871 	jr	NZ, 00117$
-                                   9872 ;main.c:730: NR21_REG = 0x84;
-    000028C2 3E 84            [ 8] 9873 	ld	a, #0x84
-    000028C4 E0r00            [12] 9874 	ldh	(_NR21_REG + 0), a
-                                   9875 ;main.c:731: NR22_REG = 0x26;
-    000028C6 3E 26            [ 8] 9876 	ld	a, #0x26
-    000028C8 E0r00            [12] 9877 	ldh	(_NR22_REG + 0), a
-                                   9878 ;main.c:732: NR23_REG = 0x2D;
-    000028CA 3E 2D            [ 8] 9879 	ld	a, #0x2d
-    000028CC E0r00            [12] 9880 	ldh	(_NR23_REG + 0), a
-                                   9881 ;main.c:733: NR24_REG = 0x81;
-    000028CE 3E 81            [ 8] 9882 	ld	a, #0x81
-    000028D0 E0r00            [12] 9883 	ldh	(_NR24_REG + 0), a
-                                   9884 ;main.c:735: NR41_REG = 0x05;
-    000028D2 3E 05            [ 8] 9885 	ld	a, #0x05
-    000028D4 E0r00            [12] 9886 	ldh	(_NR41_REG + 0), a
-                                   9887 ;main.c:736: NR41_REG = 0xA7;
-    000028D6 3E A7            [ 8] 9888 	ld	a, #0xa7
-    000028D8 E0r00            [12] 9889 	ldh	(_NR41_REG + 0), a
-                                   9890 ;main.c:737: NR41_REG = 0xC0;
-    000028DA 3E C0            [ 8] 9891 	ld	a, #0xc0
-    000028DC E0r00            [12] 9892 	ldh	(_NR41_REG + 0), a
-                                   9893 ;main.c:738: NR41_REG = 0xC0;
-    000028DE 3E C0            [ 8] 9894 	ld	a, #0xc0
-    000028E0 E0r00            [12] 9895 	ldh	(_NR41_REG + 0), a
-                                   9896 ;main.c:741: m_bPlayKillSoundEffect = FALSE;
-    000028E2 36 00            [12] 9897 	ld	(hl), #0x00
-                                   9898 ;main.c:744: m_bShowSpray = FALSE;
-    000028E4 AF               [ 4] 9899 	xor	a, a
-    000028E5 EAr00r00         [16] 9900 	ld	(#_m_bShowSpray),a
-    000028E8                       9901 00117$:
-                                   9902 ;main.c:748: nCurrentHealth = m_oPlayer.nHealth / 10;
-    000028E8 21r11r00         [12] 9903 	ld	hl, #(_m_oPlayer + 17)
-    000028EB 2A               [ 8] 9904 	ld	a,	(hl+)
-    000028EC 66               [ 8] 9905 	ld	h, (hl)
-    000028ED 5F               [ 4] 9906 	ld	e, a
-    000028EE 01 0A 00         [12] 9907 	ld	bc, #0x000a
-    000028F1 54               [ 4] 9908 	ld	d, h
-                                   9909 ;main.c:749: nCurrentScore = m_oPlayer.nScore;
-    000028F2 CDr00r00         [24] 9910 	call	__divuint
-    000028F5 E1               [12] 9911 	pop	hl
-    000028F6 C5               [16] 9912 	push	bc
-    000028F7 21r14r00         [12] 9913 	ld	hl, #(_m_oPlayer + 20)
-    000028FA 2A               [ 8] 9914 	ld	a, (hl+)
-    000028FB 4F               [ 4] 9915 	ld	c, a
-    000028FC 46               [ 8] 9916 	ld	b, (hl)
-                                   9917 ;main.c:752: if (m_oPlayer.bTakenDamage)
-    000028FD FAr18r00         [16] 9918 	ld	a, (#(_m_oPlayer + 24) + 0)
-    00002900 B7               [ 4] 9919 	or	a, a
-    00002901 28 19            [12] 9920 	jr	Z, 00120$
-                                   9921 ;main.c:755: NR10_REG = 0x0D;
-    00002903 3E 0D            [ 8] 9922 	ld	a, #0x0d
-    00002905 E0r00            [12] 9923 	ldh	(_NR10_REG + 0), a
-                                   9924 ;main.c:756: NR11_REG = 0xC2;
-    00002907 3E C2            [ 8] 9925 	ld	a, #0xc2
-    00002909 E0r00            [12] 9926 	ldh	(_NR11_REG + 0), a
-                                   9927 ;main.c:757: NR12_REG = 0x54;
-    0000290B 3E 54            [ 8] 9928 	ld	a, #0x54
-    0000290D E0r00            [12] 9929 	ldh	(_NR12_REG + 0), a
-                                   9930 ;main.c:758: NR13_REG = 0x63;
-    0000290F 3E 63            [ 8] 9931 	ld	a, #0x63
-    00002911 E0r00            [12] 9932 	ldh	(_NR13_REG + 0), a
-                                   9933 ;main.c:759: NR14_REG = 0x82;
-    00002913 3E 82            [ 8] 9934 	ld	a, #0x82
-    00002915 E0r00            [12] 9935 	ldh	(_NR14_REG + 0), a
-                                   9936 ;main.c:762: m_oPlayer.bTakenDamage = FALSE;
-    00002917 21r18r00         [12] 9937 	ld	hl, #(_m_oPlayer + 24)
-    0000291A 36 00            [12] 9938 	ld	(hl), #0x00
-    0000291C                       9939 00120$:
-                                   9940 ;main.c:766: if (nCurrentHealth != m_nPrevHealth)
-    0000291C F8 00            [12] 9941 	ldhl	sp,	#0
-    0000291E 7E               [ 8] 9942 	ld	a, (hl)
-    0000291F 21r00r00         [12] 9943 	ld	hl, #_m_nPrevHealth
-    00002922 96               [ 8] 9944 	sub	a, (hl)
-    00002923 20 09            [12] 9945 	jr	NZ, 00285$
-    00002925 F8 01            [12] 9946 	ldhl	sp,	#1
-    00002927 7E               [ 8] 9947 	ld	a, (hl)
-    00002928 21r01r00         [12] 9948 	ld	hl, #_m_nPrevHealth + 1
-    0000292B 96               [ 8] 9949 	sub	a, (hl)
-    0000292C 28 16            [12] 9950 	jr	Z, 00122$
-    0000292E                       9951 00285$:
-                                   9952 ;main.c:769: SetHealth(nCurrentHealth);
-    0000292E C5               [16] 9953 	push	bc
-    0000292F F8 02            [12] 9954 	ldhl	sp,	#2
-    00002931 2A               [ 8] 9955 	ld	a, (hl+)
-    00002932 5F               [ 4] 9956 	ld	e, a
-    00002933 56               [ 8] 9957 	ld	d, (hl)
-    00002934 CDr00r00         [24] 9958 	call	_SetHealth
-    00002937 C1               [12] 9959 	pop	bc
-                                   9960 ;main.c:772: m_nPrevHealth = nCurrentHealth;
-    00002938 F8 00            [12] 9961 	ldhl	sp,	#0
-    0000293A 7E               [ 8] 9962 	ld	a, (hl)
-    0000293B EAr00r00         [16] 9963 	ld	(#_m_nPrevHealth),a
-    0000293E F8 01            [12] 9964 	ldhl	sp,	#1
-    00002940 7E               [ 8] 9965 	ld	a, (hl)
-    00002941 EAr01r00         [16] 9966 	ld	(#_m_nPrevHealth + 1),a
-    00002944                       9967 00122$:
-                                   9968 ;main.c:776: if (nCurrentScore != m_nPrevScore) 
-    00002944 21r02r00         [12] 9969 	ld	hl, #_m_nPrevScore
-    00002947 7E               [ 8] 9970 	ld	a, (hl)
-    00002948 91               [ 4] 9971 	sub	a, c
-    00002949 20 05            [12] 9972 	jr	NZ, 00286$
-    0000294B 23               [ 8] 9973 	inc	hl
-    0000294C 7E               [ 8] 9974 	ld	a, (hl)
-    0000294D 90               [ 4] 9975 	sub	a, b
-    0000294E 28 46            [12] 9976 	jr	Z, 00133$
-    00002950                       9977 00286$:
-                                   9978 ;main.c:779: SetScore(nCurrentScore);
-    00002950 C5               [16] 9979 	push	bc
-    00002951 59               [ 4] 9980 	ld	e, c
-    00002952 50               [ 4] 9981 	ld	d, b
-    00002953 CDr00r00         [24] 9982 	call	_SetScore
-    00002956 C1               [12] 9983 	pop	bc
-                                   9984 ;main.c:782: m_nPrevScore = nCurrentScore;
-    00002957 21r02r00         [12] 9985 	ld	hl, #_m_nPrevScore
-    0000295A 79               [ 4] 9986 	ld	a, c
-    0000295B 22               [ 8] 9987 	ld	(hl+), a
-    0000295C 70               [ 8] 9988 	ld	(hl), b
-    0000295D 18 37            [12] 9989 	jr	00133$
-    0000295F                       9990 00132$:
-                                   9991 ;main.c:790: nBlinkTimer++;
-    0000295F F8 04            [12] 9992 	ldhl	sp,	#4
-    00002961 34               [12] 9993 	inc	(hl)
-                                   9994 ;main.c:792: if (nBlinkTimer >= 20) 
-    00002962 7E               [ 8] 9995 	ld	a, (hl)
-    00002963 D6 14            [ 8] 9996 	sub	a, #0x14
-    00002965 38 2F            [12] 9997 	jr	C, 00133$
-                                   9998 ;main.c:794: nBlinkTimer = 0;
-                                   9999 ;main.c:795: nBlinkState = (nBlinkState + 1) % 3;
-    00002967 AF               [ 4]10000 	xor	a, a
-    00002968 32               [ 8]10001 	ld	(hl-), a
-    00002969 7E               [ 8]10002 	ld	a, (hl)
-    0000296A 3C               [ 4]10003 	inc	a
-    0000296B 1E 03            [ 8]10004 	ld	e, #0x03
-    0000296D CDr00r00         [24]10005 	call	__moduchar
-    00002970 F8 03            [12]10006 	ldhl	sp,	#3
-    00002972 71               [ 8]10007 	ld	(hl), c
-                                  10008 ;main.c:797: switch(nBlinkState) 
-    00002973 7E               [ 8]10009 	ld	a, (hl)
-    00002974 B7               [ 4]10010 	or	a, a
-    00002975 28 0F            [12]10011 	jr	Z, 00125$
-    00002977 F8 03            [12]10012 	ldhl	sp,	#3
-    00002979 7E               [ 8]10013 	ld	a, (hl)
-    0000297A 3D               [ 4]10014 	dec	a
-    0000297B 28 0F            [12]10015 	jr	Z, 00126$
-    0000297D F8 03            [12]10016 	ldhl	sp,	#3
-    0000297F 7E               [ 8]10017 	ld	a, (hl)
-    00002980 D6 02            [ 8]10018 	sub	a, #0x02
-    00002982 28 0E            [12]10019 	jr	Z, 00127$
-    00002984 18 10            [12]10020 	jr	00133$
-                                  10021 ;main.c:799: case 0: BGP_REG = 0xE4; break;  // Normal
-    00002986                      10022 00125$:
-    00002986 3E E4            [ 8]10023 	ld	a, #0xe4
-    00002988 E0r00            [12]10024 	ldh	(_BGP_REG + 0), a
-    0000298A 18 0A            [12]10025 	jr	00133$
-                                  10026 ;main.c:800: case 1: BGP_REG = 0xB0; break;  // Dims
-    0000298C                      10027 00126$:
-    0000298C 3E B0            [ 8]10028 	ld	a, #0xb0
-    0000298E E0r00            [12]10029 	ldh	(_BGP_REG + 0), a
-    00002990 18 04            [12]10030 	jr	00133$
-                                  10031 ;main.c:801: case 2: BGP_REG = 0xE4; break;  // Normal
-    00002992                      10032 00127$:
-    00002992 3E E4            [ 8]10033 	ld	a, #0xe4
-    00002994 E0r00            [12]10034 	ldh	(_BGP_REG + 0), a
-                                  10035 ;main.c:802: }
-    00002996                      10036 00133$:
-                                  10037 ;main.c:807: m_nPrevJoy = m_nJoy;
-    00002996 FAr19r00         [16]10038 	ld	a, (#_m_nJoy)
-    00002999 EAr1Ar00         [16]10039 	ld	(#_m_nPrevJoy),a
-                                  10040 ;main.c:811: wait_vbl_done();
-    0000299C CDr00r00         [24]10041 	call	_wait_vbl_done
-    0000299F C3rA2r27         [16]10042 	jp	00135$
-                                  10043 ;main.c:813: }
-    000029A2 E8 06            [16]10044 	add	sp, #6
-    000029A4 C9               [16]10045 	ret
-                                  10046 	.area _CODE
-                                  10047 	.area _INITIALIZER
-    00000000                      10048 __xinit__m_nPrevHealth:
-    00000000 0F 27                10049 	.dw #0x270f
-    00000002                      10050 __xinit__m_nPrevScore:
-    00000002 0F 27                10051 	.dw #0x270f
-    00000004                      10052 __xinit__m_nLoadedScore:
-    00000004 00 00                10053 	.dw #0x0000
-    00000006                      10054 __xinit__m_nLoadedShotsTaken:
-    00000006 00 00                10055 	.dw #0x0000
-                                  10056 	.area _CABS (ABS)
+    0000279F F8 01            [12] 9672 	ldhl	sp,	#1
+    000027A1 36 00            [12] 9673 	ld	(hl), #0x00
+                                   9674 ;main.c:626: Initialize();
+    000027A3 CDr8Er26         [24] 9675 	call	_Initialize
+                                   9676 ;main.c:629: while(1) 
+    000027A6                       9677 00135$:
+                                   9678 ;main.c:632: if (m_oPlayer.nHealth == 0)
+    000027A6 21r11r00         [12] 9679 	ld	hl, #(_m_oPlayer + 17)
+    000027A9 2A               [ 8] 9680 	ld	a, (hl+)
+                                   9681 ;main.c:644: if (m_oPlayer.nScore > m_nLoadedScore) 
+                                   9682 ;main.c:632: if (m_oPlayer.nHealth == 0)
+    000027AA B6               [ 8] 9683 	or	a, (hl)
+    000027AB 20 42            [12] 9684 	jr	NZ, 00104$
+                                   9685 ;main.c:635: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+    000027AD 1E 01            [ 8] 9686 	ld	e, #0x01
+    000027AF AF               [ 4] 9687 	xor	a, a
+    000027B0 CDr00r00         [24] 9688 	call	_hUGE_mute_channel
+                                   9689 ;main.c:636: hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+    000027B3 3E 01            [ 8] 9690 	ld	a,#0x01
+    000027B5 5F               [ 4] 9691 	ld	e,a
+    000027B6 CDr00r00         [24] 9692 	call	_hUGE_mute_channel
+                                   9693 ;main.c:637: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+    000027B9 1E 01            [ 8] 9694 	ld	e, #0x01
+    000027BB 3E 02            [ 8] 9695 	ld	a, #0x02
+    000027BD CDr00r00         [24] 9696 	call	_hUGE_mute_channel
+                                   9697 ;main.c:641: SetHealth(0);
+    000027C0 11 00 00         [12] 9698 	ld	de, #0x0000
+    000027C3 CDr00r00         [24] 9699 	call	_SetHealth
+                                   9700 ;main.c:644: if (m_oPlayer.nScore > m_nLoadedScore) 
+    000027C6 11r14r00         [12] 9701 	ld	de, #(_m_oPlayer + 20)
+    000027C9 1A               [ 8] 9702 	ld	a, (de)
+    000027CA F8 05            [12] 9703 	ldhl	sp,	#5
+    000027CC 22               [ 8] 9704 	ld	(hl+), a
+    000027CD 13               [ 8] 9705 	inc	de
+    000027CE 1A               [ 8] 9706 	ld	a, (de)
+    000027CF 32               [ 8] 9707 	ld	(hl-), a
+    000027D0 11r04r00         [12] 9708 	ld	de, #_m_nLoadedScore
+    000027D3 1A               [ 8] 9709 	ld	a, (de)
+    000027D4 13               [ 8] 9710 	inc	de
+    000027D5 96               [ 8] 9711 	sub	a, (hl)
+    000027D6 23               [ 8] 9712 	inc	hl
+    000027D7 1A               [ 8] 9713 	ld	a, (de)
+    000027D8 9E               [ 8] 9714 	sbc	a, (hl)
+    000027D9 30 11            [12] 9715 	jr	NC, 00102$
+                                   9716 ;main.c:647: SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+    000027DB 21r16r00         [12] 9717 	ld	hl, #_m_oPlayer + 22
+    000027DE 2A               [ 8] 9718 	ld	a, (hl+)
+    000027DF 4F               [ 4] 9719 	ld	c, a
+    000027E0 46               [ 8] 9720 	ld	b, (hl)
+    000027E1 F8 05            [12] 9721 	ldhl	sp,	#5
+    000027E3 2A               [ 8] 9722 	ld	a, (hl+)
+    000027E4 5F               [ 4] 9723 	ld	e, a
+    000027E5 56               [ 8] 9724 	ld	d, (hl)
+    000027E6 CDr00r00         [24] 9725 	call	_SaveGameData
+                                   9726 ;main.c:648: LoadHighScoreData();
+    000027E9 CDr5Er26         [24] 9727 	call	_LoadHighScoreData
+    000027EC                       9728 00102$:
+                                   9729 ;main.c:652: DisplayGameOverScreen();
+    000027EC CDr9Cr23         [24] 9730 	call	_DisplayGameOverScreen
+    000027EF                       9731 00104$:
+                                   9732 ;main.c:656: m_nJoy = joypad();
+    000027EF CDr00r00         [24] 9733 	call	_joypad
+    000027F2 21r19r00         [12] 9734 	ld	hl, #_m_nJoy
+    000027F5 77               [ 8] 9735 	ld	(hl), a
+                                   9736 ;main.c:659: if ((m_nJoy & J_START) && !(m_nPrevJoy & J_START))
+    000027F6 7E               [ 8] 9737 	ld	a, (hl)
+    000027F7 07               [ 4] 9738 	rlca
+    000027F8 D2r8Ar28         [16] 9739 	jp	NC, 00109$
+    000027FB FAr1Ar00         [16] 9740 	ld	a, (_m_nPrevJoy)
+    000027FE 07               [ 4] 9741 	rlca
+    000027FF DAr8Ar28         [16] 9742 	jp	C, 00109$
+                                   9743 ;main.c:664: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xD6; NR14_REG = 0x86;
+    00002802 3E 78            [ 8] 9744 	ld	a, #0x78
+    00002804 E0r00            [12] 9745 	ldh	(_NR10_REG + 0), a
+    00002806 3E 82            [ 8] 9746 	ld	a, #0x82
+    00002808 E0r00            [12] 9747 	ldh	(_NR11_REG + 0), a
+    0000280A 3E 44            [ 8] 9748 	ld	a, #0x44
+    0000280C E0r00            [12] 9749 	ldh	(_NR12_REG + 0), a
+    0000280E 3E D6            [ 8] 9750 	ld	a, #0xd6
+    00002810 E0r00            [12] 9751 	ldh	(_NR13_REG + 0), a
+    00002812 3E 86            [ 8] 9752 	ld	a, #0x86
+    00002814 E0r00            [12] 9753 	ldh	(_NR14_REG + 0), a
+                                   9754 ;main.c:665: PerformantDelay(3);
+    00002816 3E 03            [ 8] 9755 	ld	a, #0x03
+    00002818 CDr86r1F         [24] 9756 	call	_PerformantDelay
+                                   9757 ;main.c:668: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x54; NR14_REG = 0x86;
+    0000281B 3E 78            [ 8] 9758 	ld	a, #0x78
+    0000281D E0r00            [12] 9759 	ldh	(_NR10_REG + 0), a
+    0000281F 3E 82            [ 8] 9760 	ld	a, #0x82
+    00002821 E0r00            [12] 9761 	ldh	(_NR11_REG + 0), a
+    00002823 3E 44            [ 8] 9762 	ld	a, #0x44
+    00002825 E0r00            [12] 9763 	ldh	(_NR12_REG + 0), a
+    00002827 3E 54            [ 8] 9764 	ld	a, #0x54
+    00002829 E0r00            [12] 9765 	ldh	(_NR13_REG + 0), a
+    0000282B 3E 86            [ 8] 9766 	ld	a, #0x86
+    0000282D E0r00            [12] 9767 	ldh	(_NR14_REG + 0), a
+                                   9768 ;main.c:669: PerformantDelay(3);
+    0000282F 3E 03            [ 8] 9769 	ld	a, #0x03
+    00002831 CDr86r1F         [24] 9770 	call	_PerformantDelay
+                                   9771 ;main.c:672: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x9D; NR14_REG = 0x86;
+    00002834 3E 78            [ 8] 9772 	ld	a, #0x78
+    00002836 E0r00            [12] 9773 	ldh	(_NR10_REG + 0), a
+    00002838 3E 82            [ 8] 9774 	ld	a, #0x82
+    0000283A E0r00            [12] 9775 	ldh	(_NR11_REG + 0), a
+    0000283C 3E 44            [ 8] 9776 	ld	a, #0x44
+    0000283E E0r00            [12] 9777 	ldh	(_NR12_REG + 0), a
+    00002840 3E 9D            [ 8] 9778 	ld	a, #0x9d
+    00002842 E0r00            [12] 9779 	ldh	(_NR13_REG + 0), a
+    00002844 3E 86            [ 8] 9780 	ld	a, #0x86
+    00002846 E0r00            [12] 9781 	ldh	(_NR14_REG + 0), a
+                                   9782 ;main.c:675: bPaused = !bPaused;
+    00002848 F8 00            [12] 9783 	ldhl	sp,	#0
+    0000284A 7E               [ 8] 9784 	ld	a, (hl)
+    0000284B D6 01            [ 8] 9785 	sub	a, #0x01
+    0000284D 3E 00            [ 8] 9786 	ld	a, #0x00
+    0000284F 17               [ 4] 9787 	rla
+    00002850 77               [ 8] 9788 	ld	(hl), a
+                                   9789 ;main.c:676: nBlinkTimer = 0;
+    00002851 F8 07            [12] 9790 	ldhl	sp,	#7
+    00002853 36 00            [12] 9791 	ld	(hl), #0x00
+                                   9792 ;main.c:677: nBlinkState = 0;
+    00002855 F8 01            [12] 9793 	ldhl	sp,	#1
+                                   9794 ;main.c:678: BGP_REG = 0xE4;
+                                   9795 ;main.c:681: if (bPaused)
+    00002857 AF               [ 4] 9796 	xor	a, a
+    00002858 32               [ 8] 9797 	ld	(hl-), a
+    00002859 3E E4            [ 8] 9798 	ld	a, #0xe4
+    0000285B E0r00            [12] 9799 	ldh	(_BGP_REG + 0), a
+    0000285D 7E               [ 8] 9800 	ld	a, (hl)
+    0000285E B7               [ 4] 9801 	or	a, a
+    0000285F 28 16            [12] 9802 	jr	Z, 00106$
+                                   9803 ;main.c:683: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+    00002861 1E 01            [ 8] 9804 	ld	e, #0x01
+    00002863 AF               [ 4] 9805 	xor	a, a
+    00002864 CDr00r00         [24] 9806 	call	_hUGE_mute_channel
+                                   9807 ;main.c:684: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+    00002867 1E 01            [ 8] 9808 	ld	e, #0x01
+    00002869 3E 02            [ 8] 9809 	ld	a, #0x02
+    0000286B CDr00r00         [24] 9810 	call	_hUGE_mute_channel
+                                   9811 ;main.c:685: hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+    0000286E 1E 01            [ 8] 9812 	ld	e, #0x01
+    00002870 3E 03            [ 8] 9813 	ld	a, #0x03
+    00002872 CDr00r00         [24] 9814 	call	_hUGE_mute_channel
+    00002875 18 13            [12] 9815 	jr	00109$
+    00002877                       9816 00106$:
+                                   9817 ;main.c:689: hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
+    00002877 AF               [ 4] 9818 	xor	a, a
+    00002878 5F               [ 4] 9819 	ld	e, a
+    00002879 CDr00r00         [24] 9820 	call	_hUGE_mute_channel
+                                   9821 ;main.c:690: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+    0000287C 1E 00            [ 8] 9822 	ld	e, #0x00
+    0000287E 3E 02            [ 8] 9823 	ld	a, #0x02
+    00002880 CDr00r00         [24] 9824 	call	_hUGE_mute_channel
+                                   9825 ;main.c:691: hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
+    00002883 1E 00            [ 8] 9826 	ld	e, #0x00
+    00002885 3E 03            [ 8] 9827 	ld	a, #0x03
+    00002887 CDr00r00         [24] 9828 	call	_hUGE_mute_channel
+    0000288A                       9829 00109$:
+                                   9830 ;main.c:696: if (!bPaused)
+    0000288A F8 00            [12] 9831 	ldhl	sp,	#0
+    0000288C 7E               [ 8] 9832 	ld	a, (hl)
+    0000288D B7               [ 4] 9833 	or	a, a
+    0000288E C2rADr29         [16] 9834 	jp	NZ, 00132$
+                                   9835 ;main.c:699: HandlePlayerInput(&m_oPlayer, m_nJoy);
+    00002891 FAr19r00         [16] 9836 	ld	a, (_m_nJoy)
+    00002894 11r00r00         [12] 9837 	ld	de, #_m_oPlayer
+    00002897 CDr00r00         [24] 9838 	call	_HandlePlayerInput
+                                   9839 ;main.c:702: TickSpawnTimer();
+    0000289A CDr00r00         [24] 9840 	call	_TickSpawnTimer
+                                   9841 ;main.c:705: if (m_nSpawnTimer <= 0) 
+    0000289D FAr00r00         [16] 9842 	ld	a, (#_m_nSpawnTimer)
+    000028A0 B7               [ 4] 9843 	or	a, a
+    000028A1 20 09            [12] 9844 	jr	NZ, 00149$
+                                   9845 ;main.c:708: SpawnNext();
+    000028A3 CDr00r00         [24] 9846 	call	_SpawnNext
+                                   9847 ;main.c:711: m_nSpawnTimer = m_nSpawnDelay;
+    000028A6 FAr00r00         [16] 9848 	ld	a, (#_m_nSpawnDelay)
+    000028A9 EAr00r00         [16] 9849 	ld	(#_m_nSpawnTimer),a
+                                   9850 ;main.c:715: for (o = 0; o < MAX_ENEMIES; o++) 
+    000028AC                       9851 00149$:
+    000028AC F8 06            [12] 9852 	ldhl	sp,	#6
+    000028AE 36 00            [12] 9853 	ld	(hl), #0x00
+    000028B0                       9854 00137$:
+                                   9855 ;main.c:718: if (IsEnemyAlive(o)) 
+    000028B0 F8 06            [12] 9856 	ldhl	sp,	#6
+    000028B2 7E               [ 8] 9857 	ld	a, (hl)
+    000028B3 CDr00r00         [24] 9858 	call	_IsEnemyAlive
+    000028B6 B7               [ 4] 9859 	or	a, a
+    000028B7 28 09            [12] 9860 	jr	Z, 00138$
+                                   9861 ;main.c:721: UpdateEnemy(o, &m_oPlayer);
+    000028B9 11r00r00         [12] 9862 	ld	de, #_m_oPlayer
+    000028BC F8 06            [12] 9863 	ldhl	sp,	#6
+    000028BE 7E               [ 8] 9864 	ld	a, (hl)
+    000028BF CDr00r00         [24] 9865 	call	_UpdateEnemy
+    000028C2                       9866 00138$:
+                                   9867 ;main.c:715: for (o = 0; o < MAX_ENEMIES; o++) 
+    000028C2 F8 06            [12] 9868 	ldhl	sp,	#6
+    000028C4 34               [12] 9869 	inc	(hl)
+    000028C5 7E               [ 8] 9870 	ld	a, (hl)
+    000028C6 D6 10            [ 8] 9871 	sub	a, #0x10
+    000028C8 38 E6            [12] 9872 	jr	C, 00137$
+                                   9873 ;main.c:726: IncreaseDifficulty();
+    000028CA CDr00r00         [24] 9874 	call	_IncreaseDifficulty
+                                   9875 ;main.c:729: ShowSprayEffect(m_bShowSpray);
+    000028CD FAr00r00         [16] 9876 	ld	a, (_m_bShowSpray)
+    000028D0 CDr00r00         [24] 9877 	call	_ShowSprayEffect
+                                   9878 ;main.c:733: if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
+    000028D3 FAr00r00         [16] 9879 	ld	a, (#_m_bPlayKillSoundEffect)
+    000028D6 B7               [ 4] 9880 	or	a, a
+    000028D7 28 3B            [12] 9881 	jr	Z, 00117$
+    000028D9 FAr18r00         [16] 9882 	ld	a, (#(_m_oPlayer + 24) + 0)
+    000028DC B7               [ 4] 9883 	or	a, a
+    000028DD 20 35            [12] 9884 	jr	NZ, 00117$
+                                   9885 ;main.c:735: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+    000028DF 1E 01            [ 8] 9886 	ld	e, #0x01
+    000028E1 3E 02            [ 8] 9887 	ld	a, #0x02
+    000028E3 CDr00r00         [24] 9888 	call	_hUGE_mute_channel
+                                   9889 ;main.c:738: NR21_REG = 0x84;
+    000028E6 3E 84            [ 8] 9890 	ld	a, #0x84
+    000028E8 E0r00            [12] 9891 	ldh	(_NR21_REG + 0), a
+                                   9892 ;main.c:739: NR22_REG = 0x26;
+    000028EA 3E 26            [ 8] 9893 	ld	a, #0x26
+    000028EC E0r00            [12] 9894 	ldh	(_NR22_REG + 0), a
+                                   9895 ;main.c:740: NR23_REG = 0x2D;
+    000028EE 3E 2D            [ 8] 9896 	ld	a, #0x2d
+    000028F0 E0r00            [12] 9897 	ldh	(_NR23_REG + 0), a
+                                   9898 ;main.c:741: NR24_REG = 0x81;
+    000028F2 3E 81            [ 8] 9899 	ld	a, #0x81
+    000028F4 E0r00            [12] 9900 	ldh	(_NR24_REG + 0), a
+                                   9901 ;main.c:743: NR41_REG = 0x05;
+    000028F6 3E 05            [ 8] 9902 	ld	a, #0x05
+    000028F8 E0r00            [12] 9903 	ldh	(_NR41_REG + 0), a
+                                   9904 ;main.c:744: NR41_REG = 0xA7;
+    000028FA 3E A7            [ 8] 9905 	ld	a, #0xa7
+    000028FC E0r00            [12] 9906 	ldh	(_NR41_REG + 0), a
+                                   9907 ;main.c:745: NR41_REG = 0xC0;
+    000028FE 3E C0            [ 8] 9908 	ld	a, #0xc0
+    00002900 E0r00            [12] 9909 	ldh	(_NR41_REG + 0), a
+                                   9910 ;main.c:746: NR41_REG = 0xC0;
+    00002902 3E C0            [ 8] 9911 	ld	a, #0xc0
+    00002904 E0r00            [12] 9912 	ldh	(_NR41_REG + 0), a
+                                   9913 ;main.c:748: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+    00002906 1E 00            [ 8] 9914 	ld	e, #0x00
+    00002908 3E 02            [ 8] 9915 	ld	a, #0x02
+    0000290A CDr00r00         [24] 9916 	call	_hUGE_mute_channel
+                                   9917 ;main.c:751: m_bPlayKillSoundEffect = FALSE;
+                                   9918 ;main.c:754: m_bShowSpray = FALSE;
+    0000290D AF               [ 4] 9919 	xor	a, a
+    0000290E EAr00r00         [16] 9920 	ld	(#_m_bPlayKillSoundEffect), a
+    00002911 EAr00r00         [16] 9921 	ld	(#_m_bShowSpray),a
+    00002914                       9922 00117$:
+                                   9923 ;main.c:758: nCurrentHealth = m_oPlayer.nHealth / 10;
+    00002914 21r11r00         [12] 9924 	ld	hl, #(_m_oPlayer + 17)
+    00002917 2A               [ 8] 9925 	ld	a,	(hl+)
+    00002918 66               [ 8] 9926 	ld	h, (hl)
+    00002919 5F               [ 4] 9927 	ld	e, a
+    0000291A 01 0A 00         [12] 9928 	ld	bc, #0x000a
+    0000291D 54               [ 4] 9929 	ld	d, h
+                                   9930 ;main.c:759: nCurrentScore = m_oPlayer.nScore;
+    0000291E CDr00r00         [24] 9931 	call	__divuint
+    00002921 F8 02            [12] 9932 	ldhl	sp,	#2
+    00002923 79               [ 4] 9933 	ld	a, c
+    00002924 22               [ 8] 9934 	ld	(hl+), a
+    00002925 70               [ 8] 9935 	ld	(hl), b
+    00002926 11r14r00         [12] 9936 	ld	de, #(_m_oPlayer + 20)
+    00002929 1A               [ 8] 9937 	ld	a, (de)
+    0000292A F8 04            [12] 9938 	ldhl	sp,	#4
+    0000292C 22               [ 8] 9939 	ld	(hl+), a
+    0000292D 13               [ 8] 9940 	inc	de
+    0000292E 1A               [ 8] 9941 	ld	a, (de)
+    0000292F 77               [ 8] 9942 	ld	(hl), a
+                                   9943 ;main.c:762: if (m_oPlayer.bTakenDamage)
+    00002930 FAr18r00         [16] 9944 	ld	a, (#(_m_oPlayer + 24) + 0)
+    00002933 F8 06            [12] 9945 	ldhl	sp,#6
+    00002935 77               [ 8] 9946 	ld	(hl), a
+    00002936 7E               [ 8] 9947 	ld	a, (hl)
+    00002937 B7               [ 4] 9948 	or	a, a
+    00002938 28 27            [12] 9949 	jr	Z, 00120$
+                                   9950 ;main.c:764: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+    0000293A 1E 01            [ 8] 9951 	ld	e, #0x01
+    0000293C 3E 02            [ 8] 9952 	ld	a, #0x02
+    0000293E CDr00r00         [24] 9953 	call	_hUGE_mute_channel
+                                   9954 ;main.c:767: NR10_REG = 0x0D;
+    00002941 3E 0D            [ 8] 9955 	ld	a, #0x0d
+    00002943 E0r00            [12] 9956 	ldh	(_NR10_REG + 0), a
+                                   9957 ;main.c:768: NR11_REG = 0xC2;
+    00002945 3E C2            [ 8] 9958 	ld	a, #0xc2
+    00002947 E0r00            [12] 9959 	ldh	(_NR11_REG + 0), a
+                                   9960 ;main.c:769: NR12_REG = 0x54;
+    00002949 3E 54            [ 8] 9961 	ld	a, #0x54
+    0000294B E0r00            [12] 9962 	ldh	(_NR12_REG + 0), a
+                                   9963 ;main.c:770: NR13_REG = 0x63;
+    0000294D 3E 63            [ 8] 9964 	ld	a, #0x63
+    0000294F E0r00            [12] 9965 	ldh	(_NR13_REG + 0), a
+                                   9966 ;main.c:771: NR14_REG = 0x82;
+    00002951 3E 82            [ 8] 9967 	ld	a, #0x82
+    00002953 E0r00            [12] 9968 	ldh	(_NR14_REG + 0), a
+                                   9969 ;main.c:773: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+    00002955 1E 00            [ 8] 9970 	ld	e, #0x00
+    00002957 3E 02            [ 8] 9971 	ld	a, #0x02
+    00002959 CDr00r00         [24] 9972 	call	_hUGE_mute_channel
+                                   9973 ;main.c:776: m_oPlayer.bTakenDamage = FALSE;
+    0000295C 21r18r00         [12] 9974 	ld	hl, #(_m_oPlayer + 24)
+    0000295F 36 00            [12] 9975 	ld	(hl), #0x00
+    00002961                       9976 00120$:
+                                   9977 ;main.c:780: if (nCurrentHealth != m_nPrevHealth)
+    00002961 F8 02            [12] 9978 	ldhl	sp,	#2
+    00002963 7E               [ 8] 9979 	ld	a, (hl)
+    00002964 21r00r00         [12] 9980 	ld	hl, #_m_nPrevHealth
+    00002967 96               [ 8] 9981 	sub	a, (hl)
+    00002968 20 09            [12] 9982 	jr	NZ, 00285$
+    0000296A F8 03            [12] 9983 	ldhl	sp,	#3
+    0000296C 7E               [ 8] 9984 	ld	a, (hl)
+    0000296D 21r01r00         [12] 9985 	ld	hl, #_m_nPrevHealth + 1
+    00002970 96               [ 8] 9986 	sub	a, (hl)
+    00002971 28 14            [12] 9987 	jr	Z, 00122$
+    00002973                       9988 00285$:
+                                   9989 ;main.c:783: SetHealth(nCurrentHealth);
+    00002973 F8 02            [12] 9990 	ldhl	sp,	#2
+    00002975 2A               [ 8] 9991 	ld	a, (hl+)
+    00002976 5F               [ 4] 9992 	ld	e, a
+    00002977 56               [ 8] 9993 	ld	d, (hl)
+    00002978 CDr00r00         [24] 9994 	call	_SetHealth
+                                   9995 ;main.c:786: m_nPrevHealth = nCurrentHealth;
+    0000297B F8 02            [12] 9996 	ldhl	sp,	#2
+    0000297D 7E               [ 8] 9997 	ld	a, (hl)
+    0000297E EAr00r00         [16] 9998 	ld	(#_m_nPrevHealth),a
+    00002981 F8 03            [12] 9999 	ldhl	sp,	#3
+    00002983 7E               [ 8]10000 	ld	a, (hl)
+    00002984 EAr01r00         [16]10001 	ld	(#_m_nPrevHealth + 1),a
+    00002987                      10002 00122$:
+                                  10003 ;main.c:790: if (nCurrentScore != m_nPrevScore) 
+    00002987 FAr02r00         [16]10004 	ld	a, (#_m_nPrevScore)
+    0000298A F8 04            [12]10005 	ldhl	sp,	#4
+    0000298C 96               [ 8]10006 	sub	a, (hl)
+    0000298D 20 08            [12]10007 	jr	NZ, 00286$
+    0000298F FAr03r00         [16]10008 	ld	a, (#_m_nPrevScore + 1)
+    00002992 F8 05            [12]10009 	ldhl	sp,	#5
+    00002994 96               [ 8]10010 	sub	a, (hl)
+    00002995 28 4F            [12]10011 	jr	Z, 00133$
+    00002997                      10012 00286$:
+                                  10013 ;main.c:793: SetScore(nCurrentScore);
+    00002997 F8 04            [12]10014 	ldhl	sp,	#4
+    00002999 2A               [ 8]10015 	ld	a, (hl+)
+    0000299A 5F               [ 4]10016 	ld	e, a
+    0000299B 56               [ 8]10017 	ld	d, (hl)
+    0000299C CDr00r00         [24]10018 	call	_SetScore
+                                  10019 ;main.c:796: m_nPrevScore = nCurrentScore;
+    0000299F F8 04            [12]10020 	ldhl	sp,	#4
+    000029A1 7E               [ 8]10021 	ld	a, (hl)
+    000029A2 EAr02r00         [16]10022 	ld	(#_m_nPrevScore),a
+    000029A5 F8 05            [12]10023 	ldhl	sp,	#5
+    000029A7 7E               [ 8]10024 	ld	a, (hl)
+    000029A8 EAr03r00         [16]10025 	ld	(#_m_nPrevScore + 1),a
+    000029AB 18 39            [12]10026 	jr	00133$
+    000029AD                      10027 00132$:
+                                  10028 ;main.c:804: nBlinkTimer++;
+    000029AD F8 07            [12]10029 	ldhl	sp,	#7
+    000029AF 34               [12]10030 	inc	(hl)
+                                  10031 ;main.c:806: if (nBlinkTimer >= 20) 
+    000029B0 7E               [ 8]10032 	ld	a, (hl)
+    000029B1 D6 14            [ 8]10033 	sub	a, #0x14
+    000029B3 38 31            [12]10034 	jr	C, 00133$
+                                  10035 ;main.c:808: nBlinkTimer = 0;
+    000029B5 36 00            [12]10036 	ld	(hl), #0x00
+                                  10037 ;main.c:809: nBlinkState = (nBlinkState + 1) % 3;
+    000029B7 F8 01            [12]10038 	ldhl	sp,	#1
+    000029B9 7E               [ 8]10039 	ld	a, (hl)
+    000029BA 3C               [ 4]10040 	inc	a
+    000029BB 1E 03            [ 8]10041 	ld	e, #0x03
+    000029BD CDr00r00         [24]10042 	call	__moduchar
+    000029C0 F8 01            [12]10043 	ldhl	sp,	#1
+    000029C2 71               [ 8]10044 	ld	(hl), c
+                                  10045 ;main.c:811: switch(nBlinkState) 
+    000029C3 7E               [ 8]10046 	ld	a, (hl)
+    000029C4 B7               [ 4]10047 	or	a, a
+    000029C5 28 0F            [12]10048 	jr	Z, 00125$
+    000029C7 F8 01            [12]10049 	ldhl	sp,	#1
+    000029C9 7E               [ 8]10050 	ld	a, (hl)
+    000029CA 3D               [ 4]10051 	dec	a
+    000029CB 28 0F            [12]10052 	jr	Z, 00126$
+    000029CD F8 01            [12]10053 	ldhl	sp,	#1
+    000029CF 7E               [ 8]10054 	ld	a, (hl)
+    000029D0 D6 02            [ 8]10055 	sub	a, #0x02
+    000029D2 28 0E            [12]10056 	jr	Z, 00127$
+    000029D4 18 10            [12]10057 	jr	00133$
+                                  10058 ;main.c:813: case 0: BGP_REG = 0xE4; break;  // Normal
+    000029D6                      10059 00125$:
+    000029D6 3E E4            [ 8]10060 	ld	a, #0xe4
+    000029D8 E0r00            [12]10061 	ldh	(_BGP_REG + 0), a
+    000029DA 18 0A            [12]10062 	jr	00133$
+                                  10063 ;main.c:814: case 1: BGP_REG = 0xB0; break;  // Dims
+    000029DC                      10064 00126$:
+    000029DC 3E B0            [ 8]10065 	ld	a, #0xb0
+    000029DE E0r00            [12]10066 	ldh	(_BGP_REG + 0), a
+    000029E0 18 04            [12]10067 	jr	00133$
+                                  10068 ;main.c:815: case 2: BGP_REG = 0xE4; break;  // Normal
+    000029E2                      10069 00127$:
+    000029E2 3E E4            [ 8]10070 	ld	a, #0xe4
+    000029E4 E0r00            [12]10071 	ldh	(_BGP_REG + 0), a
+                                  10072 ;main.c:816: }
+    000029E6                      10073 00133$:
+                                  10074 ;main.c:821: m_nPrevJoy = m_nJoy;
+    000029E6 FAr19r00         [16]10075 	ld	a, (#_m_nJoy)
+    000029E9 EAr1Ar00         [16]10076 	ld	(#_m_nPrevJoy),a
+                                  10077 ;main.c:825: wait_vbl_done();
+    000029EC CDr00r00         [24]10078 	call	_wait_vbl_done
+    000029EF C3rA6r27         [16]10079 	jp	00135$
+                                  10080 ;main.c:827: }
+    000029F2 E8 08            [16]10081 	add	sp, #8
+    000029F4 C9               [16]10082 	ret
+                                  10083 	.area _CODE
+                                  10084 	.area _INITIALIZER
+    00000000                      10085 __xinit__m_nPrevHealth:
+    00000000 0F 27                10086 	.dw #0x270f
+    00000002                      10087 __xinit__m_nPrevScore:
+    00000002 0F 27                10088 	.dw #0x270f
+    00000004                      10089 __xinit__m_nLoadedScore:
+    00000004 00 00                10090 	.dw #0x0000
+    00000006                      10091 __xinit__m_nLoadedShotsTaken:
+    00000006 00 00                10092 	.dw #0x0000
+                                  10093 	.area _CABS (ABS)

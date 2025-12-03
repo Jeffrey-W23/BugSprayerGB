@@ -631,6 +631,12 @@ void main(void)
         // Check for game over condition.
         if (m_oPlayer.nHealth == 0)
         {
+
+            hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+            hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+            hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+            //hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+
             // Set in case not quite 0.
             SetHealth(0);
 
@@ -726,6 +732,8 @@ void main(void)
             // Play once per frame instead of every enemy.
             if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
             {
+                hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+
                 // Play enemy death sound.
                 NR21_REG = 0x84;
                 NR22_REG = 0x26;
@@ -736,6 +744,8 @@ void main(void)
                 NR41_REG = 0xA7;
                 NR41_REG = 0xC0;
                 NR41_REG = 0xC0;
+
+                hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
 
                 // Mark sound as played for next request.
                 m_bPlayKillSoundEffect = FALSE;
@@ -751,12 +761,16 @@ void main(void)
             // Play the damage audio
             if (m_oPlayer.bTakenDamage)
             {
+                hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+
                 // Play damage sounmd for player.
                 NR10_REG = 0x0D;
                 NR11_REG = 0xC2;
                 NR12_REG = 0x54;
                 NR13_REG = 0x63;
                 NR14_REG = 0x82;
+
+                hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
 
                 // Mark damage false again.
                 m_oPlayer.bTakenDamage = FALSE;
