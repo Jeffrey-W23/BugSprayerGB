@@ -8,6 +8,7 @@
         "player.h": "c",
         "enemies.h": "c",
         "gb.h": "c",
-        "save.h": "c"
+        "save.h": "c",
+        "hugedriver.h": "c"
     }
 }

@@ -9,7 +9,7 @@ Symbol Table
     .__.H$L.                                                    =   00000000 L
     _BGP_REG                                                        ******** GX
     _DIV_REG                                                        ******** GX
-  0 _DisplayGameOverScreen                                          00002388 GR
+  0 _DisplayGameOverScreen                                          0000239C GR
   0 _DisplaySplashScreen                                            00002044 GR
   0 _DisplayStartScreen                                             000020CE GR
   0 _FadeDrawLayer                                                  00001F92 GR
@@ -19,12 +19,12 @@ Symbol Table
     _InitEnemy                                                      ******** GX
     _InitHud                                                        ******** GX
     _InitPlayer                                                     ******** GX
-  0 _Initialize                                                     0000267A GR
+  0 _Initialize                                                     0000268E GR
     _IsEnemyAlive                                                   ******** GX
     _LCDC_REG                                                       ******** GX
     _LY_REG                                                         ******** GX
     _LoadGameData                                                   ******** GX
-  0 _LoadHighScoreData                                              0000264A GR
+  0 _LoadHighScoreData                                              0000265E GR
     _NR10_REG                                                       ******** GX
     _NR11_REG                                                       ******** GX
     _NR12_REG                                                       ******** GX
@@ -47,7 +47,7 @@ Symbol Table
   0 _SetDialog                                                      00000000 GR
     _SetHealth                                                      ******** GX
     _SetScore                                                       ******** GX
-  0 _ShowScoreGrade                                                 00002212 GR
+  0 _ShowScoreGrade                                                 00002226 GR
     _ShowSprayEffect                                                ******** GX
     _SpawnNext                                                      ******** GX
     _TickSpawnTimer                                                 ******** GX
@@ -56,20 +56,20 @@ Symbol Table
     _VBK_REG                                                        ******** GX
     _WX_REG                                                         ******** GX
     _WY_REG                                                         ******** GX
-  0 ___str_0                                                        00002383 R
-  0 ___str_10                                                       000025C1 R
+  0 ___str_0                                                        00002397 R
+  0 ___str_10                                                       000025D5 R
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
 Hexadecimal [32-Bits]
 
 Symbol Table
 
-  0 ___str_11                                                       000025CD R
-  0 ___str_15                                                       000025DB R
-  0 ___str_18                                                       000025ED R
-  0 ___str_24                                                       00002600 R
-  0 ___str_25                                                       00002604 R
-  0 ___str_29                                                       0000260A R
-  0 ___str_31                                                       0000262B R
+  0 ___str_11                                                       000025E1 R
+  0 ___str_15                                                       000025EF R
+  0 ___str_18                                                       00002601 R
+  0 ___str_24                                                       00002614 R
+  0 ___str_25                                                       00002618 R
+  0 ___str_29                                                       0000261E R
+  0 ___str_31                                                       0000263F R
     __divuint                                                       ******** GX
     __moduchar                                                      ******** GX
     __moduint                                                       ******** GX
@@ -77,6 +77,10 @@ Symbol Table
   7 __xinit__m_nLoadedShotsTaken                                    00000006 R
   7 __xinit__m_nPrevHealth                                          00000000 R
   7 __xinit__m_nPrevScore                                           00000002 R
+    _add_VBL                                                        ******** GX
+    _hUGE_dosound                                                   ******** GX
+    _hUGE_init                                                      ******** GX
+    _hUGE_mute_channel                                              ******** GX
     _initrand                                                       ******** GX
     _joypad                                                         ******** GX
     _m_bPlayKillSoundEffect                                         ******** GX
@@ -98,7 +102,7 @@ Symbol Table
     _m_nSpawnDelay                                                  ******** GX
     _m_nSpawnTimer                                                  ******** GX
   1 _m_oPlayer                                                      00000000 R
-  0 _main                                                           00002781 GR
+  0 _main                                                           00002795 GR
     _printf                                                         ******** GX
     _puts                                                           ******** GX
     _reset                                                          ******** GX
@@ -107,6 +111,7 @@ Symbol Table
     _set_sprite_data                                                ******** GX
     _set_win_tiles                                                  ******** GX
     _shadow_OAM                                                     ******** GX
+    _song1                                                          ******** GX
     _wait_vbl_done                                                  ******** GX
     _waitpad                                                        ******** GX
 
@@ -116,7 +121,7 @@ Hexadecimal [32-Bits]
 
 Area Table
 
-   0 _CODE                                      size     2962   flags    0
+   0 _CODE                                      size     29A5   flags    0
    1 _DATA                                      size       1C   flags    0
    2 _INITIALIZED                               size        8   flags    0
    3 _DABS                                      size        0   flags    8

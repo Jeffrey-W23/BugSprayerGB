@@ -16,6 +16,9 @@
 #include "player.h"
 #include "save.h"
 
+// includes for music realted scripts
+#include "hUGEDriver.h"
+
 // includes for the splash screen
 #include "Sprite-Sheets/SplashTiles.c"
 #include "Tile-Maps/SplashMap.c"
@@ -50,6 +53,9 @@ UINT16 m_nLoadedScore = 0;
 
 // New unsigned int 16 for the loaded saved shotsTaken, used to determine score grade.
 UINT16 m_nLoadedShotsTaken = 0;
+
+// New const huge song variable for the main song file of the game.
+extern const hUGESong_t song1;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -259,6 +265,15 @@ void DisplayStartScreen(void)
     set_bkg_data(0, 127, m_caStartScreenTiles);
     set_bkg_tiles(0, 0, 20, 18, m_caStartScreen);
 
+    // the critical tags ensure no interrupts will be called 
+    // while this block of code is being executed.
+    __critical 
+    {
+        // Init and use huge drive to play song1.
+        hUGE_init(&song1);
+        add_VBL(hUGE_dosound);
+    }
+
     // Fade in the start screen from previous background
     FadeDrawLayer(0, 0, 0xFB, 0xBB, 0xE4, 0x00, 15);
 
@@ -287,6 +302,9 @@ void DisplayStartScreen(void)
 
     // Hold programm until the start button is pressed
     waitpad(J_START);
+
+    // Mute the main channel that other audio plays on.
+    hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
 
     // Loop through all the sprites to
     // make up the "Press Start" text
@@ -652,6 +670,20 @@ void main(void)
             nBlinkTimer = 0;
             nBlinkState = 0;
             BGP_REG = 0xE4;
+
+            // Mute all music while paused.
+            if (bPaused)
+            {
+                hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+            }
+            else
+            {
+                hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
+                hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+                hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
+            }
         }
 
         // The main loop when not paused.
