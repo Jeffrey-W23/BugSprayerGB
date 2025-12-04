@@ -310,6 +310,7 @@ void DisplayStartScreen(void)
     waitpad(J_START);
 
     // Mute the main channel that other audio plays on.
+    hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
     hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
 
     // Loop through all the sprites to
@@ -637,11 +638,8 @@ void main(void)
         // Check for game over condition.
         if (m_oPlayer.nHealth == 0)
         {
-
-            hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
-            hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+            // On gameover only play the noise channel
             hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
-            //hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
 
             // Set in case not quite 0.
             SetHealth(0);
@@ -686,13 +684,11 @@ void main(void)
             // Mute all music while paused.
             if (bPaused)
             {
-                hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
                 hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
                 hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
             }
             else
             {
-                hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
                 hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
                 hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
             }
