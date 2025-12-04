@@ -118,8 +118,11 @@ void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer);
 
 //--------------------------------------------------------------------------------------
 // IncreaseDifficulty: Increase the spawn rate and speed of enemies based on progress.
+//
+// Param:
+//      nDamgeToPlayer: The damage value to apply to the player.
 //--------------------------------------------------------------------------------------
-void IncreaseDifficulty(void);
+void IncreaseDifficulty(UINT8 nDamgeToPlayer);
 
 //--------------------------------------------------------------------------------------
 // IsEnemyAlive: Check the status of an Enemy object.

@@ -49,12 +49,12 @@
                                      49 ; Function InitHud
                                      50 ; ---------------------------------
     00000000                         51 _InitHud::
-                                     52 ;hud.c:34: m_nCurrentHealth = 999;
+                                     52 ;hud.c:34: m_nCurrentHealth = 998;
     00000000 21r00r00         [12]   53 	ld	hl, #_m_nCurrentHealth
-    00000003 3E E7            [ 8]   54 	ld	a, #0xe7
+    00000003 3E E6            [ 8]   54 	ld	a, #0xe6
     00000005 22               [ 8]   55 	ld	(hl+), a
-                                     56 ;hud.c:35: SetHealth(999);
-    00000006 11 E7 03         [12]   57 	ld	de, #0x03e7
+                                     56 ;hud.c:35: SetHealth(998);
+    00000006 11 E6 03         [12]   57 	ld	de, #0x03e6
     00000009 72               [ 8]   58 	ld	(hl), d
     0000000A CDr13r00         [24]   59 	call	_SetHealth
                                      60 ;hud.c:36: SetScore(0);
@@ -225,5 +225,5 @@
                                     225 	.area _CODE
                                     226 	.area _INITIALIZER
     00000000                        227 __xinit__m_nCurrentHealth:
-    00000000 E7 03                  228 	.dw #0x03e7
+    00000000 E6 03                  228 	.dw #0x03e6
                                     229 	.area _CABS (ABS)

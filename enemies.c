@@ -35,9 +35,6 @@ static UINT16 m_nKillsForNextSpeed = 15;
 // New unsigned int 8 for keeping track of the kill requirements for spawn increase
 static UINT16 m_nKillsForNextSpawnRate = 15;
 
-// New signed int 8 for damage an enemy does to the player on hit.
-static UINT8 m_nDamage = 25;
-
 // New bool value for marking of the max speed has been reached.
 static BOOLEAN m_bMaxSpeedReached = FALSE;
 
@@ -353,8 +350,7 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
     // touching, so time to apply damge to player.
     else
     {
-        // Drop health of the player.
-        ptrPlayer->nHealth -= m_nDamage;
+        // Damage the player.
         ptrPlayer->bTakenDamage = TRUE;
 
         // Increase shots taken count for grade calculation.
@@ -363,10 +359,6 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
         // Kill the enemy.
         KillEnemy(ptrEnemy, ptrPlayer);
 
-        // Make sure we keep the health capped
-        // limit the possibility of overflow.
-        ptrPlayer->nHealth = (ptrPlayer->nHealth < m_nDamage) ? 0 : ptrPlayer->nHealth - m_nDamage;
-        
         // Break out of update      
         // No need to keep updating
         // now that enemy is dead.
@@ -430,8 +422,11 @@ void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
 
 //--------------------------------------------------------------------------------------
 // IncreaseDifficulty: Increase the spawn rate and speed of enemies based on progress.
+//
+// Param:
+//      nDamgeToPlayer: The damage value to apply to the player.
 //--------------------------------------------------------------------------------------
-void IncreaseDifficulty(void)
+void IncreaseDifficulty(UINT8 nDamgeToPlayer)
 {
     // Check if the amount of kills required to increase the speed has been hit.
     if (!m_bMaxSpeedReached)
@@ -471,8 +466,8 @@ void IncreaseDifficulty(void)
 
             // Change the kills required to change the kill rate. really want to slow it down.
             if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
-            else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; m_nDamage = 40; }
-            else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; m_nDamage = 50; }
+            else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; nDamgeToPlayer = 40; }
+            else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; nDamgeToPlayer = 50; }
             else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
             else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
 

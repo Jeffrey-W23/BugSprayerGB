@@ -34,7 +34,7 @@
 // includes for the sprite layer
 #include "Sprite-Sheets/Sprites.c"
 
-// PUBLIC VARIABLES //
+// PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
 // New Player object for storing and setting player information.
 static Player m_oPlayer;
@@ -48,11 +48,17 @@ static UINT16 m_nPrevHealth = 9999; static UINT16 m_nPrevScore = 9999;
 // New unsigned int 8 for keeping track of background fading stages. 
 static UINT8 m_nFadeIndex;
 
+// New const huge song variable for the main song file of the game.
+extern const hUGESong_t song1;
+
 // New unsigned int 16 for the loaded saved score, representing the highscore.
 UINT16 m_nLoadedScore = 0;
 
 // New unsigned int 16 for the loaded saved shotsTaken, used to determine score grade.
 UINT16 m_nLoadedShotsTaken = 0;
+
+// New signed int 8 for damage an enemy does to the player on hit.
+static UINT8 m_nDamgeToPlayer = 25;
 
 // New const huge song variable for the main song file of the game.
 extern const hUGESong_t song1;
@@ -723,7 +729,7 @@ void main(void)
             }
 
             // Check/Increase game difficulty
-            IncreaseDifficulty();
+            IncreaseDifficulty(m_nDamgeToPlayer);
 
             // Show the spray effect if an enemy is killed.
             ShowSprayEffect(m_bShowSpray);
@@ -761,6 +767,11 @@ void main(void)
             // Play the damage audio
             if (m_oPlayer.bTakenDamage)
             {
+                // Make sure we keep the health capped
+                // limit the possibility of overflow.
+                m_oPlayer.nHealth = (m_oPlayer.nHealth < m_nDamgeToPlayer || 
+                    m_oPlayer.nHealth > 999) ? 0 : m_oPlayer.nHealth - m_nDamgeToPlayer;
+
                 hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
 
                 // Play damage sounmd for player.

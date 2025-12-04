@@ -51,1739 +51,1502 @@
     00000005                         51 	.ds 2
     00000007                         52 _m_nKillsForNextSpawnRate:
     00000007                         53 	.ds 2
-    00000009                         54 _m_nDamage:
+    00000009                         54 _m_bMaxSpeedReached:
     00000009                         55 	.ds 1
-    0000000A                         56 _m_bMaxSpeedReached:
+    0000000A                         56 _m_bMaxSpawnRateReached:
     0000000A                         57 	.ds 1
-    0000000B                         58 _m_bMaxSpawnRateReached:
-    0000000B                         59 	.ds 1
-    0000000C                         60 _m_nLastSpawnRateKillCount:
-    0000000C                         61 	.ds 2
-    0000000E                         62 _m_nSpawnTimer::
+    0000000B                         58 _m_nLastSpawnRateKillCount:
+    0000000B                         59 	.ds 2
+    0000000D                         60 _m_nSpawnTimer::
+    0000000D                         61 	.ds 1
+    0000000E                         62 _m_nSpawnDelay::
     0000000E                         63 	.ds 1
-    0000000F                         64 _m_nSpawnDelay::
+    0000000F                         64 _m_bPlayKillSoundEffect::
     0000000F                         65 	.ds 1
-    00000010                         66 _m_bPlayKillSoundEffect::
+    00000010                         66 _m_bShowSpray::
     00000010                         67 	.ds 1
-    00000011                         68 _m_bShowSpray::
-    00000011                         69 	.ds 1
+                                     68 ;--------------------------------------------------------
+                                     69 ; absolute external ram data
                                      70 ;--------------------------------------------------------
-                                     71 ; absolute external ram data
+                                     71 	.area _DABS (ABS)
                                      72 ;--------------------------------------------------------
-                                     73 	.area _DABS (ABS)
+                                     73 ; global & static initialisations
                                      74 ;--------------------------------------------------------
-                                     75 ; global & static initialisations
-                                     76 ;--------------------------------------------------------
-                                     77 	.area _HOME
+                                     75 	.area _HOME
+                                     76 	.area _GSINIT
+                                     77 	.area _GSFINAL
                                      78 	.area _GSINIT
-                                     79 	.area _GSFINAL
-                                     80 	.area _GSINIT
+                                     79 ;--------------------------------------------------------
+                                     80 ; Home
                                      81 ;--------------------------------------------------------
-                                     82 ; Home
-                                     83 ;--------------------------------------------------------
-                                     84 	.area _HOME
-                                     85 	.area _HOME
+                                     82 	.area _HOME
+                                     83 	.area _HOME
+                                     84 ;--------------------------------------------------------
+                                     85 ; code
                                      86 ;--------------------------------------------------------
-                                     87 ; code
-                                     88 ;--------------------------------------------------------
-                                     89 	.area _CODE
-                                     90 ;enemies.c:90: void InitEnemiesSpawnQueue(void) 
-                                     91 ;	---------------------------------
-                                     92 ; Function InitEnemiesSpawnQueue
-                                     93 ; ---------------------------------
-    00000000                         94 _InitEnemiesSpawnQueue::
-    00000000 3B               [ 8]   95 	dec	sp
-                                     96 ;enemies.c:98: UINT8 nIndex = 0;
-    00000001 1E 00            [ 8]   97 	ld	e, #0x00
-                                     98 ;enemies.c:100: BOOLEAN bValidShuffle = FALSE;
-                                     99 ;enemies.c:104: for (o = 0; o < 8; o++) 
-    00000003 01 00 08         [12]  100 	ld	bc, #0x800
-                                    101 ;enemies.c:106: for (k = 0; k < 8; k++) 
-    00000006                        102 00126$:
-    00000006 16 00            [ 8]  103 	ld	d, #0x00
-    00000008                        104 00113$:
-                                    105 ;enemies.c:108: m_anSpawnQueue[nIndex++] = k;
-    00000008 3ErD0            [ 8]  106 	ld	a, #<(_m_anSpawnQueue)
-    0000000A 83               [ 4]  107 	add	a, e
-    0000000B 6F               [ 4]  108 	ld	l, a
-    0000000C 3Es00            [ 8]  109 	ld	a, #>(_m_anSpawnQueue)
-    0000000E CE 00            [ 8]  110 	adc	a, #0x00
-    00000010 67               [ 4]  111 	ld	h, a
-    00000011 1C               [ 4]  112 	inc	e
-    00000012 72               [ 8]  113 	ld	(hl), d
-                                    114 ;enemies.c:106: for (k = 0; k < 8; k++) 
-    00000013 14               [ 4]  115 	inc	d
-    00000014 7A               [ 4]  116 	ld	a, d
-    00000015 D6 08            [ 8]  117 	sub	a, #0x08
-    00000017 38 EF            [12]  118 	jr	C, 00113$
-    00000019 05               [ 4]  119 	dec	b
-    0000001A 20 EA            [12]  120 	jr	NZ, 00126$
-                                    121 ;enemies.c:104: for (o = 0; o < 8; o++) 
-                                    122 ;enemies.c:114: while (!bValidShuffle) 
-    0000001C                        123 00110$:
-    0000001C 79               [ 4]  124 	ld	a, c
-    0000001D B7               [ 4]  125 	or	a, a
-    0000001E 20 5E            [12]  126 	jr	NZ, 00112$
-                                    127 ;enemies.c:117: for (i = SPAWN_QUEUE_SIZE - 1; i > 0; i--) 
-    00000020 F8 00            [12]  128 	ldhl	sp,	#0
-    00000022 36 3F            [12]  129 	ld	(hl), #0x3f
-    00000024                        130 00118$:
-                                    131 ;enemies.c:119: j = rand() % (i + 1);
-    00000024 CDr00r00         [24]  132 	call	_rand
-    00000027 F8 00            [12]  133 	ldhl	sp,	#0
-    00000029 4E               [ 8]  134 	ld	c, (hl)
-    0000002A 06 00            [ 8]  135 	ld	b, #0x00
-    0000002C 03               [ 8]  136 	inc	bc
-    0000002D 16 00            [ 8]  137 	ld	d, #0x00
-    0000002F CDr00r00         [24]  138 	call	__modsint
-                                    139 ;enemies.c:120: nTemp = m_anSpawnQueue[i];
-    00000032 11rD0r00         [12]  140 	ld	de, #_m_anSpawnQueue
-    00000035 F8 00            [12]  141 	ldhl	sp,	#0
-    00000037 6E               [ 8]  142 	ld	l, (hl)
-    00000038 26 00            [ 8]  143 	ld	h, #0x00
-    0000003A 19               [ 8]  144 	add	hl, de
-    0000003B 5D               [ 4]  145 	ld	e, l
-    0000003C 54               [ 4]  146 	ld	d, h
-    0000003D 1A               [ 8]  147 	ld	a, (de)
-    0000003E 47               [ 4]  148 	ld	b, a
-                                    149 ;enemies.c:121: m_anSpawnQueue[i] = m_anSpawnQueue[j];
-    0000003F 3ErD0            [ 8]  150 	ld	a, #<(_m_anSpawnQueue)
-    00000041 81               [ 4]  151 	add	a, c
-    00000042 6F               [ 4]  152 	ld	l, a
-    00000043 3Es00            [ 8]  153 	ld	a, #>(_m_anSpawnQueue)
-    00000045 CE 00            [ 8]  154 	adc	a, #0x00
-    00000047 67               [ 4]  155 	ld	h, a
-    00000048 7E               [ 8]  156 	ld	a, (hl)
-    00000049 12               [ 8]  157 	ld	(de), a
-                                    158 ;enemies.c:122: m_anSpawnQueue[j] = nTemp;
-    0000004A 70               [ 8]  159 	ld	(hl), b
-                                    160 ;enemies.c:117: for (i = SPAWN_QUEUE_SIZE - 1; i > 0; i--) 
-    0000004B F8 00            [12]  161 	ldhl	sp,	#0
-    0000004D 35               [12]  162 	dec	(hl)
-    0000004E 20 D4            [12]  163 	jr	NZ, 00118$
-                                    164 ;enemies.c:127: bValidShuffle = TRUE;
-                                    165 ;enemies.c:128: nStreak = 1;
-    00000050 01 01 01         [12]  166 	ld	bc, #0x101
-                                    167 ;enemies.c:133: for (i = 1; i < SPAWN_QUEUE_SIZE; i++) 
-    00000053 1E 01            [ 8]  168 	ld	e, #0x01
-    00000055                        169 00120$:
-                                    170 ;enemies.c:136: if (m_anSpawnQueue[i] == m_anSpawnQueue[i-1]) 
-    00000055 21rD0r00         [12]  171 	ld	hl, #_m_anSpawnQueue
-    00000058 16 00            [ 8]  172 	ld	d, #0x00
-    0000005A 19               [ 8]  173 	add	hl, de
-    0000005B 56               [ 8]  174 	ld	d, (hl)
-    0000005C 7B               [ 4]  175 	ld	a, e
-    0000005D 3D               [ 4]  176 	dec	a
-    0000005E C6rD0            [ 8]  177 	add	a, #<(_m_anSpawnQueue)
-    00000060 6F               [ 4]  178 	ld	l, a
-    00000061 3E 00            [ 8]  179 	ld	a, #0x00
-    00000063 CEs00            [ 8]  180 	adc	a, #>(_m_anSpawnQueue)
-    00000065 67               [ 4]  181 	ld	h, a
-    00000066 7E               [ 8]  182 	ld	a, (hl)
-    00000067 92               [ 4]  183 	sub	a, d
-    00000068 20 0A            [12]  184 	jr	NZ, 00107$
-                                    185 ;enemies.c:139: nStreak++;
-    0000006A 04               [ 4]  186 	inc	b
-                                    187 ;enemies.c:142: if (nStreak > 3) 
-    0000006B 3E 03            [ 8]  188 	ld	a, #0x03
-    0000006D 90               [ 4]  189 	sub	a, b
-    0000006E 30 06            [12]  190 	jr	NC, 00121$
-                                    191 ;enemies.c:146: bValidShuffle = FALSE;
-    00000070 0E 00            [ 8]  192 	ld	c, #0x00
-                                    193 ;enemies.c:147: break;
-    00000072 18 A8            [12]  194 	jr	00110$
-    00000074                        195 00107$:
-                                    196 ;enemies.c:154: nStreak = 1;
-    00000074 06 01            [ 8]  197 	ld	b, #0x01
-    00000076                        198 00121$:
-                                    199 ;enemies.c:133: for (i = 1; i < SPAWN_QUEUE_SIZE; i++) 
-    00000076 1C               [ 4]  200 	inc	e
-    00000077 7B               [ 4]  201 	ld	a, e
-    00000078 D6 40            [ 8]  202 	sub	a, #0x40
-    0000007A 38 D9            [12]  203 	jr	C, 00120$
-    0000007C 18 9E            [12]  204 	jr	00110$
-    0000007E                        205 00112$:
-                                    206 ;enemies.c:160: m_nSpawnQueuePos = 0;
-    0000007E AF               [ 4]  207 	xor	a, a
-    0000007F EAr01r00         [16]  208 	ld	(#_m_nSpawnQueuePos),a
-                                    209 ;enemies.c:161: }
-    00000082 33               [ 8]  210 	inc	sp
-    00000083 C9               [16]  211 	ret
-    00000084                        212 _m_anSpawnPositions:
-    00000084 27                     213 	.db #0x27	; 39
-    00000085 2B                     214 	.db #0x2b	; 43
-    00000086 50                     215 	.db #0x50	; 80	'P'
-    00000087 29                     216 	.db #0x29	; 41
-    00000088 82                     217 	.db #0x82	; 130
-    00000089 21                     218 	.db #0x21	; 33
-    0000008A 0E                     219 	.db #0x0e	; 14
-    0000008B 52                     220 	.db #0x52	; 82	'R'
-    0000008C 9A                     221 	.db #0x9a	; 154
-    0000008D 52                     222 	.db #0x52	; 82	'R'
-    0000008E 06                     223 	.db #0x06	; 6
-    0000008F 9A                     224 	.db #0x9a	; 154
-    00000090 50                     225 	.db #0x50	; 80	'P'
-    00000091 9A                     226 	.db #0x9a	; 154
-    00000092 9C                     227 	.db #0x9c	; 156
-    00000093 9C                     228 	.db #0x9c	; 156
-    00000094                        229 _m_anMovementDirX:
-    00000094 01                     230 	.db #0x01	;  1
-    00000095 00                     231 	.db #0x00	;  0
-    00000096 FF                     232 	.db #0xff	; -1
-    00000097 01                     233 	.db #0x01	;  1
-    00000098 FF                     234 	.db #0xff	; -1
-    00000099 01                     235 	.db #0x01	;  1
-    0000009A 00                     236 	.db #0x00	;  0
-    0000009B FF                     237 	.db #0xff	; -1
-    0000009C                        238 _m_anMovementDirY:
-    0000009C 01                     239 	.db #0x01	;  1
-    0000009D 01                     240 	.db #0x01	;  1
-    0000009E 01                     241 	.db #0x01	;  1
-    0000009F 00                     242 	.db #0x00	;  0
-    000000A0 00                     243 	.db #0x00	;  0
-    000000A1 FF                     244 	.db #0xff	; -1
-    000000A2 FF                     245 	.db #0xff	; -1
-    000000A3 FF                     246 	.db #0xff	; -1
-                                    247 ;enemies.c:169: UINT8 GetNextSpawnIndex(void) 
-                                    248 ;	---------------------------------
-                                    249 ; Function GetNextSpawnIndex
-                                    250 ; ---------------------------------
-    000000A4                        251 _GetNextSpawnIndex::
-                                    252 ;enemies.c:172: UINT8 nIndex = m_anSpawnQueue[m_nSpawnQueuePos];
-    000000A4 3ErD0            [ 8]  253 	ld	a, #<(_m_anSpawnQueue)
-    000000A6 21r01r00         [12]  254 	ld	hl, #_m_nSpawnQueuePos
-    000000A9 86               [ 8]  255 	add	a, (hl)
-    000000AA 4F               [ 4]  256 	ld	c, a
-    000000AB 3Es00            [ 8]  257 	ld	a, #>(_m_anSpawnQueue)
-    000000AD CE 00            [ 8]  258 	adc	a, #0x00
-    000000AF 47               [ 4]  259 	ld	b, a
-    000000B0 0A               [ 8]  260 	ld	a, (bc)
-    000000B1 6F               [ 4]  261 	ld	l, a
-                                    262 ;enemies.c:173: m_nSpawnQueuePos = (m_nSpawnQueuePos + 1) % SPAWN_QUEUE_SIZE;
-    000000B2 FAr01r00         [16]  263 	ld	a, (_m_nSpawnQueuePos)
-    000000B5 16 00            [ 8]  264 	ld	d, #0x00
-    000000B7 5F               [ 4]  265 	ld	e, a
-    000000B8 13               [ 8]  266 	inc	de
-    000000B9 E5               [16]  267 	push	hl
-    000000BA 01 40 00         [12]  268 	ld	bc, #0x0040
-    000000BD CDr00r00         [24]  269 	call	__modsint
-    000000C0 E1               [12]  270 	pop	hl
-    000000C1 79               [ 4]  271 	ld	a, c
-    000000C2 EAr01r00         [16]  272 	ld	(_m_nSpawnQueuePos), a
-                                    273 ;enemies.c:174: return nIndex;
-    000000C5 7D               [ 4]  274 	ld	a, l
-                                    275 ;enemies.c:175: }
-    000000C6 C9               [16]  276 	ret
-                                    277 ;enemies.c:183: void InitEnemy(UINT8 nEnemyIndex) 
-                                    278 ;	---------------------------------
-                                    279 ; Function InitEnemy
-                                    280 ; ---------------------------------
-    000000C7                        281 _InitEnemy::
-    000000C7 4F               [ 4]  282 	ld	c, a
-                                    283 ;enemies.c:186: m_aoEnemies[nEnemyIndex].bAlive = FALSE;
-    000000C8 06 00            [ 8]  284 	ld	b, #0x00
-    000000CA 69               [ 4]  285 	ld	l, c
-    000000CB 60               [ 4]  286 	ld	h, b
-    000000CC 29               [ 8]  287 	add	hl, hl
-    000000CD 09               [ 8]  288 	add	hl, bc
-    000000CE 29               [ 8]  289 	add	hl, hl
-    000000CF 29               [ 8]  290 	add	hl, hl
-    000000D0 09               [ 8]  291 	add	hl, bc
-    000000D1 3Er00            [ 8]  292 	ld	a, #<(_m_aoEnemies)
-    000000D3 85               [ 4]  293 	add	a, l
-    000000D4 4F               [ 4]  294 	ld	c, a
-    000000D5 3Es00            [ 8]  295 	ld	a, #>(_m_aoEnemies)
-    000000D7 8C               [ 4]  296 	adc	a, h
-    000000D8 47               [ 4]  297 	ld	b, a
-    000000D9 69               [ 4]  298 	ld	l, c
-    000000DA 60               [ 4]  299 	ld	h, b
-    000000DB 23               [ 8]  300 	inc	hl
-    000000DC 23               [ 8]  301 	inc	hl
-    000000DD 23               [ 8]  302 	inc	hl
-    000000DE 36 00            [12]  303 	ld	(hl), #0x00
-                                    304 ;enemies.c:187: m_aoEnemies[nEnemyIndex].bCantMove = FALSE;
-    000000E0 21 06 00         [12]  305 	ld	hl, #0x0006
-    000000E3 09               [ 8]  306 	add	hl, bc
-    000000E4 36 00            [12]  307 	ld	(hl), #0x00
-                                    308 ;enemies.c:188: m_aoEnemies[nEnemyIndex].bMainSpriteSet = FALSE;
-    000000E6 21 0C 00         [12]  309 	ld	hl, #0x000c
-    000000E9 09               [ 8]  310 	add	hl, bc
-    000000EA 36 00            [12]  311 	ld	(hl), #0x00
-                                    312 ;enemies.c:189: m_aoEnemies[nEnemyIndex].nSpriteID = 0;
-    000000EC 69               [ 4]  313 	ld	l, c
-    000000ED 60               [ 4]  314 	ld	h, b
-    000000EE 23               [ 8]  315 	inc	hl
-    000000EF 23               [ 8]  316 	inc	hl
-    000000F0 36 00            [12]  317 	ld	(hl), #0x00
-                                    318 ;enemies.c:190: m_aoEnemies[nEnemyIndex].nSpeed = m_nCurrentSpeed;
-    000000F2 21 07 00         [12]  319 	ld	hl, #0x0007
-    000000F5 09               [ 8]  320 	add	hl, bc
-    000000F6 FAr02r00         [16]  321 	ld	a, (_m_nCurrentSpeed)
-    000000F9 77               [ 8]  322 	ld	(hl), a
-                                    323 ;enemies.c:191: m_aoEnemies[nEnemyIndex].nSubPixelX = 0;
-    000000FA 21 09 00         [12]  324 	ld	hl, #0x0009
-    000000FD 09               [ 8]  325 	add	hl, bc
-    000000FE 36 00            [12]  326 	ld	(hl), #0x00
-                                    327 ;enemies.c:192: m_aoEnemies[nEnemyIndex].nSubPixelY = 0;
-    00000100 21 0A 00         [12]  328 	ld	hl, #0x000a
-    00000103 09               [ 8]  329 	add	hl, bc
-    00000104 36 00            [12]  330 	ld	(hl), #0x00
-                                    331 ;enemies.c:193: }
-    00000106 C9               [16]  332 	ret
-                                    333 ;enemies.c:202: void SpawnEnemy(UINT8 nEnemyIndex, UINT8 nSpawnIndex) 
-                                    334 ;	---------------------------------
-                                    335 ; Function SpawnEnemy
-                                    336 ; ---------------------------------
-    00000107                        337 _SpawnEnemy::
-    00000107 E8 F8            [16]  338 	add	sp, #-8
-    00000109 4F               [ 4]  339 	ld	c, a
-    0000010A F8 07            [12]  340 	ldhl	sp,	#7
-    0000010C 73               [ 8]  341 	ld	(hl), e
-                                    342 ;enemies.c:205: Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
-    0000010D 06 00            [ 8]  343 	ld	b, #0x00
-    0000010F 69               [ 4]  344 	ld	l, c
-    00000110 60               [ 4]  345 	ld	h, b
-    00000111 29               [ 8]  346 	add	hl, hl
-    00000112 09               [ 8]  347 	add	hl, bc
-    00000113 29               [ 8]  348 	add	hl, hl
-    00000114 29               [ 8]  349 	add	hl, hl
-    00000115 09               [ 8]  350 	add	hl, bc
-    00000116 11r00r00         [12]  351 	ld	de, #_m_aoEnemies
-    00000119 19               [ 8]  352 	add	hl, de
-    0000011A 4D               [ 4]  353 	ld	c, l
-    0000011B 44               [ 4]  354 	ld	b, h
-                                    355 ;enemies.c:213: if (nSpawnIndex > 7) nSpawnIndex = 2;
-    0000011C 3E 07            [ 8]  356 	ld	a, #0x07
-    0000011E F8 07            [12]  357 	ldhl	sp,	#7
-    00000120 96               [ 8]  358 	sub	a, (hl)
-    00000121 30 02            [12]  359 	jr	NC, 00102$
-    00000123 36 02            [12]  360 	ld	(hl), #0x02
-    00000125                        361 00102$:
-                                    362 ;enemies.c:216: ptrEnemy->nX = m_anSpawnPositions[nSpawnIndex][0];
-    00000125 33               [ 8]  363 	inc	sp
-    00000126 33               [ 8]  364 	inc	sp
-    00000127 C5               [16]  365 	push	bc
-    00000128 F8 07            [12]  366 	ldhl	sp,	#7
-    0000012A 5E               [ 8]  367 	ld	e, (hl)
-    0000012B AF               [ 4]  368 	xor	a, a
-    0000012C 57               [ 4]  369 	ld	d, a
-    0000012D CB 23            [ 8]  370 	sla	e
-    0000012F CB 12            [ 8]  371 	rl	d
-    00000131 21r84r00         [12]  372 	ld	hl, #_m_anSpawnPositions
-    00000134 19               [ 8]  373 	add	hl, de
-    00000135 E5               [16]  374 	push	hl
-    00000136 7D               [ 4]  375 	ld	a, l
-    00000137 F8 07            [12]  376 	ldhl	sp,	#7
-    00000139 77               [ 8]  377 	ld	(hl), a
-    0000013A E1               [12]  378 	pop	hl
-    0000013B 7C               [ 4]  379 	ld	a, h
-    0000013C F8 06            [12]  380 	ldhl	sp,	#6
-    0000013E 32               [ 8]  381 	ld	(hl-), a
-    0000013F 2A               [ 8]  382 	ld	a, (hl+)
-    00000140 5F               [ 4]  383 	ld	e, a
-    00000141 56               [ 8]  384 	ld	d, (hl)
-    00000142 1A               [ 8]  385 	ld	a, (de)
-    00000143 E1               [12]  386 	pop	hl
-    00000144 E5               [16]  387 	push	hl
-    00000145 77               [ 8]  388 	ld	(hl), a
-                                    389 ;enemies.c:217: ptrEnemy->nY = m_anSpawnPositions[nSpawnIndex][1];
-    00000146 69               [ 4]  390 	ld	l, c
-    00000147 60               [ 4]  391 	ld	h, b
-    00000148 23               [ 8]  392 	inc	hl
-    00000149 E5               [16]  393 	push	hl
-    0000014A 7D               [ 4]  394 	ld	a, l
-    0000014B F8 04            [12]  395 	ldhl	sp,	#4
-    0000014D 77               [ 8]  396 	ld	(hl), a
-    0000014E E1               [12]  397 	pop	hl
-    0000014F 7C               [ 4]  398 	ld	a, h
-    00000150 F8 03            [12]  399 	ldhl	sp,	#3
-    00000152 22               [ 8]  400 	ld	(hl+), a
-    00000153 23               [ 8]  401 	inc	hl
-    00000154 2A               [ 8]  402 	ld	a, (hl+)
-    00000155 5F               [ 4]  403 	ld	e, a
-    00000156 56               [ 8]  404 	ld	d, (hl)
-    00000157 13               [ 8]  405 	inc	de
-    00000158 1A               [ 8]  406 	ld	a, (de)
-    00000159 F8 02            [12]  407 	ldhl	sp,	#2
-    0000015B 5E               [ 8]  408 	ld	e, (hl)
-    0000015C 23               [ 8]  409 	inc	hl
-    0000015D 66               [ 8]  410 	ld	h, (hl)
-    0000015E 6B               [ 4]  411 	ld	l, e
-    0000015F 77               [ 8]  412 	ld	(hl), a
-                                    413 ;enemies.c:220: ptrEnemy->nSubPixelX = 0;
-    00000160 21 09 00         [12]  414 	ld	hl, #0x0009
-    00000163 09               [ 8]  415 	add	hl, bc
-    00000164 36 00            [12]  416 	ld	(hl), #0x00
-                                    417 ;enemies.c:221: ptrEnemy->nSubPixelY = 0;
-    00000166 21 0A 00         [12]  418 	ld	hl, #0x000a
-    00000169 09               [ 8]  419 	add	hl, bc
-    0000016A 36 00            [12]  420 	ld	(hl), #0x00
-                                    421 ;enemies.c:224: ptrEnemy->bAlive = TRUE;
-    0000016C 69               [ 4]  422 	ld	l, c
-    0000016D 60               [ 4]  423 	ld	h, b
-    0000016E 23               [ 8]  424 	inc	hl
-    0000016F 23               [ 8]  425 	inc	hl
-    00000170 23               [ 8]  426 	inc	hl
-    00000171 36 01            [12]  427 	ld	(hl), #0x01
-                                    428 ;enemies.c:225: ptrEnemy->bCantMove = FALSE;
-    00000173 21 06 00         [12]  429 	ld	hl, #0x0006
-    00000176 09               [ 8]  430 	add	hl, bc
-    00000177 36 00            [12]  431 	ld	(hl), #0x00
-                                    432 ;enemies.c:226: ptrEnemy->bMainSpriteSet = FALSE;
-    00000179 21 0C 00         [12]  433 	ld	hl, #0x000c
-    0000017C 09               [ 8]  434 	add	hl, bc
-    0000017D 36 00            [12]  435 	ld	(hl), #0x00
-                                    436 ;enemies.c:229: nMoveventX = m_anMovementDirX[nSpawnIndex];
-    0000017F 11r94r00         [12]  437 	ld	de, #_m_anMovementDirX+0
-    00000182 F8 07            [12]  438 	ldhl	sp,	#7
-    00000184 6E               [ 8]  439 	ld	l, (hl)
-    00000185 26 00            [ 8]  440 	ld	h, #0x00
-    00000187 19               [ 8]  441 	add	hl, de
-    00000188 5D               [ 4]  442 	ld	e, l
-    00000189 54               [ 4]  443 	ld	d, h
-    0000018A 1A               [ 8]  444 	ld	a, (de)
-    0000018B F8 06            [12]  445 	ldhl	sp,	#6
-                                    446 ;enemies.c:230: nMovementY = m_anMovementDirY[nSpawnIndex];
-    0000018D 22               [ 8]  447 	ld	(hl+), a
-    0000018E 11r9Cr00         [12]  448 	ld	de, #_m_anMovementDirY+0
-    00000191 6E               [ 8]  449 	ld	l, (hl)
-    00000192 26 00            [ 8]  450 	ld	h, #0x00
-    00000194 19               [ 8]  451 	add	hl, de
-    00000195 5D               [ 4]  452 	ld	e, l
-    00000196 54               [ 4]  453 	ld	d, h
-    00000197 1A               [ 8]  454 	ld	a, (de)
-    00000198 5F               [ 4]  455 	ld	e, a
-                                    456 ;enemies.c:231: ptrEnemy->nDirX = nMoveventX;
-    00000199 21 04 00         [12]  457 	ld	hl, #0x0004
-    0000019C 09               [ 8]  458 	add	hl, bc
-    0000019D E5               [16]  459 	push	hl
-    0000019E F8 08            [12]  460 	ldhl	sp,	#8
-    000001A0 7E               [ 8]  461 	ld	a, (hl)
-    000001A1 E1               [12]  462 	pop	hl
-    000001A2 77               [ 8]  463 	ld	(hl), a
-                                    464 ;enemies.c:232: ptrEnemy->nDirY = nMovementY;
-    000001A3 21 05 00         [12]  465 	ld	hl, #0x0005
-    000001A6 09               [ 8]  466 	add	hl, bc
-    000001A7 73               [ 8]  467 	ld	(hl), e
-                                    468 ;enemies.c:235: ptrEnemy->nSpeed = m_nCurrentSpeed;
-    000001A8 21 07 00         [12]  469 	ld	hl, #0x0007
-    000001AB 09               [ 8]  470 	add	hl, bc
-    000001AC FAr02r00         [16]  471 	ld	a, (_m_nCurrentSpeed)
-    000001AF 77               [ 8]  472 	ld	(hl), a
-                                    473 ;enemies.c:238: ptrEnemy->nSpriteID = m_nNextSpriteID++;
-    000001B0 21 02 00         [12]  474 	ld	hl, #0x0002
-    000001B3 09               [ 8]  475 	add	hl, bc
-    000001B4 E5               [16]  476 	push	hl
-    000001B5 7D               [ 4]  477 	ld	a, l
-    000001B6 F8 06            [12]  478 	ldhl	sp,	#6
-    000001B8 77               [ 8]  479 	ld	(hl), a
-    000001B9 E1               [12]  480 	pop	hl
-    000001BA 7C               [ 4]  481 	ld	a, h
-    000001BB F8 05            [12]  482 	ldhl	sp,	#5
-    000001BD 77               [ 8]  483 	ld	(hl), a
-    000001BE FAr00r00         [16]  484 	ld	a, (#_m_nNextSpriteID)
-    000001C1 F8 06            [12]  485 	ldhl	sp,	#6
-    000001C3 77               [ 8]  486 	ld	(hl), a
-    000001C4 21r00r00         [12]  487 	ld	hl, #_m_nNextSpriteID
-    000001C7 34               [12]  488 	inc	(hl)
-    000001C8 F8 04            [12]  489 	ldhl	sp,	#4
-    000001CA 2A               [ 8]  490 	ld	a, (hl+)
-    000001CB 5F               [ 4]  491 	ld	e, a
-    000001CC 2A               [ 8]  492 	ld	a, (hl+)
-    000001CD 57               [ 4]  493 	ld	d, a
-    000001CE 7E               [ 8]  494 	ld	a, (hl)
-    000001CF 12               [ 8]  495 	ld	(de), a
-                                    496 ;enemies.c:241: if (m_nNextSpriteID >= 40) m_nNextSpriteID = 7;
-    000001D0 21r00r00         [12]  497 	ld	hl, #_m_nNextSpriteID
-    000001D3 7E               [ 8]  498 	ld	a, (hl)
-    000001D4 D6 28            [ 8]  499 	sub	a, #0x28
-    000001D6 38 02            [12]  500 	jr	C, 00104$
-    000001D8 36 07            [12]  501 	ld	(hl), #0x07
-    000001DA                        502 00104$:
-                                    503 ;enemies.c:244: ptrEnemy->nIndex = nSpawnIndex;
-    000001DA 21 08 00         [12]  504 	ld	hl, #0x0008
-    000001DD 09               [ 8]  505 	add	hl, bc
-    000001DE 5D               [ 4]  506 	ld	e, l
-    000001DF 54               [ 4]  507 	ld	d, h
-    000001E0 F8 07            [12]  508 	ldhl	sp,	#7
-    000001E2 7E               [ 8]  509 	ld	a, (hl)
-    000001E3 12               [ 8]  510 	ld	(de), a
-                                    511 ;enemies.c:248: ptrEnemy->nSpriteNumber = GetSprite((rand() >> 4) % 5) + nSpawnIndex;
-    000001E4 21 0B 00         [12]  512 	ld	hl, #0x000b
-    000001E7 09               [ 8]  513 	add	hl, bc
-    000001E8 4D               [ 4]  514 	ld	c, l
-    000001E9 44               [ 4]  515 	ld	b, h
-    000001EA CDr00r00         [24]  516 	call	_rand
-    000001ED 7B               [ 4]  517 	ld	a, e
-    000001EE CB 37            [ 8]  518 	swap	a
-    000001F0 E6 0F            [ 8]  519 	and	a, #0x0f
-    000001F2 C5               [16]  520 	push	bc
-    000001F3 1E 05            [ 8]  521 	ld	e, #0x05
-    000001F5 CDr00r00         [24]  522 	call	__moduchar
-    000001F8 79               [ 4]  523 	ld	a, c
-    000001F9 CDr3Ar02         [24]  524 	call	_GetSprite
-    000001FC C1               [12]  525 	pop	bc
-    000001FD F8 07            [12]  526 	ldhl	sp,	#7
-    000001FF 5E               [ 8]  527 	ld	e, (hl)
-                                    528 ;enemies.c:251: set_sprite_tile(ptrEnemy->nSpriteID, 32);
-    00000200 2B               [ 8]  529 	dec	hl
-    00000201 2B               [ 8]  530 	dec	hl
-    00000202 2B               [ 8]  531 	dec	hl
-    00000203 83               [ 4]  532 	add	a, e
-    00000204 02               [ 8]  533 	ld	(bc), a
-    00000205 2A               [ 8]  534 	ld	a, (hl+)
-    00000206 5F               [ 4]  535 	ld	e, a
-    00000207 56               [ 8]  536 	ld	d, (hl)
-    00000208 1A               [ 8]  537 	ld	a, (de)
-    00000209 4F               [ 4]  538 	ld	c, a
-                                    539 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
-    0000020A 11r00r00         [12]  540 	ld	de, #_shadow_OAM+0
-    0000020D AF               [ 4]  541 	xor	a, a
-    0000020E 69               [ 4]  542 	ld	l, c
-    0000020F 67               [ 4]  543 	ld	h, a
-    00000210 29               [ 8]  544 	add	hl, hl
-    00000211 29               [ 8]  545 	add	hl, hl
-    00000212 19               [ 8]  546 	add	hl, de
-    00000213 23               [ 8]  547 	inc	hl
-    00000214 23               [ 8]  548 	inc	hl
-    00000215 36 20            [12]  549 	ld	(hl), #0x20
-                                    550 ;enemies.c:254: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-    00000217 F8 02            [12]  551 	ldhl	sp,#2
-    00000219 2A               [ 8]  552 	ld	a, (hl+)
-    0000021A 5F               [ 4]  553 	ld	e, a
-    0000021B 2A               [ 8]  554 	ld	a, (hl+)
-    0000021C 57               [ 4]  555 	ld	d, a
-    0000021D 1A               [ 8]  556 	ld	a, (de)
-    0000021E 47               [ 4]  557 	ld	b, a
-    0000021F D1               [12]  558 	pop	de
-    00000220 D5               [16]  559 	push	de
-    00000221 1A               [ 8]  560 	ld	a, (de)
-    00000222 4F               [ 4]  561 	ld	c, a
-    00000223 2A               [ 8]  562 	ld	a, (hl+)
-    00000224 5F               [ 4]  563 	ld	e, a
-    00000225 2A               [ 8]  564 	ld	a, (hl+)
-    00000226 57               [ 4]  565 	ld	d, a
-    00000227 1A               [ 8]  566 	ld	a, (de)
-    00000228 77               [ 8]  567 	ld	(hl), a
-                                    568 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
-    00000229 5E               [ 8]  569 	ld	e, (hl)
-    0000022A 16 00            [ 8]  570 	ld	d, #0x00
-    0000022C 6B               [ 4]  571 	ld	l, e
-    0000022D 62               [ 4]  572 	ld	h, d
-    0000022E 29               [ 8]  573 	add	hl, hl
-    0000022F 29               [ 8]  574 	add	hl, hl
-    00000230 11r00r00         [12]  575 	ld	de, #_shadow_OAM
-    00000233 19               [ 8]  576 	add	hl, de
-                                    577 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
-    00000234 70               [ 8]  578 	ld	(hl), b
-    00000235 23               [ 8]  579 	inc	hl
-    00000236 71               [ 8]  580 	ld	(hl), c
-                                    581 ;enemies.c:254: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-                                    582 ;enemies.c:255: }
-    00000237 E8 08            [16]  583 	add	sp, #8
-    00000239 C9               [16]  584 	ret
-                                    585 ;enemies.c:267: INT8 GetSprite(INT8 nRandNumber)
-                                    586 ;	---------------------------------
-                                    587 ; Function GetSprite
-                                    588 ; ---------------------------------
-    0000023A                        589 _GetSprite::
-                                    590 ;enemies.c:271: switch (nRandNumber)
-    0000023A B7               [ 4]  591 	or	a, a
-    0000023B 28 12            [12]  592 	jr	Z, 00101$
-    0000023D FE 01            [ 8]  593 	cp	a, #0x01
-    0000023F 28 11            [12]  594 	jr	Z, 00102$
-    00000241 FE 02            [ 8]  595 	cp	a, #0x02
-    00000243 28 10            [12]  596 	jr	Z, 00103$
-    00000245 FE 03            [ 8]  597 	cp	a, #0x03
-    00000247 28 0F            [12]  598 	jr	Z, 00104$
-    00000249 D6 04            [ 8]  599 	sub	a, #0x04
-    0000024B 28 0E            [12]  600 	jr	Z, 00105$
-    0000024D 18 0F            [12]  601 	jr	00106$
-                                    602 ;enemies.c:273: case 0:
-    0000024F                        603 00101$:
-                                    604 ;enemies.c:274: return 47;
-    0000024F 3E 2F            [ 8]  605 	ld	a, #0x2f
-    00000251 C9               [16]  606 	ret
-                                    607 ;enemies.c:276: case 1:
-    00000252                        608 00102$:
-                                    609 ;enemies.c:277: return 55;
-    00000252 3E 37            [ 8]  610 	ld	a, #0x37
-    00000254 C9               [16]  611 	ret
-                                    612 ;enemies.c:279: case 2:
-    00000255                        613 00103$:
-                                    614 ;enemies.c:280: return 63;
-    00000255 3E 3F            [ 8]  615 	ld	a, #0x3f
-    00000257 C9               [16]  616 	ret
-                                    617 ;enemies.c:282: case 3:
-    00000258                        618 00104$:
-                                    619 ;enemies.c:283: return 71;
-    00000258 3E 47            [ 8]  620 	ld	a, #0x47
-    0000025A C9               [16]  621 	ret
-                                    622 ;enemies.c:285: case 4:
-    0000025B                        623 00105$:
-                                    624 ;enemies.c:286: return 79;
-    0000025B 3E 4F            [ 8]  625 	ld	a, #0x4f
-    0000025D C9               [16]  626 	ret
-                                    627 ;enemies.c:289: default:
-    0000025E                        628 00106$:
-                                    629 ;enemies.c:290: return 47;
-    0000025E 3E 2F            [ 8]  630 	ld	a, #0x2f
-                                    631 ;enemies.c:292: }
-                                    632 ;enemies.c:293: }
-    00000260 C9               [16]  633 	ret
-                                    634 ;enemies.c:302: void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer) 
-                                    635 ;	---------------------------------
-                                    636 ; Function UpdateEnemy
-                                    637 ; ---------------------------------
-    00000261                        638 _UpdateEnemy::
-    00000261 E8 F3            [16]  639 	add	sp, #-13
-    00000263 4F               [ 4]  640 	ld	c, a
-    00000264 F8 0B            [12]  641 	ldhl	sp,	#11
-    00000266 7B               [ 4]  642 	ld	a, e
-    00000267 22               [ 8]  643 	ld	(hl+), a
-    00000268 72               [ 8]  644 	ld	(hl), d
-                                    645 ;enemies.c:305: Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
-    00000269 06 00            [ 8]  646 	ld	b, #0x00
-    0000026B 69               [ 4]  647 	ld	l, c
-    0000026C 60               [ 4]  648 	ld	h, b
-    0000026D 29               [ 8]  649 	add	hl, hl
-    0000026E 09               [ 8]  650 	add	hl, bc
-    0000026F 29               [ 8]  651 	add	hl, hl
-    00000270 29               [ 8]  652 	add	hl, hl
-    00000271 09               [ 8]  653 	add	hl, bc
-    00000272 E5               [16]  654 	push	hl
-    00000273 7D               [ 4]  655 	ld	a, l
-    00000274 F8 09            [12]  656 	ldhl	sp,	#9
-    00000276 77               [ 8]  657 	ld	(hl), a
-    00000277 E1               [12]  658 	pop	hl
-    00000278 7C               [ 4]  659 	ld	a, h
-    00000279 F8 08            [12]  660 	ldhl	sp,	#8
-    0000027B 77               [ 8]  661 	ld	(hl), a
-    0000027C 11r00r00         [12]  662 	ld	de, #_m_aoEnemies
-    0000027F 3A               [ 8]  663 	ld	a, (hl-)
-    00000280 6E               [ 8]  664 	ld	l, (hl)
-    00000281 67               [ 4]  665 	ld	h, a
-    00000282 19               [ 8]  666 	add	hl, de
-    00000283 E5               [16]  667 	push	hl
-    00000284 7D               [ 4]  668 	ld	a, l
-    00000285 F8 0B            [12]  669 	ldhl	sp,	#11
-    00000287 77               [ 8]  670 	ld	(hl), a
-    00000288 E1               [12]  671 	pop	hl
-    00000289 7C               [ 4]  672 	ld	a, h
-    0000028A F8 0A            [12]  673 	ldhl	sp,	#10
-    0000028C 32               [ 8]  674 	ld	(hl-), a
-    0000028D 7E               [ 8]  675 	ld	a, (hl)
-    0000028E F8 04            [12]  676 	ldhl	sp,	#4
-    00000290 77               [ 8]  677 	ld	(hl), a
-    00000291 F8 0A            [12]  678 	ldhl	sp,	#10
-    00000293 7E               [ 8]  679 	ld	a, (hl)
-    00000294 F8 05            [12]  680 	ldhl	sp,	#5
-                                    681 ;enemies.c:308: if (!ptrEnemy->bAlive) return;
-    00000296 32               [ 8]  682 	ld	(hl-), a
-    00000297 2A               [ 8]  683 	ld	a, (hl+)
-    00000298 5F               [ 4]  684 	ld	e, a
-    00000299 56               [ 8]  685 	ld	d, (hl)
-    0000029A 21 03 00         [12]  686 	ld	hl, #0x0003
-    0000029D 19               [ 8]  687 	add	hl, de
-    0000029E E5               [16]  688 	push	hl
-    0000029F 7D               [ 4]  689 	ld	a, l
-    000002A0 F8 0B            [12]  690 	ldhl	sp,	#11
-    000002A2 77               [ 8]  691 	ld	(hl), a
-    000002A3 E1               [12]  692 	pop	hl
-    000002A4 7C               [ 4]  693 	ld	a, h
-    000002A5 F8 0A            [12]  694 	ldhl	sp,	#10
-    000002A7 32               [ 8]  695 	ld	(hl-), a
-    000002A8 2A               [ 8]  696 	ld	a, (hl+)
-    000002A9 5F               [ 4]  697 	ld	e, a
-    000002AA 56               [ 8]  698 	ld	d, (hl)
-    000002AB 1A               [ 8]  699 	ld	a, (de)
-    000002AC 77               [ 8]  700 	ld	(hl), a
-    000002AD 7E               [ 8]  701 	ld	a, (hl)
-    000002AE B7               [ 4]  702 	or	a, a
-    000002AF CArC3r05         [16]  703 	jp	Z, 00133$
-                                    704 ;enemies.c:311: if (!ptrEnemy->bCantMove) 
-    000002B2 F8 04            [12]  705 	ldhl	sp,#4
-    000002B4 2A               [ 8]  706 	ld	a, (hl+)
-    000002B5 5F               [ 4]  707 	ld	e, a
-    000002B6 56               [ 8]  708 	ld	d, (hl)
-    000002B7 21 06 00         [12]  709 	ld	hl, #0x0006
-    000002BA 19               [ 8]  710 	add	hl, de
-    000002BB E5               [16]  711 	push	hl
-    000002BC 7D               [ 4]  712 	ld	a, l
-    000002BD F8 04            [12]  713 	ldhl	sp,	#4
+                                     87 	.area _CODE
+                                     88 ;enemies.c:87: void InitEnemiesSpawnQueue(void) 
+                                     89 ;	---------------------------------
+                                     90 ; Function InitEnemiesSpawnQueue
+                                     91 ; ---------------------------------
+    00000000                         92 _InitEnemiesSpawnQueue::
+    00000000 3B               [ 8]   93 	dec	sp
+                                     94 ;enemies.c:95: UINT8 nIndex = 0;
+    00000001 1E 00            [ 8]   95 	ld	e, #0x00
+                                     96 ;enemies.c:97: BOOLEAN bValidShuffle = FALSE;
+                                     97 ;enemies.c:101: for (o = 0; o < 8; o++) 
+    00000003 01 00 08         [12]   98 	ld	bc, #0x800
+                                     99 ;enemies.c:103: for (k = 0; k < 8; k++) 
+    00000006                        100 00126$:
+    00000006 16 00            [ 8]  101 	ld	d, #0x00
+    00000008                        102 00113$:
+                                    103 ;enemies.c:105: m_anSpawnQueue[nIndex++] = k;
+    00000008 3ErD0            [ 8]  104 	ld	a, #<(_m_anSpawnQueue)
+    0000000A 83               [ 4]  105 	add	a, e
+    0000000B 6F               [ 4]  106 	ld	l, a
+    0000000C 3Es00            [ 8]  107 	ld	a, #>(_m_anSpawnQueue)
+    0000000E CE 00            [ 8]  108 	adc	a, #0x00
+    00000010 67               [ 4]  109 	ld	h, a
+    00000011 1C               [ 4]  110 	inc	e
+    00000012 72               [ 8]  111 	ld	(hl), d
+                                    112 ;enemies.c:103: for (k = 0; k < 8; k++) 
+    00000013 14               [ 4]  113 	inc	d
+    00000014 7A               [ 4]  114 	ld	a, d
+    00000015 D6 08            [ 8]  115 	sub	a, #0x08
+    00000017 38 EF            [12]  116 	jr	C, 00113$
+    00000019 05               [ 4]  117 	dec	b
+    0000001A 20 EA            [12]  118 	jr	NZ, 00126$
+                                    119 ;enemies.c:101: for (o = 0; o < 8; o++) 
+                                    120 ;enemies.c:111: while (!bValidShuffle) 
+    0000001C                        121 00110$:
+    0000001C 79               [ 4]  122 	ld	a, c
+    0000001D B7               [ 4]  123 	or	a, a
+    0000001E 20 5E            [12]  124 	jr	NZ, 00112$
+                                    125 ;enemies.c:114: for (i = SPAWN_QUEUE_SIZE - 1; i > 0; i--) 
+    00000020 F8 00            [12]  126 	ldhl	sp,	#0
+    00000022 36 3F            [12]  127 	ld	(hl), #0x3f
+    00000024                        128 00118$:
+                                    129 ;enemies.c:116: j = rand() % (i + 1);
+    00000024 CDr00r00         [24]  130 	call	_rand
+    00000027 F8 00            [12]  131 	ldhl	sp,	#0
+    00000029 4E               [ 8]  132 	ld	c, (hl)
+    0000002A 06 00            [ 8]  133 	ld	b, #0x00
+    0000002C 03               [ 8]  134 	inc	bc
+    0000002D 16 00            [ 8]  135 	ld	d, #0x00
+    0000002F CDr00r00         [24]  136 	call	__modsint
+                                    137 ;enemies.c:117: nTemp = m_anSpawnQueue[i];
+    00000032 11rD0r00         [12]  138 	ld	de, #_m_anSpawnQueue
+    00000035 F8 00            [12]  139 	ldhl	sp,	#0
+    00000037 6E               [ 8]  140 	ld	l, (hl)
+    00000038 26 00            [ 8]  141 	ld	h, #0x00
+    0000003A 19               [ 8]  142 	add	hl, de
+    0000003B 5D               [ 4]  143 	ld	e, l
+    0000003C 54               [ 4]  144 	ld	d, h
+    0000003D 1A               [ 8]  145 	ld	a, (de)
+    0000003E 47               [ 4]  146 	ld	b, a
+                                    147 ;enemies.c:118: m_anSpawnQueue[i] = m_anSpawnQueue[j];
+    0000003F 3ErD0            [ 8]  148 	ld	a, #<(_m_anSpawnQueue)
+    00000041 81               [ 4]  149 	add	a, c
+    00000042 6F               [ 4]  150 	ld	l, a
+    00000043 3Es00            [ 8]  151 	ld	a, #>(_m_anSpawnQueue)
+    00000045 CE 00            [ 8]  152 	adc	a, #0x00
+    00000047 67               [ 4]  153 	ld	h, a
+    00000048 7E               [ 8]  154 	ld	a, (hl)
+    00000049 12               [ 8]  155 	ld	(de), a
+                                    156 ;enemies.c:119: m_anSpawnQueue[j] = nTemp;
+    0000004A 70               [ 8]  157 	ld	(hl), b
+                                    158 ;enemies.c:114: for (i = SPAWN_QUEUE_SIZE - 1; i > 0; i--) 
+    0000004B F8 00            [12]  159 	ldhl	sp,	#0
+    0000004D 35               [12]  160 	dec	(hl)
+    0000004E 20 D4            [12]  161 	jr	NZ, 00118$
+                                    162 ;enemies.c:124: bValidShuffle = TRUE;
+                                    163 ;enemies.c:125: nStreak = 1;
+    00000050 01 01 01         [12]  164 	ld	bc, #0x101
+                                    165 ;enemies.c:130: for (i = 1; i < SPAWN_QUEUE_SIZE; i++) 
+    00000053 1E 01            [ 8]  166 	ld	e, #0x01
+    00000055                        167 00120$:
+                                    168 ;enemies.c:133: if (m_anSpawnQueue[i] == m_anSpawnQueue[i-1]) 
+    00000055 21rD0r00         [12]  169 	ld	hl, #_m_anSpawnQueue
+    00000058 16 00            [ 8]  170 	ld	d, #0x00
+    0000005A 19               [ 8]  171 	add	hl, de
+    0000005B 56               [ 8]  172 	ld	d, (hl)
+    0000005C 7B               [ 4]  173 	ld	a, e
+    0000005D 3D               [ 4]  174 	dec	a
+    0000005E C6rD0            [ 8]  175 	add	a, #<(_m_anSpawnQueue)
+    00000060 6F               [ 4]  176 	ld	l, a
+    00000061 3E 00            [ 8]  177 	ld	a, #0x00
+    00000063 CEs00            [ 8]  178 	adc	a, #>(_m_anSpawnQueue)
+    00000065 67               [ 4]  179 	ld	h, a
+    00000066 7E               [ 8]  180 	ld	a, (hl)
+    00000067 92               [ 4]  181 	sub	a, d
+    00000068 20 0A            [12]  182 	jr	NZ, 00107$
+                                    183 ;enemies.c:136: nStreak++;
+    0000006A 04               [ 4]  184 	inc	b
+                                    185 ;enemies.c:139: if (nStreak > 3) 
+    0000006B 3E 03            [ 8]  186 	ld	a, #0x03
+    0000006D 90               [ 4]  187 	sub	a, b
+    0000006E 30 06            [12]  188 	jr	NC, 00121$
+                                    189 ;enemies.c:143: bValidShuffle = FALSE;
+    00000070 0E 00            [ 8]  190 	ld	c, #0x00
+                                    191 ;enemies.c:144: break;
+    00000072 18 A8            [12]  192 	jr	00110$
+    00000074                        193 00107$:
+                                    194 ;enemies.c:151: nStreak = 1;
+    00000074 06 01            [ 8]  195 	ld	b, #0x01
+    00000076                        196 00121$:
+                                    197 ;enemies.c:130: for (i = 1; i < SPAWN_QUEUE_SIZE; i++) 
+    00000076 1C               [ 4]  198 	inc	e
+    00000077 7B               [ 4]  199 	ld	a, e
+    00000078 D6 40            [ 8]  200 	sub	a, #0x40
+    0000007A 38 D9            [12]  201 	jr	C, 00120$
+    0000007C 18 9E            [12]  202 	jr	00110$
+    0000007E                        203 00112$:
+                                    204 ;enemies.c:157: m_nSpawnQueuePos = 0;
+    0000007E AF               [ 4]  205 	xor	a, a
+    0000007F EAr01r00         [16]  206 	ld	(#_m_nSpawnQueuePos),a
+                                    207 ;enemies.c:158: }
+    00000082 33               [ 8]  208 	inc	sp
+    00000083 C9               [16]  209 	ret
+    00000084                        210 _m_anSpawnPositions:
+    00000084 27                     211 	.db #0x27	; 39
+    00000085 2B                     212 	.db #0x2b	; 43
+    00000086 50                     213 	.db #0x50	; 80	'P'
+    00000087 29                     214 	.db #0x29	; 41
+    00000088 82                     215 	.db #0x82	; 130
+    00000089 21                     216 	.db #0x21	; 33
+    0000008A 0E                     217 	.db #0x0e	; 14
+    0000008B 52                     218 	.db #0x52	; 82	'R'
+    0000008C 9A                     219 	.db #0x9a	; 154
+    0000008D 52                     220 	.db #0x52	; 82	'R'
+    0000008E 06                     221 	.db #0x06	; 6
+    0000008F 9A                     222 	.db #0x9a	; 154
+    00000090 50                     223 	.db #0x50	; 80	'P'
+    00000091 9A                     224 	.db #0x9a	; 154
+    00000092 9C                     225 	.db #0x9c	; 156
+    00000093 9C                     226 	.db #0x9c	; 156
+    00000094                        227 _m_anMovementDirX:
+    00000094 01                     228 	.db #0x01	;  1
+    00000095 00                     229 	.db #0x00	;  0
+    00000096 FF                     230 	.db #0xff	; -1
+    00000097 01                     231 	.db #0x01	;  1
+    00000098 FF                     232 	.db #0xff	; -1
+    00000099 01                     233 	.db #0x01	;  1
+    0000009A 00                     234 	.db #0x00	;  0
+    0000009B FF                     235 	.db #0xff	; -1
+    0000009C                        236 _m_anMovementDirY:
+    0000009C 01                     237 	.db #0x01	;  1
+    0000009D 01                     238 	.db #0x01	;  1
+    0000009E 01                     239 	.db #0x01	;  1
+    0000009F 00                     240 	.db #0x00	;  0
+    000000A0 00                     241 	.db #0x00	;  0
+    000000A1 FF                     242 	.db #0xff	; -1
+    000000A2 FF                     243 	.db #0xff	; -1
+    000000A3 FF                     244 	.db #0xff	; -1
+                                    245 ;enemies.c:166: UINT8 GetNextSpawnIndex(void) 
+                                    246 ;	---------------------------------
+                                    247 ; Function GetNextSpawnIndex
+                                    248 ; ---------------------------------
+    000000A4                        249 _GetNextSpawnIndex::
+                                    250 ;enemies.c:169: UINT8 nIndex = m_anSpawnQueue[m_nSpawnQueuePos];
+    000000A4 3ErD0            [ 8]  251 	ld	a, #<(_m_anSpawnQueue)
+    000000A6 21r01r00         [12]  252 	ld	hl, #_m_nSpawnQueuePos
+    000000A9 86               [ 8]  253 	add	a, (hl)
+    000000AA 4F               [ 4]  254 	ld	c, a
+    000000AB 3Es00            [ 8]  255 	ld	a, #>(_m_anSpawnQueue)
+    000000AD CE 00            [ 8]  256 	adc	a, #0x00
+    000000AF 47               [ 4]  257 	ld	b, a
+    000000B0 0A               [ 8]  258 	ld	a, (bc)
+    000000B1 6F               [ 4]  259 	ld	l, a
+                                    260 ;enemies.c:170: m_nSpawnQueuePos = (m_nSpawnQueuePos + 1) % SPAWN_QUEUE_SIZE;
+    000000B2 FAr01r00         [16]  261 	ld	a, (_m_nSpawnQueuePos)
+    000000B5 16 00            [ 8]  262 	ld	d, #0x00
+    000000B7 5F               [ 4]  263 	ld	e, a
+    000000B8 13               [ 8]  264 	inc	de
+    000000B9 E5               [16]  265 	push	hl
+    000000BA 01 40 00         [12]  266 	ld	bc, #0x0040
+    000000BD CDr00r00         [24]  267 	call	__modsint
+    000000C0 E1               [12]  268 	pop	hl
+    000000C1 79               [ 4]  269 	ld	a, c
+    000000C2 EAr01r00         [16]  270 	ld	(_m_nSpawnQueuePos), a
+                                    271 ;enemies.c:171: return nIndex;
+    000000C5 7D               [ 4]  272 	ld	a, l
+                                    273 ;enemies.c:172: }
+    000000C6 C9               [16]  274 	ret
+                                    275 ;enemies.c:180: void InitEnemy(UINT8 nEnemyIndex) 
+                                    276 ;	---------------------------------
+                                    277 ; Function InitEnemy
+                                    278 ; ---------------------------------
+    000000C7                        279 _InitEnemy::
+    000000C7 4F               [ 4]  280 	ld	c, a
+                                    281 ;enemies.c:183: m_aoEnemies[nEnemyIndex].bAlive = FALSE;
+    000000C8 06 00            [ 8]  282 	ld	b, #0x00
+    000000CA 69               [ 4]  283 	ld	l, c
+    000000CB 60               [ 4]  284 	ld	h, b
+    000000CC 29               [ 8]  285 	add	hl, hl
+    000000CD 09               [ 8]  286 	add	hl, bc
+    000000CE 29               [ 8]  287 	add	hl, hl
+    000000CF 29               [ 8]  288 	add	hl, hl
+    000000D0 09               [ 8]  289 	add	hl, bc
+    000000D1 3Er00            [ 8]  290 	ld	a, #<(_m_aoEnemies)
+    000000D3 85               [ 4]  291 	add	a, l
+    000000D4 4F               [ 4]  292 	ld	c, a
+    000000D5 3Es00            [ 8]  293 	ld	a, #>(_m_aoEnemies)
+    000000D7 8C               [ 4]  294 	adc	a, h
+    000000D8 47               [ 4]  295 	ld	b, a
+    000000D9 69               [ 4]  296 	ld	l, c
+    000000DA 60               [ 4]  297 	ld	h, b
+    000000DB 23               [ 8]  298 	inc	hl
+    000000DC 23               [ 8]  299 	inc	hl
+    000000DD 23               [ 8]  300 	inc	hl
+    000000DE 36 00            [12]  301 	ld	(hl), #0x00
+                                    302 ;enemies.c:184: m_aoEnemies[nEnemyIndex].bCantMove = FALSE;
+    000000E0 21 06 00         [12]  303 	ld	hl, #0x0006
+    000000E3 09               [ 8]  304 	add	hl, bc
+    000000E4 36 00            [12]  305 	ld	(hl), #0x00
+                                    306 ;enemies.c:185: m_aoEnemies[nEnemyIndex].bMainSpriteSet = FALSE;
+    000000E6 21 0C 00         [12]  307 	ld	hl, #0x000c
+    000000E9 09               [ 8]  308 	add	hl, bc
+    000000EA 36 00            [12]  309 	ld	(hl), #0x00
+                                    310 ;enemies.c:186: m_aoEnemies[nEnemyIndex].nSpriteID = 0;
+    000000EC 69               [ 4]  311 	ld	l, c
+    000000ED 60               [ 4]  312 	ld	h, b
+    000000EE 23               [ 8]  313 	inc	hl
+    000000EF 23               [ 8]  314 	inc	hl
+    000000F0 36 00            [12]  315 	ld	(hl), #0x00
+                                    316 ;enemies.c:187: m_aoEnemies[nEnemyIndex].nSpeed = m_nCurrentSpeed;
+    000000F2 21 07 00         [12]  317 	ld	hl, #0x0007
+    000000F5 09               [ 8]  318 	add	hl, bc
+    000000F6 FAr02r00         [16]  319 	ld	a, (_m_nCurrentSpeed)
+    000000F9 77               [ 8]  320 	ld	(hl), a
+                                    321 ;enemies.c:188: m_aoEnemies[nEnemyIndex].nSubPixelX = 0;
+    000000FA 21 09 00         [12]  322 	ld	hl, #0x0009
+    000000FD 09               [ 8]  323 	add	hl, bc
+    000000FE 36 00            [12]  324 	ld	(hl), #0x00
+                                    325 ;enemies.c:189: m_aoEnemies[nEnemyIndex].nSubPixelY = 0;
+    00000100 21 0A 00         [12]  326 	ld	hl, #0x000a
+    00000103 09               [ 8]  327 	add	hl, bc
+    00000104 36 00            [12]  328 	ld	(hl), #0x00
+                                    329 ;enemies.c:190: }
+    00000106 C9               [16]  330 	ret
+                                    331 ;enemies.c:199: void SpawnEnemy(UINT8 nEnemyIndex, UINT8 nSpawnIndex) 
+                                    332 ;	---------------------------------
+                                    333 ; Function SpawnEnemy
+                                    334 ; ---------------------------------
+    00000107                        335 _SpawnEnemy::
+    00000107 E8 F8            [16]  336 	add	sp, #-8
+    00000109 4F               [ 4]  337 	ld	c, a
+    0000010A F8 07            [12]  338 	ldhl	sp,	#7
+    0000010C 73               [ 8]  339 	ld	(hl), e
+                                    340 ;enemies.c:202: Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
+    0000010D 06 00            [ 8]  341 	ld	b, #0x00
+    0000010F 69               [ 4]  342 	ld	l, c
+    00000110 60               [ 4]  343 	ld	h, b
+    00000111 29               [ 8]  344 	add	hl, hl
+    00000112 09               [ 8]  345 	add	hl, bc
+    00000113 29               [ 8]  346 	add	hl, hl
+    00000114 29               [ 8]  347 	add	hl, hl
+    00000115 09               [ 8]  348 	add	hl, bc
+    00000116 11r00r00         [12]  349 	ld	de, #_m_aoEnemies
+    00000119 19               [ 8]  350 	add	hl, de
+    0000011A 4D               [ 4]  351 	ld	c, l
+    0000011B 44               [ 4]  352 	ld	b, h
+                                    353 ;enemies.c:210: if (nSpawnIndex > 7) nSpawnIndex = 2;
+    0000011C 3E 07            [ 8]  354 	ld	a, #0x07
+    0000011E F8 07            [12]  355 	ldhl	sp,	#7
+    00000120 96               [ 8]  356 	sub	a, (hl)
+    00000121 30 02            [12]  357 	jr	NC, 00102$
+    00000123 36 02            [12]  358 	ld	(hl), #0x02
+    00000125                        359 00102$:
+                                    360 ;enemies.c:213: ptrEnemy->nX = m_anSpawnPositions[nSpawnIndex][0];
+    00000125 33               [ 8]  361 	inc	sp
+    00000126 33               [ 8]  362 	inc	sp
+    00000127 C5               [16]  363 	push	bc
+    00000128 F8 07            [12]  364 	ldhl	sp,	#7
+    0000012A 5E               [ 8]  365 	ld	e, (hl)
+    0000012B AF               [ 4]  366 	xor	a, a
+    0000012C 57               [ 4]  367 	ld	d, a
+    0000012D CB 23            [ 8]  368 	sla	e
+    0000012F CB 12            [ 8]  369 	rl	d
+    00000131 21r84r00         [12]  370 	ld	hl, #_m_anSpawnPositions
+    00000134 19               [ 8]  371 	add	hl, de
+    00000135 E5               [16]  372 	push	hl
+    00000136 7D               [ 4]  373 	ld	a, l
+    00000137 F8 07            [12]  374 	ldhl	sp,	#7
+    00000139 77               [ 8]  375 	ld	(hl), a
+    0000013A E1               [12]  376 	pop	hl
+    0000013B 7C               [ 4]  377 	ld	a, h
+    0000013C F8 06            [12]  378 	ldhl	sp,	#6
+    0000013E 32               [ 8]  379 	ld	(hl-), a
+    0000013F 2A               [ 8]  380 	ld	a, (hl+)
+    00000140 5F               [ 4]  381 	ld	e, a
+    00000141 56               [ 8]  382 	ld	d, (hl)
+    00000142 1A               [ 8]  383 	ld	a, (de)
+    00000143 E1               [12]  384 	pop	hl
+    00000144 E5               [16]  385 	push	hl
+    00000145 77               [ 8]  386 	ld	(hl), a
+                                    387 ;enemies.c:214: ptrEnemy->nY = m_anSpawnPositions[nSpawnIndex][1];
+    00000146 69               [ 4]  388 	ld	l, c
+    00000147 60               [ 4]  389 	ld	h, b
+    00000148 23               [ 8]  390 	inc	hl
+    00000149 E5               [16]  391 	push	hl
+    0000014A 7D               [ 4]  392 	ld	a, l
+    0000014B F8 04            [12]  393 	ldhl	sp,	#4
+    0000014D 77               [ 8]  394 	ld	(hl), a
+    0000014E E1               [12]  395 	pop	hl
+    0000014F 7C               [ 4]  396 	ld	a, h
+    00000150 F8 03            [12]  397 	ldhl	sp,	#3
+    00000152 22               [ 8]  398 	ld	(hl+), a
+    00000153 23               [ 8]  399 	inc	hl
+    00000154 2A               [ 8]  400 	ld	a, (hl+)
+    00000155 5F               [ 4]  401 	ld	e, a
+    00000156 56               [ 8]  402 	ld	d, (hl)
+    00000157 13               [ 8]  403 	inc	de
+    00000158 1A               [ 8]  404 	ld	a, (de)
+    00000159 F8 02            [12]  405 	ldhl	sp,	#2
+    0000015B 5E               [ 8]  406 	ld	e, (hl)
+    0000015C 23               [ 8]  407 	inc	hl
+    0000015D 66               [ 8]  408 	ld	h, (hl)
+    0000015E 6B               [ 4]  409 	ld	l, e
+    0000015F 77               [ 8]  410 	ld	(hl), a
+                                    411 ;enemies.c:217: ptrEnemy->nSubPixelX = 0;
+    00000160 21 09 00         [12]  412 	ld	hl, #0x0009
+    00000163 09               [ 8]  413 	add	hl, bc
+    00000164 36 00            [12]  414 	ld	(hl), #0x00
+                                    415 ;enemies.c:218: ptrEnemy->nSubPixelY = 0;
+    00000166 21 0A 00         [12]  416 	ld	hl, #0x000a
+    00000169 09               [ 8]  417 	add	hl, bc
+    0000016A 36 00            [12]  418 	ld	(hl), #0x00
+                                    419 ;enemies.c:221: ptrEnemy->bAlive = TRUE;
+    0000016C 69               [ 4]  420 	ld	l, c
+    0000016D 60               [ 4]  421 	ld	h, b
+    0000016E 23               [ 8]  422 	inc	hl
+    0000016F 23               [ 8]  423 	inc	hl
+    00000170 23               [ 8]  424 	inc	hl
+    00000171 36 01            [12]  425 	ld	(hl), #0x01
+                                    426 ;enemies.c:222: ptrEnemy->bCantMove = FALSE;
+    00000173 21 06 00         [12]  427 	ld	hl, #0x0006
+    00000176 09               [ 8]  428 	add	hl, bc
+    00000177 36 00            [12]  429 	ld	(hl), #0x00
+                                    430 ;enemies.c:223: ptrEnemy->bMainSpriteSet = FALSE;
+    00000179 21 0C 00         [12]  431 	ld	hl, #0x000c
+    0000017C 09               [ 8]  432 	add	hl, bc
+    0000017D 36 00            [12]  433 	ld	(hl), #0x00
+                                    434 ;enemies.c:226: nMoveventX = m_anMovementDirX[nSpawnIndex];
+    0000017F 11r94r00         [12]  435 	ld	de, #_m_anMovementDirX+0
+    00000182 F8 07            [12]  436 	ldhl	sp,	#7
+    00000184 6E               [ 8]  437 	ld	l, (hl)
+    00000185 26 00            [ 8]  438 	ld	h, #0x00
+    00000187 19               [ 8]  439 	add	hl, de
+    00000188 5D               [ 4]  440 	ld	e, l
+    00000189 54               [ 4]  441 	ld	d, h
+    0000018A 1A               [ 8]  442 	ld	a, (de)
+    0000018B F8 06            [12]  443 	ldhl	sp,	#6
+                                    444 ;enemies.c:227: nMovementY = m_anMovementDirY[nSpawnIndex];
+    0000018D 22               [ 8]  445 	ld	(hl+), a
+    0000018E 11r9Cr00         [12]  446 	ld	de, #_m_anMovementDirY+0
+    00000191 6E               [ 8]  447 	ld	l, (hl)
+    00000192 26 00            [ 8]  448 	ld	h, #0x00
+    00000194 19               [ 8]  449 	add	hl, de
+    00000195 5D               [ 4]  450 	ld	e, l
+    00000196 54               [ 4]  451 	ld	d, h
+    00000197 1A               [ 8]  452 	ld	a, (de)
+    00000198 5F               [ 4]  453 	ld	e, a
+                                    454 ;enemies.c:228: ptrEnemy->nDirX = nMoveventX;
+    00000199 21 04 00         [12]  455 	ld	hl, #0x0004
+    0000019C 09               [ 8]  456 	add	hl, bc
+    0000019D E5               [16]  457 	push	hl
+    0000019E F8 08            [12]  458 	ldhl	sp,	#8
+    000001A0 7E               [ 8]  459 	ld	a, (hl)
+    000001A1 E1               [12]  460 	pop	hl
+    000001A2 77               [ 8]  461 	ld	(hl), a
+                                    462 ;enemies.c:229: ptrEnemy->nDirY = nMovementY;
+    000001A3 21 05 00         [12]  463 	ld	hl, #0x0005
+    000001A6 09               [ 8]  464 	add	hl, bc
+    000001A7 73               [ 8]  465 	ld	(hl), e
+                                    466 ;enemies.c:232: ptrEnemy->nSpeed = m_nCurrentSpeed;
+    000001A8 21 07 00         [12]  467 	ld	hl, #0x0007
+    000001AB 09               [ 8]  468 	add	hl, bc
+    000001AC FAr02r00         [16]  469 	ld	a, (_m_nCurrentSpeed)
+    000001AF 77               [ 8]  470 	ld	(hl), a
+                                    471 ;enemies.c:235: ptrEnemy->nSpriteID = m_nNextSpriteID++;
+    000001B0 21 02 00         [12]  472 	ld	hl, #0x0002
+    000001B3 09               [ 8]  473 	add	hl, bc
+    000001B4 E5               [16]  474 	push	hl
+    000001B5 7D               [ 4]  475 	ld	a, l
+    000001B6 F8 06            [12]  476 	ldhl	sp,	#6
+    000001B8 77               [ 8]  477 	ld	(hl), a
+    000001B9 E1               [12]  478 	pop	hl
+    000001BA 7C               [ 4]  479 	ld	a, h
+    000001BB F8 05            [12]  480 	ldhl	sp,	#5
+    000001BD 77               [ 8]  481 	ld	(hl), a
+    000001BE FAr00r00         [16]  482 	ld	a, (#_m_nNextSpriteID)
+    000001C1 F8 06            [12]  483 	ldhl	sp,	#6
+    000001C3 77               [ 8]  484 	ld	(hl), a
+    000001C4 21r00r00         [12]  485 	ld	hl, #_m_nNextSpriteID
+    000001C7 34               [12]  486 	inc	(hl)
+    000001C8 F8 04            [12]  487 	ldhl	sp,	#4
+    000001CA 2A               [ 8]  488 	ld	a, (hl+)
+    000001CB 5F               [ 4]  489 	ld	e, a
+    000001CC 2A               [ 8]  490 	ld	a, (hl+)
+    000001CD 57               [ 4]  491 	ld	d, a
+    000001CE 7E               [ 8]  492 	ld	a, (hl)
+    000001CF 12               [ 8]  493 	ld	(de), a
+                                    494 ;enemies.c:238: if (m_nNextSpriteID >= 40) m_nNextSpriteID = 7;
+    000001D0 21r00r00         [12]  495 	ld	hl, #_m_nNextSpriteID
+    000001D3 7E               [ 8]  496 	ld	a, (hl)
+    000001D4 D6 28            [ 8]  497 	sub	a, #0x28
+    000001D6 38 02            [12]  498 	jr	C, 00104$
+    000001D8 36 07            [12]  499 	ld	(hl), #0x07
+    000001DA                        500 00104$:
+                                    501 ;enemies.c:241: ptrEnemy->nIndex = nSpawnIndex;
+    000001DA 21 08 00         [12]  502 	ld	hl, #0x0008
+    000001DD 09               [ 8]  503 	add	hl, bc
+    000001DE 5D               [ 4]  504 	ld	e, l
+    000001DF 54               [ 4]  505 	ld	d, h
+    000001E0 F8 07            [12]  506 	ldhl	sp,	#7
+    000001E2 7E               [ 8]  507 	ld	a, (hl)
+    000001E3 12               [ 8]  508 	ld	(de), a
+                                    509 ;enemies.c:245: ptrEnemy->nSpriteNumber = GetSprite((rand() >> 4) % 5) + nSpawnIndex;
+    000001E4 21 0B 00         [12]  510 	ld	hl, #0x000b
+    000001E7 09               [ 8]  511 	add	hl, bc
+    000001E8 4D               [ 4]  512 	ld	c, l
+    000001E9 44               [ 4]  513 	ld	b, h
+    000001EA CDr00r00         [24]  514 	call	_rand
+    000001ED 7B               [ 4]  515 	ld	a, e
+    000001EE CB 37            [ 8]  516 	swap	a
+    000001F0 E6 0F            [ 8]  517 	and	a, #0x0f
+    000001F2 C5               [16]  518 	push	bc
+    000001F3 1E 05            [ 8]  519 	ld	e, #0x05
+    000001F5 CDr00r00         [24]  520 	call	__moduchar
+    000001F8 79               [ 4]  521 	ld	a, c
+    000001F9 CDr3Ar02         [24]  522 	call	_GetSprite
+    000001FC C1               [12]  523 	pop	bc
+    000001FD F8 07            [12]  524 	ldhl	sp,	#7
+    000001FF 5E               [ 8]  525 	ld	e, (hl)
+                                    526 ;enemies.c:248: set_sprite_tile(ptrEnemy->nSpriteID, 32);
+    00000200 2B               [ 8]  527 	dec	hl
+    00000201 2B               [ 8]  528 	dec	hl
+    00000202 2B               [ 8]  529 	dec	hl
+    00000203 83               [ 4]  530 	add	a, e
+    00000204 02               [ 8]  531 	ld	(bc), a
+    00000205 2A               [ 8]  532 	ld	a, (hl+)
+    00000206 5F               [ 4]  533 	ld	e, a
+    00000207 56               [ 8]  534 	ld	d, (hl)
+    00000208 1A               [ 8]  535 	ld	a, (de)
+    00000209 4F               [ 4]  536 	ld	c, a
+                                    537 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
+    0000020A 11r00r00         [12]  538 	ld	de, #_shadow_OAM+0
+    0000020D AF               [ 4]  539 	xor	a, a
+    0000020E 69               [ 4]  540 	ld	l, c
+    0000020F 67               [ 4]  541 	ld	h, a
+    00000210 29               [ 8]  542 	add	hl, hl
+    00000211 29               [ 8]  543 	add	hl, hl
+    00000212 19               [ 8]  544 	add	hl, de
+    00000213 23               [ 8]  545 	inc	hl
+    00000214 23               [ 8]  546 	inc	hl
+    00000215 36 20            [12]  547 	ld	(hl), #0x20
+                                    548 ;enemies.c:251: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+    00000217 F8 02            [12]  549 	ldhl	sp,#2
+    00000219 2A               [ 8]  550 	ld	a, (hl+)
+    0000021A 5F               [ 4]  551 	ld	e, a
+    0000021B 2A               [ 8]  552 	ld	a, (hl+)
+    0000021C 57               [ 4]  553 	ld	d, a
+    0000021D 1A               [ 8]  554 	ld	a, (de)
+    0000021E 47               [ 4]  555 	ld	b, a
+    0000021F D1               [12]  556 	pop	de
+    00000220 D5               [16]  557 	push	de
+    00000221 1A               [ 8]  558 	ld	a, (de)
+    00000222 4F               [ 4]  559 	ld	c, a
+    00000223 2A               [ 8]  560 	ld	a, (hl+)
+    00000224 5F               [ 4]  561 	ld	e, a
+    00000225 2A               [ 8]  562 	ld	a, (hl+)
+    00000226 57               [ 4]  563 	ld	d, a
+    00000227 1A               [ 8]  564 	ld	a, (de)
+    00000228 77               [ 8]  565 	ld	(hl), a
+                                    566 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    00000229 5E               [ 8]  567 	ld	e, (hl)
+    0000022A 16 00            [ 8]  568 	ld	d, #0x00
+    0000022C 6B               [ 4]  569 	ld	l, e
+    0000022D 62               [ 4]  570 	ld	h, d
+    0000022E 29               [ 8]  571 	add	hl, hl
+    0000022F 29               [ 8]  572 	add	hl, hl
+    00000230 11r00r00         [12]  573 	ld	de, #_shadow_OAM
+    00000233 19               [ 8]  574 	add	hl, de
+                                    575 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
+    00000234 70               [ 8]  576 	ld	(hl), b
+    00000235 23               [ 8]  577 	inc	hl
+    00000236 71               [ 8]  578 	ld	(hl), c
+                                    579 ;enemies.c:251: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+                                    580 ;enemies.c:252: }
+    00000237 E8 08            [16]  581 	add	sp, #8
+    00000239 C9               [16]  582 	ret
+                                    583 ;enemies.c:264: INT8 GetSprite(INT8 nRandNumber)
+                                    584 ;	---------------------------------
+                                    585 ; Function GetSprite
+                                    586 ; ---------------------------------
+    0000023A                        587 _GetSprite::
+                                    588 ;enemies.c:268: switch (nRandNumber)
+    0000023A B7               [ 4]  589 	or	a, a
+    0000023B 28 12            [12]  590 	jr	Z, 00101$
+    0000023D FE 01            [ 8]  591 	cp	a, #0x01
+    0000023F 28 11            [12]  592 	jr	Z, 00102$
+    00000241 FE 02            [ 8]  593 	cp	a, #0x02
+    00000243 28 10            [12]  594 	jr	Z, 00103$
+    00000245 FE 03            [ 8]  595 	cp	a, #0x03
+    00000247 28 0F            [12]  596 	jr	Z, 00104$
+    00000249 D6 04            [ 8]  597 	sub	a, #0x04
+    0000024B 28 0E            [12]  598 	jr	Z, 00105$
+    0000024D 18 0F            [12]  599 	jr	00106$
+                                    600 ;enemies.c:270: case 0:
+    0000024F                        601 00101$:
+                                    602 ;enemies.c:271: return 47;
+    0000024F 3E 2F            [ 8]  603 	ld	a, #0x2f
+    00000251 C9               [16]  604 	ret
+                                    605 ;enemies.c:273: case 1:
+    00000252                        606 00102$:
+                                    607 ;enemies.c:274: return 55;
+    00000252 3E 37            [ 8]  608 	ld	a, #0x37
+    00000254 C9               [16]  609 	ret
+                                    610 ;enemies.c:276: case 2:
+    00000255                        611 00103$:
+                                    612 ;enemies.c:277: return 63;
+    00000255 3E 3F            [ 8]  613 	ld	a, #0x3f
+    00000257 C9               [16]  614 	ret
+                                    615 ;enemies.c:279: case 3:
+    00000258                        616 00104$:
+                                    617 ;enemies.c:280: return 71;
+    00000258 3E 47            [ 8]  618 	ld	a, #0x47
+    0000025A C9               [16]  619 	ret
+                                    620 ;enemies.c:282: case 4:
+    0000025B                        621 00105$:
+                                    622 ;enemies.c:283: return 79;
+    0000025B 3E 4F            [ 8]  623 	ld	a, #0x4f
+    0000025D C9               [16]  624 	ret
+                                    625 ;enemies.c:286: default:
+    0000025E                        626 00106$:
+                                    627 ;enemies.c:287: return 47;
+    0000025E 3E 2F            [ 8]  628 	ld	a, #0x2f
+                                    629 ;enemies.c:289: }
+                                    630 ;enemies.c:290: }
+    00000260 C9               [16]  631 	ret
+                                    632 ;enemies.c:299: void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer) 
+                                    633 ;	---------------------------------
+                                    634 ; Function UpdateEnemy
+                                    635 ; ---------------------------------
+    00000261                        636 _UpdateEnemy::
+    00000261 E8 F1            [16]  637 	add	sp, #-15
+    00000263 4F               [ 4]  638 	ld	c, a
+    00000264 F8 0D            [12]  639 	ldhl	sp,	#13
+    00000266 7B               [ 4]  640 	ld	a, e
+    00000267 22               [ 8]  641 	ld	(hl+), a
+    00000268 72               [ 8]  642 	ld	(hl), d
+                                    643 ;enemies.c:302: Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
+    00000269 06 00            [ 8]  644 	ld	b, #0x00
+    0000026B 69               [ 4]  645 	ld	l, c
+    0000026C 60               [ 4]  646 	ld	h, b
+    0000026D 29               [ 8]  647 	add	hl, hl
+    0000026E 09               [ 8]  648 	add	hl, bc
+    0000026F 29               [ 8]  649 	add	hl, hl
+    00000270 29               [ 8]  650 	add	hl, hl
+    00000271 09               [ 8]  651 	add	hl, bc
+    00000272 3Er00            [ 8]  652 	ld	a, #<(_m_aoEnemies)
+    00000274 85               [ 4]  653 	add	a, l
+    00000275 4F               [ 4]  654 	ld	c, a
+    00000276 3Es00            [ 8]  655 	ld	a, #>(_m_aoEnemies)
+    00000278 8C               [ 4]  656 	adc	a, h
+    00000279 F8 00            [12]  657 	ldhl	sp,	#0
+    0000027B 71               [ 8]  658 	ld	(hl), c
+    0000027C 23               [ 8]  659 	inc	hl
+    0000027D 77               [ 8]  660 	ld	(hl), a
+                                    661 ;enemies.c:305: if (!ptrEnemy->bAlive) return;
+    0000027E E1               [12]  662 	pop	hl
+    0000027F E5               [16]  663 	push	hl
+    00000280 23               [ 8]  664 	inc	hl
+    00000281 23               [ 8]  665 	inc	hl
+    00000282 23               [ 8]  666 	inc	hl
+    00000283 4E               [ 8]  667 	ld	c, (hl)
+    00000284 79               [ 4]  668 	ld	a, c
+    00000285 B7               [ 4]  669 	or	a, a
+    00000286 CAr9Br04         [16]  670 	jp	Z, 00133$
+                                    671 ;enemies.c:308: if (!ptrEnemy->bCantMove) 
+    00000289 D1               [12]  672 	pop	de
+    0000028A D5               [16]  673 	push	de
+    0000028B 21 06 00         [12]  674 	ld	hl, #0x0006
+    0000028E 19               [ 8]  675 	add	hl, de
+    0000028F E5               [16]  676 	push	hl
+    00000290 7D               [ 4]  677 	ld	a, l
+    00000291 F8 04            [12]  678 	ldhl	sp,	#4
+    00000293 77               [ 8]  679 	ld	(hl), a
+    00000294 E1               [12]  680 	pop	hl
+    00000295 7C               [ 4]  681 	ld	a, h
+    00000296 F8 03            [12]  682 	ldhl	sp,	#3
+    00000298 32               [ 8]  683 	ld	(hl-), a
+    00000299 2A               [ 8]  684 	ld	a, (hl+)
+    0000029A 5F               [ 4]  685 	ld	e, a
+    0000029B 56               [ 8]  686 	ld	d, (hl)
+    0000029C 1A               [ 8]  687 	ld	a, (de)
+    0000029D B7               [ 4]  688 	or	a, a
+    0000029E C2rEBr03         [16]  689 	jp	NZ, 00120$
+                                    690 ;enemies.c:311: ptrEnemy->nSubPixelX += m_nCurrentSpeed;
+    000002A1 D1               [12]  691 	pop	de
+    000002A2 D5               [16]  692 	push	de
+    000002A3 21 09 00         [12]  693 	ld	hl, #0x0009
+    000002A6 19               [ 8]  694 	add	hl, de
+    000002A7 E5               [16]  695 	push	hl
+    000002A8 7D               [ 4]  696 	ld	a, l
+    000002A9 F8 06            [12]  697 	ldhl	sp,	#6
+    000002AB 77               [ 8]  698 	ld	(hl), a
+    000002AC E1               [12]  699 	pop	hl
+    000002AD 7C               [ 4]  700 	ld	a, h
+    000002AE F8 05            [12]  701 	ldhl	sp,	#5
+    000002B0 32               [ 8]  702 	ld	(hl-), a
+    000002B1 2A               [ 8]  703 	ld	a, (hl+)
+    000002B2 5F               [ 4]  704 	ld	e, a
+    000002B3 56               [ 8]  705 	ld	d, (hl)
+    000002B4 1A               [ 8]  706 	ld	a, (de)
+    000002B5 21r02r00         [12]  707 	ld	hl, #_m_nCurrentSpeed
+    000002B8 86               [ 8]  708 	add	a, (hl)
+    000002B9 F8 04            [12]  709 	ldhl	sp,	#4
+    000002BB 5E               [ 8]  710 	ld	e, (hl)
+    000002BC 23               [ 8]  711 	inc	hl
+    000002BD 66               [ 8]  712 	ld	h, (hl)
+    000002BE 6B               [ 4]  713 	ld	l, e
     000002BF 77               [ 8]  714 	ld	(hl), a
-    000002C0 E1               [12]  715 	pop	hl
-    000002C1 7C               [ 4]  716 	ld	a, h
-    000002C2 F8 03            [12]  717 	ldhl	sp,	#3
-    000002C4 32               [ 8]  718 	ld	(hl-), a
-    000002C5 2A               [ 8]  719 	ld	a, (hl+)
-    000002C6 5F               [ 4]  720 	ld	e, a
-    000002C7 56               [ 8]  721 	ld	d, (hl)
-    000002C8 1A               [ 8]  722 	ld	a, (de)
-    000002C9 B7               [ 4]  723 	or	a, a
-    000002CA C2r17r04         [16]  724 	jp	NZ, 00120$
-                                    725 ;enemies.c:314: ptrEnemy->nSubPixelX += m_nCurrentSpeed;
-    000002CD 23               [ 8]  726 	inc	hl
-    000002CE 2A               [ 8]  727 	ld	a, (hl+)
-    000002CF 5F               [ 4]  728 	ld	e, a
-    000002D0 56               [ 8]  729 	ld	d, (hl)
-    000002D1 21 09 00         [12]  730 	ld	hl, #0x0009
-    000002D4 19               [ 8]  731 	add	hl, de
-    000002D5 4D               [ 4]  732 	ld	c, l
-    000002D6 44               [ 4]  733 	ld	b, h
-    000002D7 0A               [ 8]  734 	ld	a, (bc)
-    000002D8 21r02r00         [12]  735 	ld	hl, #_m_nCurrentSpeed
-    000002DB 86               [ 8]  736 	add	a, (hl)
-    000002DC 02               [ 8]  737 	ld	(bc), a
-                                    738 ;enemies.c:315: ptrEnemy->nSubPixelY += m_nCurrentSpeed;
-    000002DD F8 04            [12]  739 	ldhl	sp,#4
-    000002DF 2A               [ 8]  740 	ld	a, (hl+)
-    000002E0 5F               [ 4]  741 	ld	e, a
-    000002E1 56               [ 8]  742 	ld	d, (hl)
-    000002E2 21 0A 00         [12]  743 	ld	hl, #0x000a
-    000002E5 19               [ 8]  744 	add	hl, de
-    000002E6 E5               [16]  745 	push	hl
-    000002E7 7D               [ 4]  746 	ld	a, l
-    000002E8 F8 0B            [12]  747 	ldhl	sp,	#11
-    000002EA 77               [ 8]  748 	ld	(hl), a
-    000002EB E1               [12]  749 	pop	hl
-    000002EC 7C               [ 4]  750 	ld	a, h
-    000002ED F8 0A            [12]  751 	ldhl	sp,	#10
-    000002EF 32               [ 8]  752 	ld	(hl-), a
-    000002F0 2A               [ 8]  753 	ld	a, (hl+)
-    000002F1 5F               [ 4]  754 	ld	e, a
-    000002F2 56               [ 8]  755 	ld	d, (hl)
-    000002F3 1A               [ 8]  756 	ld	a, (de)
-    000002F4 21r02r00         [12]  757 	ld	hl, #_m_nCurrentSpeed
-    000002F7 86               [ 8]  758 	add	a, (hl)
-    000002F8 F8 09            [12]  759 	ldhl	sp,	#9
-    000002FA 5E               [ 8]  760 	ld	e, (hl)
-    000002FB 23               [ 8]  761 	inc	hl
-    000002FC 66               [ 8]  762 	ld	h, (hl)
-    000002FD 6B               [ 4]  763 	ld	l, e
-    000002FE 77               [ 8]  764 	ld	(hl), a
-                                    765 ;enemies.c:317: if (ptrEnemy->nSubPixelX >= 16) 
-    000002FF 0A               [ 8]  766 	ld	a, (bc)
-    00000300 5F               [ 4]  767 	ld	e, a
-                                    768 ;enemies.c:319: ptrEnemy->nX += ptrEnemy->nDirX;
-    00000301 F8 04            [12]  769 	ldhl	sp,	#4
-    00000303 7E               [ 8]  770 	ld	a, (hl)
-    00000304 F8 00            [12]  771 	ldhl	sp,	#0
-    00000306 77               [ 8]  772 	ld	(hl), a
-    00000307 F8 05            [12]  773 	ldhl	sp,	#5
-    00000309 7E               [ 8]  774 	ld	a, (hl)
-    0000030A F8 01            [12]  775 	ldhl	sp,	#1
-    0000030C 77               [ 8]  776 	ld	(hl), a
-                                    777 ;enemies.c:317: if (ptrEnemy->nSubPixelX >= 16) 
-    0000030D 7B               [ 4]  778 	ld	a, e
-    0000030E D6 10            [ 8]  779 	sub	a, #0x10
-    00000310 38 1D            [12]  780 	jr	C, 00104$
-                                    781 ;enemies.c:319: ptrEnemy->nX += ptrEnemy->nDirX;
-    00000312 D1               [12]  782 	pop	de
-    00000313 D5               [16]  783 	push	de
-    00000314 1A               [ 8]  784 	ld	a, (de)
-    00000315 F8 08            [12]  785 	ldhl	sp,	#8
-    00000317 77               [ 8]  786 	ld	(hl), a
-    00000318 F8 04            [12]  787 	ldhl	sp,#4
-    0000031A 2A               [ 8]  788 	ld	a, (hl+)
-    0000031B 5F               [ 4]  789 	ld	e, a
-    0000031C 56               [ 8]  790 	ld	d, (hl)
-    0000031D 21 04 00         [12]  791 	ld	hl, #0x0004
-    00000320 19               [ 8]  792 	add	hl, de
-    00000321 5D               [ 4]  793 	ld	e, l
-    00000322 54               [ 4]  794 	ld	d, h
-    00000323 1A               [ 8]  795 	ld	a, (de)
-    00000324 F8 08            [12]  796 	ldhl	sp,	#8
-    00000326 5E               [ 8]  797 	ld	e, (hl)
-    00000327 83               [ 4]  798 	add	a, e
-    00000328 E1               [12]  799 	pop	hl
-    00000329 E5               [16]  800 	push	hl
-    0000032A 77               [ 8]  801 	ld	(hl), a
-                                    802 ;enemies.c:320: ptrEnemy->nSubPixelX -= 16;
-    0000032B 0A               [ 8]  803 	ld	a, (bc)
-    0000032C C6 F0            [ 8]  804 	add	a, #0xf0
-    0000032E 02               [ 8]  805 	ld	(bc), a
-    0000032F                        806 00104$:
-                                    807 ;enemies.c:322: if (ptrEnemy->nSubPixelY >= 16) 
-    0000032F F8 09            [12]  808 	ldhl	sp,#9
-    00000331 2A               [ 8]  809 	ld	a, (hl+)
-    00000332 5F               [ 4]  810 	ld	e, a
-    00000333 56               [ 8]  811 	ld	d, (hl)
-    00000334 1A               [ 8]  812 	ld	a, (de)
-    00000335 4F               [ 4]  813 	ld	c, a
-                                    814 ;enemies.c:324: ptrEnemy->nY += ptrEnemy->nDirY;
-    00000336 F8 04            [12]  815 	ldhl	sp,#4
-    00000338 2A               [ 8]  816 	ld	a, (hl+)
-    00000339 5F               [ 4]  817 	ld	e, a
-    0000033A 56               [ 8]  818 	ld	d, (hl)
-    0000033B 6B               [ 4]  819 	ld	l, e
-    0000033C 62               [ 4]  820 	ld	h, d
-    0000033D 23               [ 8]  821 	inc	hl
-    0000033E E5               [16]  822 	push	hl
-    0000033F 7D               [ 4]  823 	ld	a, l
-    00000340 F8 09            [12]  824 	ldhl	sp,	#9
-    00000342 77               [ 8]  825 	ld	(hl), a
-    00000343 E1               [12]  826 	pop	hl
-    00000344 7C               [ 4]  827 	ld	a, h
-    00000345 F8 08            [12]  828 	ldhl	sp,	#8
-    00000347 77               [ 8]  829 	ld	(hl), a
-                                    830 ;enemies.c:322: if (ptrEnemy->nSubPixelY >= 16) 
-    00000348 79               [ 4]  831 	ld	a, c
-    00000349 D6 10            [ 8]  832 	sub	a, #0x10
-    0000034B 38 28            [12]  833 	jr	C, 00106$
-                                    834 ;enemies.c:324: ptrEnemy->nY += ptrEnemy->nDirY;
-    0000034D 2B               [ 8]  835 	dec	hl
-    0000034E 2A               [ 8]  836 	ld	a, (hl+)
-    0000034F 5F               [ 4]  837 	ld	e, a
-    00000350 56               [ 8]  838 	ld	d, (hl)
-    00000351 1A               [ 8]  839 	ld	a, (de)
-    00000352 4F               [ 4]  840 	ld	c, a
-    00000353 F8 04            [12]  841 	ldhl	sp,#4
-    00000355 2A               [ 8]  842 	ld	a, (hl+)
-    00000356 5F               [ 4]  843 	ld	e, a
-    00000357 56               [ 8]  844 	ld	d, (hl)
-    00000358 21 05 00         [12]  845 	ld	hl, #0x0005
-    0000035B 19               [ 8]  846 	add	hl, de
-    0000035C 5D               [ 4]  847 	ld	e, l
-    0000035D 54               [ 4]  848 	ld	d, h
-    0000035E 1A               [ 8]  849 	ld	a, (de)
-    0000035F 81               [ 4]  850 	add	a, c
-    00000360 F8 07            [12]  851 	ldhl	sp,	#7
-    00000362 5E               [ 8]  852 	ld	e, (hl)
-    00000363 23               [ 8]  853 	inc	hl
-    00000364 66               [ 8]  854 	ld	h, (hl)
-    00000365 6B               [ 4]  855 	ld	l, e
-    00000366 77               [ 8]  856 	ld	(hl), a
-                                    857 ;enemies.c:325: ptrEnemy->nSubPixelY -= 16;
-    00000367 F8 09            [12]  858 	ldhl	sp,#9
-    00000369 2A               [ 8]  859 	ld	a, (hl+)
-    0000036A 5F               [ 4]  860 	ld	e, a
-    0000036B 3A               [ 8]  861 	ld	a, (hl-)
-    0000036C 57               [ 4]  862 	ld	d, a
-    0000036D 1A               [ 8]  863 	ld	a, (de)
-    0000036E C6 F0            [ 8]  864 	add	a, #0xf0
-    00000370 5E               [ 8]  865 	ld	e, (hl)
-    00000371 23               [ 8]  866 	inc	hl
-    00000372 66               [ 8]  867 	ld	h, (hl)
-    00000373 6B               [ 4]  868 	ld	l, e
-    00000374 77               [ 8]  869 	ld	(hl), a
-    00000375                        870 00106$:
-                                    871 ;enemies.c:329: if (!ptrEnemy->bMainSpriteSet)
-    00000375 F8 04            [12]  872 	ldhl	sp,#4
-    00000377 2A               [ 8]  873 	ld	a, (hl+)
-    00000378 5F               [ 4]  874 	ld	e, a
-    00000379 56               [ 8]  875 	ld	d, (hl)
-    0000037A 21 0C 00         [12]  876 	ld	hl, #0x000c
-    0000037D 19               [ 8]  877 	add	hl, de
-    0000037E E5               [16]  878 	push	hl
-    0000037F 7D               [ 4]  879 	ld	a, l
-    00000380 F8 0B            [12]  880 	ldhl	sp,	#11
-    00000382 77               [ 8]  881 	ld	(hl), a
-    00000383 E1               [12]  882 	pop	hl
-    00000384 7C               [ 4]  883 	ld	a, h
-    00000385 F8 0A            [12]  884 	ldhl	sp,	#10
-    00000387 32               [ 8]  885 	ld	(hl-), a
-    00000388 2A               [ 8]  886 	ld	a, (hl+)
-    00000389 5F               [ 4]  887 	ld	e, a
-    0000038A 56               [ 8]  888 	ld	d, (hl)
-    0000038B 1A               [ 8]  889 	ld	a, (de)
-    0000038C B7               [ 4]  890 	or	a, a
-    0000038D 20 41            [12]  891 	jr	NZ, 00113$
-                                    892 ;enemies.c:332: if (ptrEnemy->nX >= 15 && ptrEnemy->nX <= 153 && ptrEnemy->nY >= 44 && ptrEnemy->nY <= 143) 
-    0000038F D1               [12]  893 	pop	de
-    00000390 D5               [16]  894 	push	de
-    00000391 1A               [ 8]  895 	ld	a, (de)
-    00000392 FE 0F            [ 8]  896 	cp	a, #0x0f
-    00000394 38 3A            [12]  897 	jr	C, 00113$
-    00000396 FE 9A            [ 8]  898 	cp	a, #0x9a
-    00000398 30 36            [12]  899 	jr	NC, 00113$
-    0000039A 2B               [ 8]  900 	dec	hl
-    0000039B 2B               [ 8]  901 	dec	hl
-    0000039C 2B               [ 8]  902 	dec	hl
-    0000039D 2A               [ 8]  903 	ld	a, (hl+)
-    0000039E 5F               [ 4]  904 	ld	e, a
-    0000039F 56               [ 8]  905 	ld	d, (hl)
-    000003A0 1A               [ 8]  906 	ld	a, (de)
-    000003A1 FE 2C            [ 8]  907 	cp	a, #0x2c
-    000003A3 38 2B            [12]  908 	jr	C, 00113$
-    000003A5 FE 90            [ 8]  909 	cp	a, #0x90
-    000003A7 30 27            [12]  910 	jr	NC, 00113$
-                                    911 ;enemies.c:335: ptrEnemy->bMainSpriteSet = TRUE;
-    000003A9 23               [ 8]  912 	inc	hl
-    000003AA 2A               [ 8]  913 	ld	a, (hl+)
-    000003AB 66               [ 8]  914 	ld	h, (hl)
-    000003AC 6F               [ 4]  915 	ld	l, a
-    000003AD 36 01            [12]  916 	ld	(hl), #0x01
-                                    917 ;enemies.c:338: set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber);
-    000003AF F8 04            [12]  918 	ldhl	sp,#4
-    000003B1 2A               [ 8]  919 	ld	a, (hl+)
-    000003B2 5F               [ 4]  920 	ld	e, a
-    000003B3 56               [ 8]  921 	ld	d, (hl)
-    000003B4 21 0B 00         [12]  922 	ld	hl, #0x000b
-    000003B7 19               [ 8]  923 	add	hl, de
-    000003B8 4D               [ 4]  924 	ld	c, l
-    000003B9 44               [ 4]  925 	ld	b, h
-    000003BA 0A               [ 8]  926 	ld	a, (bc)
-    000003BB 4F               [ 4]  927 	ld	c, a
-    000003BC F8 04            [12]  928 	ldhl	sp,	#4
-    000003BE 2A               [ 8]  929 	ld	a, (hl+)
-    000003BF 66               [ 8]  930 	ld	h, (hl)
-    000003C0 6F               [ 4]  931 	ld	l, a
-    000003C1 23               [ 8]  932 	inc	hl
-    000003C2 23               [ 8]  933 	inc	hl
-    000003C3 46               [ 8]  934 	ld	b, (hl)
-                                    935 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
-    000003C4 11r00r00         [12]  936 	ld	de, #_shadow_OAM+0
-    000003C7 68               [ 4]  937 	ld	l, b
-    000003C8 26 00            [ 8]  938 	ld	h, #0x00
-    000003CA 29               [ 8]  939 	add	hl, hl
-    000003CB 29               [ 8]  940 	add	hl, hl
-    000003CC 19               [ 8]  941 	add	hl, de
-    000003CD 23               [ 8]  942 	inc	hl
-    000003CE 23               [ 8]  943 	inc	hl
-    000003CF 71               [ 8]  944 	ld	(hl), c
-                                    945 ;enemies.c:338: set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber);
-    000003D0                        946 00113$:
-                                    947 ;enemies.c:343: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
-    000003D0 F8 04            [12]  948 	ldhl	sp,	#4
-    000003D2 7E               [ 8]  949 	ld	a, (hl)
-    000003D3 F8 07            [12]  950 	ldhl	sp,	#7
-    000003D5 32               [ 8]  951 	ld	(hl-), a
-    000003D6 2B               [ 8]  952 	dec	hl
-    000003D7 7E               [ 8]  953 	ld	a, (hl)
-    000003D8 F8 08            [12]  954 	ldhl	sp,	#8
-    000003DA 32               [ 8]  955 	ld	(hl-), a
-    000003DB 2A               [ 8]  956 	ld	a, (hl+)
-    000003DC 5F               [ 4]  957 	ld	e, a
-    000003DD 56               [ 8]  958 	ld	d, (hl)
-    000003DE 1A               [ 8]  959 	ld	a, (de)
-    000003DF 4F               [ 4]  960 	ld	c, a
-                                    961 ;enemies.c:324: ptrEnemy->nY += ptrEnemy->nDirY;
-    000003E0 F8 04            [12]  962 	ldhl	sp,#4
-    000003E2 2A               [ 8]  963 	ld	a, (hl+)
-    000003E3 5F               [ 4]  964 	ld	e, a
-    000003E4 56               [ 8]  965 	ld	d, (hl)
-    000003E5 6B               [ 4]  966 	ld	l, e
-    000003E6 62               [ 4]  967 	ld	h, d
-    000003E7 23               [ 8]  968 	inc	hl
-    000003E8 E5               [16]  969 	push	hl
-    000003E9 7D               [ 4]  970 	ld	a, l
-    000003EA F8 0B            [12]  971 	ldhl	sp,	#11
-    000003EC 77               [ 8]  972 	ld	(hl), a
-    000003ED E1               [12]  973 	pop	hl
-    000003EE 7C               [ 4]  974 	ld	a, h
-    000003EF F8 0A            [12]  975 	ldhl	sp,	#10
-    000003F1 77               [ 8]  976 	ld	(hl), a
-                                    977 ;enemies.c:343: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
-    000003F2 79               [ 4]  978 	ld	a, c
-    000003F3 D6 4C            [ 8]  979 	sub	a, #0x4c
-    000003F5 DArB8r04         [16]  980 	jp	C, 00121$
-    000003F8 3E 56            [ 8]  981 	ld	a, #0x56
-    000003FA 91               [ 4]  982 	sub	a, c
-    000003FB DArB8r04         [16]  983 	jp	C, 00121$
-    000003FE 2B               [ 8]  984 	dec	hl
-    000003FF 2A               [ 8]  985 	ld	a, (hl+)
-    00000400 5F               [ 4]  986 	ld	e, a
-    00000401 56               [ 8]  987 	ld	d, (hl)
-    00000402 1A               [ 8]  988 	ld	a, (de)
-    00000403 FE 4A            [ 8]  989 	cp	a, #0x4a
-    00000405 DArB8r04         [16]  990 	jp	C, 00121$
-    00000408 FE 55            [ 8]  991 	cp	a, #0x55
-    0000040A D2rB8r04         [16]  992 	jp	NC, 00121$
-                                    993 ;enemies.c:347: ptrEnemy->bCantMove = TRUE;
-    0000040D F8 02            [12]  994 	ldhl	sp,	#2
-    0000040F 2A               [ 8]  995 	ld	a, (hl+)
-    00000410 66               [ 8]  996 	ld	h, (hl)
-    00000411 6F               [ 4]  997 	ld	l, a
-    00000412 36 01            [12]  998 	ld	(hl), #0x01
-    00000414 C3rB8r04         [16]  999 	jp	00121$
-    00000417                       1000 00120$:
-                                   1001 ;enemies.c:357: ptrPlayer->nHealth -= m_nDamage;
-    00000417 F8 0B            [12] 1002 	ldhl	sp,#11
-    00000419 2A               [ 8] 1003 	ld	a, (hl+)
-    0000041A 5F               [ 4] 1004 	ld	e, a
-    0000041B 56               [ 8] 1005 	ld	d, (hl)
-    0000041C 21 11 00         [12] 1006 	ld	hl, #0x0011
-    0000041F 19               [ 8] 1007 	add	hl, de
-    00000420 E5               [16] 1008 	push	hl
-    00000421 7D               [ 4] 1009 	ld	a, l
-    00000422 F8 0B            [12] 1010 	ldhl	sp,	#11
-    00000424 77               [ 8] 1011 	ld	(hl), a
-    00000425 E1               [12] 1012 	pop	hl
-    00000426 7C               [ 4] 1013 	ld	a, h
-    00000427 F8 0A            [12] 1014 	ldhl	sp,	#10
-    00000429 32               [ 8] 1015 	ld	(hl-), a
-    0000042A 2A               [ 8] 1016 	ld	a, (hl+)
-    0000042B 5F               [ 4] 1017 	ld	e, a
-    0000042C 56               [ 8] 1018 	ld	d, (hl)
-    0000042D 1A               [ 8] 1019 	ld	a, (de)
-    0000042E 4F               [ 4] 1020 	ld	c, a
-    0000042F 13               [ 8] 1021 	inc	de
-    00000430 1A               [ 8] 1022 	ld	a, (de)
-    00000431 47               [ 4] 1023 	ld	b, a
-    00000432 FAr09r00         [16] 1024 	ld	a, (_m_nDamage)
-    00000435 5F               [ 4] 1025 	ld	e, a
-    00000436 16 00            [ 8] 1026 	ld	d, #0x00
-    00000438 79               [ 4] 1027 	ld	a, c
-    00000439 93               [ 4] 1028 	sub	a, e
-    0000043A 4F               [ 4] 1029 	ld	c, a
-    0000043B 78               [ 4] 1030 	ld	a, b
-    0000043C 9A               [ 4] 1031 	sbc	a, d
-    0000043D 47               [ 4] 1032 	ld	b, a
-    0000043E 3A               [ 8] 1033 	ld	a, (hl-)
-    0000043F 6E               [ 8] 1034 	ld	l, (hl)
-    00000440 67               [ 4] 1035 	ld	h, a
-    00000441 79               [ 4] 1036 	ld	a, c
-    00000442 22               [ 8] 1037 	ld	(hl+), a
-    00000443 70               [ 8] 1038 	ld	(hl), b
-                                   1039 ;enemies.c:358: ptrPlayer->bTakenDamage = TRUE;
-    00000444 F8 0B            [12] 1040 	ldhl	sp,#11
-    00000446 2A               [ 8] 1041 	ld	a, (hl+)
-    00000447 5F               [ 4] 1042 	ld	e, a
-    00000448 56               [ 8] 1043 	ld	d, (hl)
-    00000449 21 18 00         [12] 1044 	ld	hl, #0x0018
-    0000044C 19               [ 8] 1045 	add	hl, de
-    0000044D 36 01            [12] 1046 	ld	(hl), #0x01
-                                   1047 ;enemies.c:361: ptrPlayer->nTotalShotsTaken++;
-    0000044F F8 0B            [12] 1048 	ldhl	sp,#11
-    00000451 2A               [ 8] 1049 	ld	a, (hl+)
-    00000452 5F               [ 4] 1050 	ld	e, a
-    00000453 56               [ 8] 1051 	ld	d, (hl)
-    00000454 21 16 00         [12] 1052 	ld	hl, #0x0016
-    00000457 19               [ 8] 1053 	add	hl, de
-    00000458 4D               [ 4] 1054 	ld	c,l
-    00000459 44               [ 4] 1055 	ld	b,h
-    0000045A 2A               [ 8] 1056 	ld	a,	(hl+)
-    0000045B 66               [ 8] 1057 	ld	h, (hl)
-    0000045C 6F               [ 4] 1058 	ld	l, a
-    0000045D 23               [ 8] 1059 	inc	hl
-    0000045E 7D               [ 4] 1060 	ld	a, l
-    0000045F 02               [ 8] 1061 	ld	(bc), a
-    00000460 03               [ 8] 1062 	inc	bc
-    00000461 7C               [ 4] 1063 	ld	a, h
-    00000462 02               [ 8] 1064 	ld	(bc), a
-                                   1065 ;enemies.c:364: KillEnemy(ptrEnemy, ptrPlayer);
-    00000463 F8 0B            [12] 1066 	ldhl	sp,	#11
-    00000465 2A               [ 8] 1067 	ld	a, (hl+)
-    00000466 4F               [ 4] 1068 	ld	c, a
-    00000467 46               [ 8] 1069 	ld	b, (hl)
-    00000468 F8 04            [12] 1070 	ldhl	sp,	#4
-    0000046A 2A               [ 8] 1071 	ld	a, (hl+)
-    0000046B 5F               [ 4] 1072 	ld	e, a
-    0000046C 56               [ 8] 1073 	ld	d, (hl)
-    0000046D CDrC6r05         [24] 1074 	call	_KillEnemy
-                                   1075 ;enemies.c:368: ptrPlayer->nHealth = (ptrPlayer->nHealth < m_nDamage) ? 0 : ptrPlayer->nHealth - m_nDamage;
-    00000470 F8 09            [12] 1076 	ldhl	sp,#9
-    00000472 2A               [ 8] 1077 	ld	a, (hl+)
-    00000473 5F               [ 4] 1078 	ld	e, a
-    00000474 56               [ 8] 1079 	ld	d, (hl)
-    00000475 1A               [ 8] 1080 	ld	a, (de)
-    00000476 F8 03            [12] 1081 	ldhl	sp,	#3
-    00000478 22               [ 8] 1082 	ld	(hl+), a
-    00000479 13               [ 8] 1083 	inc	de
-    0000047A 1A               [ 8] 1084 	ld	a, (de)
-    0000047B 32               [ 8] 1085 	ld	(hl-), a
-    0000047C FAr09r00         [16] 1086 	ld	a, (_m_nDamage)
-    0000047F 4F               [ 4] 1087 	ld	c, a
-    00000480 06 00            [ 8] 1088 	ld	b, #0x00
-    00000482 2A               [ 8] 1089 	ld	a, (hl+)
-    00000483 91               [ 4] 1090 	sub	a, c
-    00000484 7E               [ 8] 1091 	ld	a, (hl)
-    00000485 98               [ 4] 1092 	sbc	a, b
-    00000486 30 06            [12] 1093 	jr	NC, 00135$
-    00000488 23               [ 8] 1094 	inc	hl
-    00000489 AF               [ 4] 1095 	xor	a, a
-    0000048A 22               [ 8] 1096 	ld	(hl+), a
-    0000048B 77               [ 8] 1097 	ld	(hl), a
-    0000048C 18 1B            [12] 1098 	jr	00136$
-    0000048E                       1099 00135$:
-    0000048E FAr09r00         [16] 1100 	ld	a, (_m_nDamage)
-    00000491 F8 07            [12] 1101 	ldhl	sp,	#7
-    00000493 22               [ 8] 1102 	ld	(hl+), a
-    00000494 36 00            [12] 1103 	ld	(hl), #0x00
-    00000496 F8 03            [12] 1104 	ldhl	sp,#3
-    00000498 2A               [ 8] 1105 	ld	a, (hl+)
-    00000499 5F               [ 4] 1106 	ld	e, a
-    0000049A 56               [ 8] 1107 	ld	d, (hl)
-    0000049B F8 07            [12] 1108 	ldhl	sp,	#7
-    0000049D 2A               [ 8] 1109 	ld	a,	(hl+)
-    0000049E 66               [ 8] 1110 	ld	h, (hl)
-    0000049F 6F               [ 4] 1111 	ld	l, a
-    000004A0 7B               [ 4] 1112 	ld	a, e
-    000004A1 95               [ 4] 1113 	sub	a, l
-    000004A2 5F               [ 4] 1114 	ld	e, a
-    000004A3 7A               [ 4] 1115 	ld	a, d
-    000004A4 9C               [ 4] 1116 	sbc	a, h
-    000004A5 F8 06            [12] 1117 	ldhl	sp,	#6
-    000004A7 32               [ 8] 1118 	ld	(hl-), a
-    000004A8 73               [ 8] 1119 	ld	(hl), e
-    000004A9                       1120 00136$:
-    000004A9 F8 09            [12] 1121 	ldhl	sp,	#9
-    000004AB 2A               [ 8] 1122 	ld	a, (hl+)
-    000004AC 5F               [ 4] 1123 	ld	e, a
-    000004AD 56               [ 8] 1124 	ld	d, (hl)
-    000004AE F8 05            [12] 1125 	ldhl	sp,	#5
-    000004B0 2A               [ 8] 1126 	ld	a, (hl+)
-    000004B1 12               [ 8] 1127 	ld	(de), a
-    000004B2 13               [ 8] 1128 	inc	de
-    000004B3 7E               [ 8] 1129 	ld	a, (hl)
-    000004B4 12               [ 8] 1130 	ld	(de), a
-                                   1131 ;enemies.c:373: return;
-    000004B5 C3rC3r05         [16] 1132 	jp	00133$
-    000004B8                       1133 00121$:
-                                   1134 ;enemies.c:377: if (!ptrEnemy->bCantMove)
-    000004B8 F8 02            [12] 1135 	ldhl	sp,#2
-    000004BA 2A               [ 8] 1136 	ld	a, (hl+)
-    000004BB 5F               [ 4] 1137 	ld	e, a
-    000004BC 56               [ 8] 1138 	ld	d, (hl)
-    000004BD 1A               [ 8] 1139 	ld	a, (de)
-    000004BE 4F               [ 4] 1140 	ld	c, a
-                                   1141 ;enemies.c:343: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
-    000004BF F8 07            [12] 1142 	ldhl	sp,#7
-    000004C1 2A               [ 8] 1143 	ld	a, (hl+)
-    000004C2 5F               [ 4] 1144 	ld	e, a
-    000004C3 3A               [ 8] 1145 	ld	a, (hl-)
-    000004C4 2B               [ 8] 1146 	dec	hl
-    000004C5 57               [ 4] 1147 	ld	d, a
-    000004C6 1A               [ 8] 1148 	ld	a, (de)
-    000004C7 77               [ 8] 1149 	ld	(hl), a
-                                   1150 ;enemies.c:324: ptrEnemy->nY += ptrEnemy->nDirY;
-    000004C8 F8 09            [12] 1151 	ldhl	sp,#9
-    000004CA 2A               [ 8] 1152 	ld	a, (hl+)
-    000004CB 5F               [ 4] 1153 	ld	e, a
-    000004CC 56               [ 8] 1154 	ld	d, (hl)
-    000004CD 1A               [ 8] 1155 	ld	a, (de)
-    000004CE F8 07            [12] 1156 	ldhl	sp,	#7
-    000004D0 77               [ 8] 1157 	ld	(hl), a
-                                   1158 ;enemies.c:377: if (!ptrEnemy->bCantMove)
-    000004D1 79               [ 4] 1159 	ld	a, c
-    000004D2 B7               [ 4] 1160 	or	a, a
-    000004D3 C2r66r05         [16] 1161 	jp	NZ, 00130$
-                                   1162 ;enemies.c:381: if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
-    000004D6 2B               [ 8] 1163 	dec	hl
-    000004D7 2B               [ 8] 1164 	dec	hl
-    000004D8 2B               [ 8] 1165 	dec	hl
-    000004D9 2A               [ 8] 1166 	ld	a, (hl+)
-    000004DA 5F               [ 4] 1167 	ld	e, a
-    000004DB 56               [ 8] 1168 	ld	d, (hl)
-    000004DC 21 08 00         [12] 1169 	ld	hl, #0x0008
-    000004DF 19               [ 8] 1170 	add	hl, de
-    000004E0 4D               [ 4] 1171 	ld	c, l
-    000004E1 44               [ 4] 1172 	ld	b, h
-    000004E2 0A               [ 8] 1173 	ld	a, (bc)
-    000004E3 F8 08            [12] 1174 	ldhl	sp,	#8
-    000004E5 77               [ 8] 1175 	ld	(hl), a
-    000004E6 F8 0B            [12] 1176 	ldhl	sp,#11
-    000004E8 2A               [ 8] 1177 	ld	a, (hl+)
-    000004E9 5F               [ 4] 1178 	ld	e, a
-    000004EA 56               [ 8] 1179 	ld	d, (hl)
-    000004EB 21 13 00         [12] 1180 	ld	hl, #0x0013
-    000004EE 19               [ 8] 1181 	add	hl, de
-    000004EF E5               [16] 1182 	push	hl
-    000004F0 7D               [ 4] 1183 	ld	a, l
-    000004F1 F8 0B            [12] 1184 	ldhl	sp,	#11
-    000004F3 77               [ 8] 1185 	ld	(hl), a
-    000004F4 E1               [12] 1186 	pop	hl
-    000004F5 7C               [ 4] 1187 	ld	a, h
-    000004F6 F8 0A            [12] 1188 	ldhl	sp,	#10
-    000004F8 32               [ 8] 1189 	ld	(hl-), a
-    000004F9 2A               [ 8] 1190 	ld	a, (hl+)
-    000004FA 5F               [ 4] 1191 	ld	e, a
-    000004FB 56               [ 8] 1192 	ld	d, (hl)
-    000004FC 1A               [ 8] 1193 	ld	a, (de)
-    000004FD 32               [ 8] 1194 	ld	(hl-), a
-    000004FE 2B               [ 8] 1195 	dec	hl
-    000004FF 2A               [ 8] 1196 	ld	a, (hl+)
-    00000500 23               [ 8] 1197 	inc	hl
-    00000501 96               [ 8] 1198 	sub	a, (hl)
-    00000502 20 62            [12] 1199 	jr	NZ, 00130$
-                                   1200 ;enemies.c:384: if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
-    00000504 F8 06            [12] 1201 	ldhl	sp,	#6
-    00000506 7E               [ 8] 1202 	ld	a, (hl)
-    00000507 D6 3E            [ 8] 1203 	sub	a, #0x3e
-    00000509 38 5B            [12] 1204 	jr	C, 00130$
-    0000050B 3E 64            [ 8] 1205 	ld	a, #0x64
-    0000050D 96               [ 8] 1206 	sub	a, (hl)
-    0000050E 38 56            [12] 1207 	jr	C, 00130$
-    00000510 23               [ 8] 1208 	inc	hl
-    00000511 7E               [ 8] 1209 	ld	a, (hl)
-    00000512 D6 3C            [ 8] 1210 	sub	a, #0x3c
-    00000514 38 50            [12] 1211 	jr	C, 00130$
-    00000516 3E 64            [ 8] 1212 	ld	a, #0x64
-    00000518 96               [ 8] 1213 	sub	a, (hl)
-    00000519 38 4B            [12] 1214 	jr	C, 00130$
-                                   1215 ;enemies.c:387: ptrPlayer->nTotalShotsTaken++;
-    0000051B F8 0B            [12] 1216 	ldhl	sp,#11
-    0000051D 2A               [ 8] 1217 	ld	a, (hl+)
-    0000051E 5F               [ 4] 1218 	ld	e, a
-    0000051F 56               [ 8] 1219 	ld	d, (hl)
-    00000520 21 16 00         [12] 1220 	ld	hl, #0x0016
-    00000523 19               [ 8] 1221 	add	hl, de
-    00000524 E5               [16] 1222 	push	hl
-    00000525 7D               [ 4] 1223 	ld	a, l
-    00000526 F8 04            [12] 1224 	ldhl	sp,	#4
-    00000528 77               [ 8] 1225 	ld	(hl), a
-    00000529 E1               [12] 1226 	pop	hl
-    0000052A 7C               [ 4] 1227 	ld	a, h
-    0000052B F8 03            [12] 1228 	ldhl	sp,	#3
-    0000052D 32               [ 8] 1229 	ld	(hl-), a
-    0000052E 2A               [ 8] 1230 	ld	a, (hl+)
-    0000052F 5F               [ 4] 1231 	ld	e, a
-    00000530 56               [ 8] 1232 	ld	d, (hl)
-    00000531 1A               [ 8] 1233 	ld	a, (de)
-    00000532 F8 07            [12] 1234 	ldhl	sp,	#7
-    00000534 22               [ 8] 1235 	ld	(hl+), a
-    00000535 13               [ 8] 1236 	inc	de
-    00000536 1A               [ 8] 1237 	ld	a, (de)
-    00000537 32               [ 8] 1238 	ld	(hl-), a
-    00000538 2A               [ 8] 1239 	ld	a, (hl+)
-    00000539 5F               [ 4] 1240 	ld	e, a
-    0000053A 56               [ 8] 1241 	ld	d, (hl)
-    0000053B 6B               [ 4] 1242 	ld	l, e
-    0000053C 62               [ 4] 1243 	ld	h, d
-    0000053D 23               [ 8] 1244 	inc	hl
-    0000053E E5               [16] 1245 	push	hl
-    0000053F 7D               [ 4] 1246 	ld	a, l
-    00000540 F8 0B            [12] 1247 	ldhl	sp,	#11
-    00000542 77               [ 8] 1248 	ld	(hl), a
-    00000543 E1               [12] 1249 	pop	hl
-    00000544 7C               [ 4] 1250 	ld	a, h
-    00000545 F8 0A            [12] 1251 	ldhl	sp,	#10
-    00000547 77               [ 8] 1252 	ld	(hl), a
-    00000548 F8 02            [12] 1253 	ldhl	sp,	#2
-    0000054A 2A               [ 8] 1254 	ld	a, (hl+)
-    0000054B 5F               [ 4] 1255 	ld	e, a
-    0000054C 56               [ 8] 1256 	ld	d, (hl)
-    0000054D F8 09            [12] 1257 	ldhl	sp,	#9
-    0000054F 2A               [ 8] 1258 	ld	a, (hl+)
-    00000550 12               [ 8] 1259 	ld	(de), a
-    00000551 13               [ 8] 1260 	inc	de
-                                   1261 ;enemies.c:390: KillEnemy(ptrEnemy, ptrPlayer);
-    00000552 2A               [ 8] 1262 	ld	a, (hl+)
-    00000553 12               [ 8] 1263 	ld	(de), a
-    00000554 2A               [ 8] 1264 	ld	a, (hl+)
-    00000555 4F               [ 4] 1265 	ld	c, a
-    00000556 46               [ 8] 1266 	ld	b, (hl)
-    00000557 F8 04            [12] 1267 	ldhl	sp,	#4
-    00000559 2A               [ 8] 1268 	ld	a, (hl+)
-    0000055A 5F               [ 4] 1269 	ld	e, a
-    0000055B 56               [ 8] 1270 	ld	d, (hl)
-    0000055C CDrC6r05         [24] 1271 	call	_KillEnemy
-                                   1272 ;enemies.c:393: m_bShowSpray = TRUE;
-    0000055F 21r11r00         [12] 1273 	ld	hl, #_m_bShowSpray
-    00000562 36 01            [12] 1274 	ld	(hl), #0x01
-                                   1275 ;enemies.c:398: return;
-    00000564 18 5D            [12] 1276 	jr	00133$
-    00000566                       1277 00130$:
-                                   1278 ;enemies.c:404: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-    00000566 F8 07            [12] 1279 	ldhl	sp,	#7
-    00000568 7E               [ 8] 1280 	ld	a, (hl)
-    00000569 F8 0A            [12] 1281 	ldhl	sp,	#10
-    0000056B 77               [ 8] 1282 	ld	(hl), a
-    0000056C F8 06            [12] 1283 	ldhl	sp,	#6
-    0000056E 7E               [ 8] 1284 	ld	a, (hl)
-    0000056F F8 09            [12] 1285 	ldhl	sp,	#9
-    00000571 77               [ 8] 1286 	ld	(hl), a
-    00000572 F8 04            [12] 1287 	ldhl	sp,	#4
-    00000574 2A               [ 8] 1288 	ld	a, (hl+)
-    00000575 66               [ 8] 1289 	ld	h, (hl)
-    00000576 6F               [ 4] 1290 	ld	l, a
-    00000577 23               [ 8] 1291 	inc	hl
-    00000578 23               [ 8] 1292 	inc	hl
-    00000579 4E               [ 8] 1293 	ld	c, (hl)
-                                   1294 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
-    0000057A F8 07            [12] 1295 	ldhl	sp,	#7
-    0000057C 79               [ 4] 1296 	ld	a, c
-    0000057D 22               [ 8] 1297 	ld	(hl+), a
-    0000057E AF               [ 4] 1298 	xor	a, a
-    0000057F 32               [ 8] 1299 	ld	(hl-), a
-    00000580 3A               [ 8] 1300 	ld	a, (hl-)
-    00000581 2B               [ 8] 1301 	dec	hl
-    00000582 22               [ 8] 1302 	ld	(hl+), a
-    00000583 36 00            [12] 1303 	ld	(hl), #0x00
-    00000585 3E 02            [ 8] 1304 	ld	a, #0x02
-    00000587                       1305 00279$:
-    00000587 F8 05            [12] 1306 	ldhl	sp,	#5
-    00000589 CB 26            [16] 1307 	sla	(hl)
-    0000058B 23               [ 8] 1308 	inc	hl
-    0000058C CB 16            [16] 1309 	rl	(hl)
-    0000058E 3D               [ 4] 1310 	dec	a
-    0000058F 20 F6            [12] 1311 	jr	NZ, 00279$
-    00000591 2B               [ 8] 1312 	dec	hl
-    00000592 2A               [ 8] 1313 	ld	a, (hl+)
-    00000593 5F               [ 4] 1314 	ld	e, a
-    00000594 56               [ 8] 1315 	ld	d, (hl)
-    00000595 21r00r00         [12] 1316 	ld	hl, #_shadow_OAM
-    00000598 19               [ 8] 1317 	add	hl, de
-    00000599 E5               [16] 1318 	push	hl
-    0000059A 7D               [ 4] 1319 	ld	a, l
-    0000059B F8 09            [12] 1320 	ldhl	sp,	#9
-    0000059D 77               [ 8] 1321 	ld	(hl), a
-    0000059E E1               [12] 1322 	pop	hl
-    0000059F 7C               [ 4] 1323 	ld	a, h
-    000005A0 F8 08            [12] 1324 	ldhl	sp,	#8
-                                   1325 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
-    000005A2 32               [ 8] 1326 	ld	(hl-), a
-    000005A3 2A               [ 8] 1327 	ld	a, (hl+)
-    000005A4 5F               [ 4] 1328 	ld	e, a
-    000005A5 2A               [ 8] 1329 	ld	a, (hl+)
-    000005A6 23               [ 8] 1330 	inc	hl
-    000005A7 57               [ 4] 1331 	ld	d, a
-    000005A8 3A               [ 8] 1332 	ld	a, (hl-)
-    000005A9 2B               [ 8] 1333 	dec	hl
-    000005AA 2B               [ 8] 1334 	dec	hl
-    000005AB 12               [ 8] 1335 	ld	(de), a
-    000005AC 2A               [ 8] 1336 	ld	a, (hl+)
-    000005AD 5F               [ 4] 1337 	ld	e, a
-    000005AE 56               [ 8] 1338 	ld	d, (hl)
-    000005AF 6B               [ 4] 1339 	ld	l, e
-    000005B0 62               [ 4] 1340 	ld	h, d
-    000005B1 23               [ 8] 1341 	inc	hl
-    000005B2 E5               [16] 1342 	push	hl
-    000005B3 7D               [ 4] 1343 	ld	a, l
-    000005B4 F8 07            [12] 1344 	ldhl	sp,	#7
-    000005B6 77               [ 8] 1345 	ld	(hl), a
-    000005B7 E1               [12] 1346 	pop	hl
-    000005B8 7C               [ 4] 1347 	ld	a, h
-    000005B9 F8 06            [12] 1348 	ldhl	sp,	#6
-    000005BB 32               [ 8] 1349 	ld	(hl-), a
-    000005BC 2A               [ 8] 1350 	ld	a, (hl+)
-    000005BD 5F               [ 4] 1351 	ld	e, a
-    000005BE 56               [ 8] 1352 	ld	d, (hl)
-    000005BF F8 09            [12] 1353 	ldhl	sp,	#9
+                                    715 ;enemies.c:312: ptrEnemy->nSubPixelY += m_nCurrentSpeed;
+    000002C0 D1               [12]  716 	pop	de
+    000002C1 D5               [16]  717 	push	de
+    000002C2 21 0A 00         [12]  718 	ld	hl, #0x000a
+    000002C5 19               [ 8]  719 	add	hl, de
+    000002C6 E5               [16]  720 	push	hl
+    000002C7 7D               [ 4]  721 	ld	a, l
+    000002C8 F8 08            [12]  722 	ldhl	sp,	#8
+    000002CA 77               [ 8]  723 	ld	(hl), a
+    000002CB E1               [12]  724 	pop	hl
+    000002CC 7C               [ 4]  725 	ld	a, h
+    000002CD F8 07            [12]  726 	ldhl	sp,	#7
+    000002CF 32               [ 8]  727 	ld	(hl-), a
+    000002D0 2A               [ 8]  728 	ld	a, (hl+)
+    000002D1 5F               [ 4]  729 	ld	e, a
+    000002D2 56               [ 8]  730 	ld	d, (hl)
+    000002D3 1A               [ 8]  731 	ld	a, (de)
+    000002D4 21r02r00         [12]  732 	ld	hl, #_m_nCurrentSpeed
+    000002D7 86               [ 8]  733 	add	a, (hl)
+    000002D8 F8 06            [12]  734 	ldhl	sp,	#6
+    000002DA 5E               [ 8]  735 	ld	e, (hl)
+    000002DB 23               [ 8]  736 	inc	hl
+    000002DC 66               [ 8]  737 	ld	h, (hl)
+    000002DD 6B               [ 4]  738 	ld	l, e
+    000002DE 77               [ 8]  739 	ld	(hl), a
+                                    740 ;enemies.c:314: if (ptrEnemy->nSubPixelX >= 16) 
+    000002DF F8 04            [12]  741 	ldhl	sp,#4
+    000002E1 2A               [ 8]  742 	ld	a, (hl+)
+    000002E2 5F               [ 4]  743 	ld	e, a
+    000002E3 56               [ 8]  744 	ld	d, (hl)
+    000002E4 1A               [ 8]  745 	ld	a, (de)
+    000002E5 4F               [ 4]  746 	ld	c, a
+                                    747 ;enemies.c:316: ptrEnemy->nX += ptrEnemy->nDirX;
+    000002E6 F8 00            [12]  748 	ldhl	sp,	#0
+    000002E8 7E               [ 8]  749 	ld	a, (hl)
+    000002E9 F8 08            [12]  750 	ldhl	sp,	#8
+    000002EB 77               [ 8]  751 	ld	(hl), a
+    000002EC F8 01            [12]  752 	ldhl	sp,	#1
+    000002EE 7E               [ 8]  753 	ld	a, (hl)
+    000002EF F8 09            [12]  754 	ldhl	sp,	#9
+    000002F1 77               [ 8]  755 	ld	(hl), a
+                                    756 ;enemies.c:314: if (ptrEnemy->nSubPixelX >= 16) 
+    000002F2 79               [ 4]  757 	ld	a, c
+    000002F3 D6 10            [ 8]  758 	sub	a, #0x10
+    000002F5 38 34            [12]  759 	jr	C, 00104$
+                                    760 ;enemies.c:316: ptrEnemy->nX += ptrEnemy->nDirX;
+    000002F7 2B               [ 8]  761 	dec	hl
+    000002F8 2A               [ 8]  762 	ld	a, (hl+)
+    000002F9 5F               [ 4]  763 	ld	e, a
+    000002FA 2A               [ 8]  764 	ld	a, (hl+)
+    000002FB 57               [ 4]  765 	ld	d, a
+    000002FC 1A               [ 8]  766 	ld	a, (de)
+    000002FD 77               [ 8]  767 	ld	(hl), a
+    000002FE D1               [12]  768 	pop	de
+    000002FF D5               [16]  769 	push	de
+    00000300 21 04 00         [12]  770 	ld	hl, #0x0004
+    00000303 19               [ 8]  771 	add	hl, de
+    00000304 E5               [16]  772 	push	hl
+    00000305 7D               [ 4]  773 	ld	a, l
+    00000306 F8 0D            [12]  774 	ldhl	sp,	#13
+    00000308 77               [ 8]  775 	ld	(hl), a
+    00000309 E1               [12]  776 	pop	hl
+    0000030A 7C               [ 4]  777 	ld	a, h
+    0000030B F8 0C            [12]  778 	ldhl	sp,	#12
+    0000030D 32               [ 8]  779 	ld	(hl-), a
+    0000030E 2A               [ 8]  780 	ld	a, (hl+)
+    0000030F 5F               [ 4]  781 	ld	e, a
+    00000310 3A               [ 8]  782 	ld	a, (hl-)
+    00000311 2B               [ 8]  783 	dec	hl
+    00000312 57               [ 4]  784 	ld	d, a
+    00000313 1A               [ 8]  785 	ld	a, (de)
+    00000314 4E               [ 8]  786 	ld	c, (hl)
+    00000315 2B               [ 8]  787 	dec	hl
+    00000316 2B               [ 8]  788 	dec	hl
+    00000317 81               [ 4]  789 	add	a, c
+    00000318 5E               [ 8]  790 	ld	e, (hl)
+    00000319 23               [ 8]  791 	inc	hl
+    0000031A 66               [ 8]  792 	ld	h, (hl)
+    0000031B 6B               [ 4]  793 	ld	l, e
+    0000031C 77               [ 8]  794 	ld	(hl), a
+                                    795 ;enemies.c:317: ptrEnemy->nSubPixelX -= 16;
+    0000031D F8 04            [12]  796 	ldhl	sp,#4
+    0000031F 2A               [ 8]  797 	ld	a, (hl+)
+    00000320 5F               [ 4]  798 	ld	e, a
+    00000321 3A               [ 8]  799 	ld	a, (hl-)
+    00000322 57               [ 4]  800 	ld	d, a
+    00000323 1A               [ 8]  801 	ld	a, (de)
+    00000324 C6 F0            [ 8]  802 	add	a, #0xf0
+    00000326 5E               [ 8]  803 	ld	e, (hl)
+    00000327 23               [ 8]  804 	inc	hl
+    00000328 66               [ 8]  805 	ld	h, (hl)
+    00000329 6B               [ 4]  806 	ld	l, e
+    0000032A 77               [ 8]  807 	ld	(hl), a
+    0000032B                        808 00104$:
+                                    809 ;enemies.c:319: if (ptrEnemy->nSubPixelY >= 16) 
+    0000032B F8 06            [12]  810 	ldhl	sp,#6
+    0000032D 2A               [ 8]  811 	ld	a, (hl+)
+    0000032E 5F               [ 4]  812 	ld	e, a
+    0000032F 56               [ 8]  813 	ld	d, (hl)
+    00000330 1A               [ 8]  814 	ld	a, (de)
+    00000331 4F               [ 4]  815 	ld	c, a
+                                    816 ;enemies.c:321: ptrEnemy->nY += ptrEnemy->nDirY;
+    00000332 D1               [12]  817 	pop	de
+    00000333 D5               [16]  818 	push	de
+    00000334 6B               [ 4]  819 	ld	l, e
+    00000335 62               [ 4]  820 	ld	h, d
+    00000336 23               [ 8]  821 	inc	hl
+    00000337 E5               [16]  822 	push	hl
+    00000338 7D               [ 4]  823 	ld	a, l
+    00000339 F8 0D            [12]  824 	ldhl	sp,	#13
+    0000033B 77               [ 8]  825 	ld	(hl), a
+    0000033C E1               [12]  826 	pop	hl
+    0000033D 7C               [ 4]  827 	ld	a, h
+    0000033E F8 0C            [12]  828 	ldhl	sp,	#12
+    00000340 77               [ 8]  829 	ld	(hl), a
+                                    830 ;enemies.c:319: if (ptrEnemy->nSubPixelY >= 16) 
+    00000341 79               [ 4]  831 	ld	a, c
+    00000342 D6 10            [ 8]  832 	sub	a, #0x10
+    00000344 38 25            [12]  833 	jr	C, 00106$
+                                    834 ;enemies.c:321: ptrEnemy->nY += ptrEnemy->nDirY;
+    00000346 2B               [ 8]  835 	dec	hl
+    00000347 2A               [ 8]  836 	ld	a, (hl+)
+    00000348 5F               [ 4]  837 	ld	e, a
+    00000349 56               [ 8]  838 	ld	d, (hl)
+    0000034A 1A               [ 8]  839 	ld	a, (de)
+    0000034B 4F               [ 4]  840 	ld	c, a
+    0000034C D1               [12]  841 	pop	de
+    0000034D D5               [16]  842 	push	de
+    0000034E 21 05 00         [12]  843 	ld	hl, #0x0005
+    00000351 19               [ 8]  844 	add	hl, de
+    00000352 5D               [ 4]  845 	ld	e, l
+    00000353 54               [ 4]  846 	ld	d, h
+    00000354 1A               [ 8]  847 	ld	a, (de)
+    00000355 81               [ 4]  848 	add	a, c
+    00000356 F8 0B            [12]  849 	ldhl	sp,	#11
+    00000358 5E               [ 8]  850 	ld	e, (hl)
+    00000359 23               [ 8]  851 	inc	hl
+    0000035A 66               [ 8]  852 	ld	h, (hl)
+    0000035B 6B               [ 4]  853 	ld	l, e
+    0000035C 77               [ 8]  854 	ld	(hl), a
+                                    855 ;enemies.c:322: ptrEnemy->nSubPixelY -= 16;
+    0000035D F8 06            [12]  856 	ldhl	sp,#6
+    0000035F 2A               [ 8]  857 	ld	a, (hl+)
+    00000360 5F               [ 4]  858 	ld	e, a
+    00000361 3A               [ 8]  859 	ld	a, (hl-)
+    00000362 57               [ 4]  860 	ld	d, a
+    00000363 1A               [ 8]  861 	ld	a, (de)
+    00000364 C6 F0            [ 8]  862 	add	a, #0xf0
+    00000366 5E               [ 8]  863 	ld	e, (hl)
+    00000367 23               [ 8]  864 	inc	hl
+    00000368 66               [ 8]  865 	ld	h, (hl)
+    00000369 6B               [ 4]  866 	ld	l, e
+    0000036A 77               [ 8]  867 	ld	(hl), a
+    0000036B                        868 00106$:
+                                    869 ;enemies.c:326: if (!ptrEnemy->bMainSpriteSet)
+    0000036B D1               [12]  870 	pop	de
+    0000036C D5               [16]  871 	push	de
+    0000036D 21 0C 00         [12]  872 	ld	hl, #0x000c
+    00000370 19               [ 8]  873 	add	hl, de
+    00000371 E5               [16]  874 	push	hl
+    00000372 7D               [ 4]  875 	ld	a, l
+    00000373 F8 08            [12]  876 	ldhl	sp,	#8
+    00000375 77               [ 8]  877 	ld	(hl), a
+    00000376 E1               [12]  878 	pop	hl
+    00000377 7C               [ 4]  879 	ld	a, h
+    00000378 F8 07            [12]  880 	ldhl	sp,	#7
+    0000037A 32               [ 8]  881 	ld	(hl-), a
+    0000037B 2A               [ 8]  882 	ld	a, (hl+)
+    0000037C 5F               [ 4]  883 	ld	e, a
+    0000037D 56               [ 8]  884 	ld	d, (hl)
+    0000037E 1A               [ 8]  885 	ld	a, (de)
+    0000037F B7               [ 4]  886 	or	a, a
+    00000380 20 3C            [12]  887 	jr	NZ, 00113$
+                                    888 ;enemies.c:329: if (ptrEnemy->nX >= 15 && ptrEnemy->nX <= 153 && ptrEnemy->nY >= 44 && ptrEnemy->nY <= 143) 
+    00000382 23               [ 8]  889 	inc	hl
+    00000383 2A               [ 8]  890 	ld	a, (hl+)
+    00000384 5F               [ 4]  891 	ld	e, a
+    00000385 56               [ 8]  892 	ld	d, (hl)
+    00000386 1A               [ 8]  893 	ld	a, (de)
+    00000387 FE 0F            [ 8]  894 	cp	a, #0x0f
+    00000389 38 33            [12]  895 	jr	C, 00113$
+    0000038B FE 9A            [ 8]  896 	cp	a, #0x9a
+    0000038D 30 2F            [12]  897 	jr	NC, 00113$
+    0000038F F8 0B            [12]  898 	ldhl	sp,#11
+    00000391 2A               [ 8]  899 	ld	a, (hl+)
+    00000392 5F               [ 4]  900 	ld	e, a
+    00000393 56               [ 8]  901 	ld	d, (hl)
+    00000394 1A               [ 8]  902 	ld	a, (de)
+    00000395 FE 2C            [ 8]  903 	cp	a, #0x2c
+    00000397 38 25            [12]  904 	jr	C, 00113$
+    00000399 FE 90            [ 8]  905 	cp	a, #0x90
+    0000039B 30 21            [12]  906 	jr	NC, 00113$
+                                    907 ;enemies.c:332: ptrEnemy->bMainSpriteSet = TRUE;
+    0000039D F8 06            [12]  908 	ldhl	sp,	#6
+    0000039F 2A               [ 8]  909 	ld	a, (hl+)
+    000003A0 66               [ 8]  910 	ld	h, (hl)
+    000003A1 6F               [ 4]  911 	ld	l, a
+    000003A2 36 01            [12]  912 	ld	(hl), #0x01
+                                    913 ;enemies.c:335: set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber);
+    000003A4 D1               [12]  914 	pop	de
+    000003A5 D5               [16]  915 	push	de
+    000003A6 21 0B 00         [12]  916 	ld	hl, #0x000b
+    000003A9 19               [ 8]  917 	add	hl, de
+    000003AA 4D               [ 4]  918 	ld	c, l
+    000003AB 44               [ 4]  919 	ld	b, h
+    000003AC 0A               [ 8]  920 	ld	a, (bc)
+    000003AD 4F               [ 4]  921 	ld	c, a
+    000003AE E1               [12]  922 	pop	hl
+    000003AF E5               [16]  923 	push	hl
+    000003B0 23               [ 8]  924 	inc	hl
+    000003B1 23               [ 8]  925 	inc	hl
+                                    926 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
+    000003B2 6E               [ 8]  927 	ld	l, (hl)
+    000003B3 11r00r00         [12]  928 	ld	de, #_shadow_OAM+0
+    000003B6 26 00            [ 8]  929 	ld	h, #0x00
+    000003B8 29               [ 8]  930 	add	hl, hl
+    000003B9 29               [ 8]  931 	add	hl, hl
+    000003BA 19               [ 8]  932 	add	hl, de
+    000003BB 23               [ 8]  933 	inc	hl
+    000003BC 23               [ 8]  934 	inc	hl
+    000003BD 71               [ 8]  935 	ld	(hl), c
+                                    936 ;enemies.c:335: set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber);
+    000003BE                        937 00113$:
+                                    938 ;enemies.c:340: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
+    000003BE F8 00            [12]  939 	ldhl	sp,	#0
+    000003C0 7E               [ 8]  940 	ld	a, (hl)
+    000003C1 F8 0B            [12]  941 	ldhl	sp,	#11
+    000003C3 77               [ 8]  942 	ld	(hl), a
+    000003C4 F8 01            [12]  943 	ldhl	sp,	#1
+    000003C6 7E               [ 8]  944 	ld	a, (hl)
+    000003C7 F8 0C            [12]  945 	ldhl	sp,	#12
+    000003C9 32               [ 8]  946 	ld	(hl-), a
+    000003CA 2A               [ 8]  947 	ld	a, (hl+)
+    000003CB 5F               [ 4]  948 	ld	e, a
+    000003CC 56               [ 8]  949 	ld	d, (hl)
+    000003CD 1A               [ 8]  950 	ld	a, (de)
+                                    951 ;enemies.c:321: ptrEnemy->nY += ptrEnemy->nDirY;
+    000003CE C1               [12]  952 	pop	bc
+    000003CF C5               [16]  953 	push	bc
+    000003D0 03               [ 8]  954 	inc	bc
+                                    955 ;enemies.c:340: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
+    000003D1 FE 4C            [ 8]  956 	cp	a, #0x4c
+    000003D3 38 42            [12]  957 	jr	C, 00121$
+    000003D5 FE 57            [ 8]  958 	cp	a, #0x57
+    000003D7 30 3E            [12]  959 	jr	NC, 00121$
+    000003D9 0A               [ 8]  960 	ld	a, (bc)
+    000003DA FE 4A            [ 8]  961 	cp	a, #0x4a
+    000003DC 38 39            [12]  962 	jr	C, 00121$
+    000003DE FE 55            [ 8]  963 	cp	a, #0x55
+    000003E0 30 35            [12]  964 	jr	NC, 00121$
+                                    965 ;enemies.c:344: ptrEnemy->bCantMove = TRUE;
+    000003E2 F8 02            [12]  966 	ldhl	sp,	#2
+    000003E4 2A               [ 8]  967 	ld	a, (hl+)
+    000003E5 66               [ 8]  968 	ld	h, (hl)
+    000003E6 6F               [ 4]  969 	ld	l, a
+    000003E7 36 01            [12]  970 	ld	(hl), #0x01
+    000003E9 18 2C            [12]  971 	jr	00121$
+    000003EB                        972 00120$:
+                                    973 ;enemies.c:354: ptrPlayer->bTakenDamage = TRUE;
+    000003EB F8 0D            [12]  974 	ldhl	sp,#13
+    000003ED 2A               [ 8]  975 	ld	a, (hl+)
+    000003EE 5F               [ 4]  976 	ld	e, a
+    000003EF 56               [ 8]  977 	ld	d, (hl)
+    000003F0 21 18 00         [12]  978 	ld	hl, #0x0018
+    000003F3 19               [ 8]  979 	add	hl, de
+    000003F4 36 01            [12]  980 	ld	(hl), #0x01
+                                    981 ;enemies.c:357: ptrPlayer->nTotalShotsTaken++;
+    000003F6 F8 0D            [12]  982 	ldhl	sp,#13
+    000003F8 2A               [ 8]  983 	ld	a, (hl+)
+    000003F9 5F               [ 4]  984 	ld	e, a
+    000003FA 56               [ 8]  985 	ld	d, (hl)
+    000003FB 21 16 00         [12]  986 	ld	hl, #0x0016
+    000003FE 19               [ 8]  987 	add	hl, de
+    000003FF 4D               [ 4]  988 	ld	c,l
+    00000400 44               [ 4]  989 	ld	b,h
+    00000401 2A               [ 8]  990 	ld	a,	(hl+)
+    00000402 66               [ 8]  991 	ld	h, (hl)
+    00000403 6F               [ 4]  992 	ld	l, a
+    00000404 23               [ 8]  993 	inc	hl
+    00000405 7D               [ 4]  994 	ld	a, l
+    00000406 02               [ 8]  995 	ld	(bc), a
+    00000407 03               [ 8]  996 	inc	bc
+    00000408 7C               [ 4]  997 	ld	a, h
+    00000409 02               [ 8]  998 	ld	(bc), a
+                                    999 ;enemies.c:360: KillEnemy(ptrEnemy, ptrPlayer);
+    0000040A F8 0D            [12] 1000 	ldhl	sp,	#13
+    0000040C 2A               [ 8] 1001 	ld	a, (hl+)
+    0000040D 4F               [ 4] 1002 	ld	c, a
+    0000040E 46               [ 8] 1003 	ld	b, (hl)
+    0000040F D1               [12] 1004 	pop	de
+    00000410 D5               [16] 1005 	push	de
+    00000411 CDr9Er04         [24] 1006 	call	_KillEnemy
+                                   1007 ;enemies.c:365: return;
+    00000414 C3r9Br04         [16] 1008 	jp	00133$
+    00000417                       1009 00121$:
+                                   1010 ;enemies.c:369: if (!ptrEnemy->bCantMove)
+    00000417 F8 02            [12] 1011 	ldhl	sp,#2
+    00000419 2A               [ 8] 1012 	ld	a, (hl+)
+    0000041A 5F               [ 4] 1013 	ld	e, a
+    0000041B 56               [ 8] 1014 	ld	d, (hl)
+    0000041C 1A               [ 8] 1015 	ld	a, (de)
+                                   1016 ;enemies.c:340: if (ptrEnemy->nX >= 76 && ptrEnemy->nX <= 86 && ptrEnemy->nY >= 74 && ptrEnemy->nY <= 84) 
+    0000041D F8 0B            [12] 1017 	ldhl	sp,#11
+    0000041F 5E               [ 8] 1018 	ld	e, (hl)
+    00000420 23               [ 8] 1019 	inc	hl
+    00000421 56               [ 8] 1020 	ld	d, (hl)
+    00000422 F5               [16] 1021 	push	af
+    00000423 1A               [ 8] 1022 	ld	a, (de)
+    00000424 77               [ 8] 1023 	ld	(hl), a
+                                   1024 ;enemies.c:321: ptrEnemy->nY += ptrEnemy->nDirY;
+    00000425 0A               [ 8] 1025 	ld	a, (bc)
+    00000426 5F               [ 4] 1026 	ld	e, a
+    00000427 F1               [12] 1027 	pop	af
+                                   1028 ;enemies.c:369: if (!ptrEnemy->bCantMove)
+    00000428 B7               [ 4] 1029 	or	a, a
+    00000429 20 5A            [12] 1030 	jr	NZ, 00130$
+                                   1031 ;enemies.c:373: if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
+    0000042B D5               [16] 1032 	push	de
+    0000042C F8 02            [12] 1033 	ldhl	sp,#2
+    0000042E 2A               [ 8] 1034 	ld	a, (hl+)
+    0000042F 5F               [ 4] 1035 	ld	e, a
+    00000430 56               [ 8] 1036 	ld	d, (hl)
+    00000431 21 08 00         [12] 1037 	ld	hl, #0x0008
+    00000434 19               [ 8] 1038 	add	hl, de
+    00000435 D1               [12] 1039 	pop	de
+    00000436 4D               [ 4] 1040 	ld	c, l
+    00000437 44               [ 4] 1041 	ld	b, h
+    00000438 0A               [ 8] 1042 	ld	a, (bc)
+    00000439 57               [ 4] 1043 	ld	d, a
+    0000043A D5               [16] 1044 	push	de
+    0000043B F8 0F            [12] 1045 	ldhl	sp,#15
+    0000043D 2A               [ 8] 1046 	ld	a, (hl+)
+    0000043E 5F               [ 4] 1047 	ld	e, a
+    0000043F 56               [ 8] 1048 	ld	d, (hl)
+    00000440 21 13 00         [12] 1049 	ld	hl, #0x0013
+    00000443 19               [ 8] 1050 	add	hl, de
+    00000444 D1               [12] 1051 	pop	de
+    00000445 4D               [ 4] 1052 	ld	c, l
+    00000446 44               [ 4] 1053 	ld	b, h
+    00000447 0A               [ 8] 1054 	ld	a, (bc)
+    00000448 92               [ 4] 1055 	sub	a, d
+    00000449 20 3A            [12] 1056 	jr	NZ, 00130$
+                                   1057 ;enemies.c:376: if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
+    0000044B F8 0C            [12] 1058 	ldhl	sp,	#12
+    0000044D 7E               [ 8] 1059 	ld	a, (hl)
+    0000044E D6 3E            [ 8] 1060 	sub	a, #0x3e
+    00000450 38 33            [12] 1061 	jr	C, 00130$
+    00000452 3E 64            [ 8] 1062 	ld	a, #0x64
+    00000454 96               [ 8] 1063 	sub	a, (hl)
+    00000455 38 2E            [12] 1064 	jr	C, 00130$
+    00000457 7B               [ 4] 1065 	ld	a, e
+    00000458 D6 3C            [ 8] 1066 	sub	a, #0x3c
+    0000045A 38 29            [12] 1067 	jr	C, 00130$
+    0000045C 3E 64            [ 8] 1068 	ld	a, #0x64
+    0000045E 93               [ 4] 1069 	sub	a, e
+    0000045F 38 24            [12] 1070 	jr	C, 00130$
+                                   1071 ;enemies.c:379: ptrPlayer->nTotalShotsTaken++;
+    00000461 23               [ 8] 1072 	inc	hl
+    00000462 2A               [ 8] 1073 	ld	a, (hl+)
+    00000463 5F               [ 4] 1074 	ld	e, a
+    00000464 56               [ 8] 1075 	ld	d, (hl)
+    00000465 21 16 00         [12] 1076 	ld	hl, #0x0016
+    00000468 19               [ 8] 1077 	add	hl, de
+    00000469 4D               [ 4] 1078 	ld	c,l
+    0000046A 44               [ 4] 1079 	ld	b,h
+    0000046B 2A               [ 8] 1080 	ld	a,	(hl+)
+    0000046C 66               [ 8] 1081 	ld	h, (hl)
+    0000046D 6F               [ 4] 1082 	ld	l, a
+    0000046E 23               [ 8] 1083 	inc	hl
+    0000046F 7D               [ 4] 1084 	ld	a, l
+    00000470 02               [ 8] 1085 	ld	(bc), a
+    00000471 03               [ 8] 1086 	inc	bc
+    00000472 7C               [ 4] 1087 	ld	a, h
+    00000473 02               [ 8] 1088 	ld	(bc), a
+                                   1089 ;enemies.c:382: KillEnemy(ptrEnemy, ptrPlayer);
+    00000474 F8 0D            [12] 1090 	ldhl	sp,	#13
+    00000476 2A               [ 8] 1091 	ld	a, (hl+)
+    00000477 4F               [ 4] 1092 	ld	c, a
+    00000478 46               [ 8] 1093 	ld	b, (hl)
+    00000479 D1               [12] 1094 	pop	de
+    0000047A D5               [16] 1095 	push	de
+    0000047B CDr9Er04         [24] 1096 	call	_KillEnemy
+                                   1097 ;enemies.c:385: m_bShowSpray = TRUE;
+    0000047E 21r10r00         [12] 1098 	ld	hl, #_m_bShowSpray
+    00000481 36 01            [12] 1099 	ld	(hl), #0x01
+                                   1100 ;enemies.c:390: return;
+    00000483 18 16            [12] 1101 	jr	00133$
+    00000485                       1102 00130$:
+                                   1103 ;enemies.c:396: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+    00000485 F8 0C            [12] 1104 	ldhl	sp,	#12
+    00000487 4E               [ 8] 1105 	ld	c, (hl)
+    00000488 E1               [12] 1106 	pop	hl
+    00000489 E5               [16] 1107 	push	hl
+    0000048A 23               [ 8] 1108 	inc	hl
+    0000048B 23               [ 8] 1109 	inc	hl
+    0000048C 46               [ 8] 1110 	ld	b, (hl)
+                                   1111 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    0000048D 68               [ 4] 1112 	ld	l, b
+    0000048E AF               [ 4] 1113 	xor	a, a
+    0000048F 67               [ 4] 1114 	ld	h, a
+    00000490 29               [ 8] 1115 	add	hl, hl
+    00000491 29               [ 8] 1116 	add	hl, hl
+    00000492 D5               [16] 1117 	push	de
+    00000493 11r00r00         [12] 1118 	ld	de, #_shadow_OAM
+    00000496 19               [ 8] 1119 	add	hl, de
+    00000497 D1               [12] 1120 	pop	de
+                                   1121 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
+    00000498 7B               [ 4] 1122 	ld	a, e
+    00000499 22               [ 8] 1123 	ld	(hl+), a
+    0000049A 71               [ 8] 1124 	ld	(hl), c
+                                   1125 ;enemies.c:396: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+    0000049B                       1126 00133$:
+                                   1127 ;enemies.c:397: }
+    0000049B E8 0F            [16] 1128 	add	sp, #15
+    0000049D C9               [16] 1129 	ret
+                                   1130 ;enemies.c:406: void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
+                                   1131 ;	---------------------------------
+                                   1132 ; Function KillEnemy
+                                   1133 ; ---------------------------------
+    0000049E                       1134 _KillEnemy::
+    0000049E C5               [16] 1135 	push	bc
+                                   1136 ;enemies.c:409: ptrEnemy->bAlive = FALSE;
+    0000049F 6B               [ 4] 1137 	ld	l, e
+    000004A0 62               [ 4] 1138 	ld	h, d
+    000004A1 23               [ 8] 1139 	inc	hl
+    000004A2 23               [ 8] 1140 	inc	hl
+    000004A3 23               [ 8] 1141 	inc	hl
+    000004A4 36 00            [12] 1142 	ld	(hl), #0x00
+                                   1143 ;enemies.c:412: set_sprite_tile(ptrEnemy->nSpriteID, 0);
+    000004A6 13               [ 8] 1144 	inc	de
+    000004A7 13               [ 8] 1145 	inc	de
+    000004A8 1A               [ 8] 1146 	ld	a, (de)
+    000004A9 4F               [ 4] 1147 	ld	c, a
+                                   1148 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
+    000004AA AF               [ 4] 1149 	xor	a, a
+    000004AB 69               [ 4] 1150 	ld	l, c
+    000004AC 67               [ 4] 1151 	ld	h, a
+    000004AD 29               [ 8] 1152 	add	hl, hl
+    000004AE 29               [ 8] 1153 	add	hl, hl
+    000004AF 01r00r00         [12] 1154 	ld	bc, #_shadow_OAM
+    000004B2 09               [ 8] 1155 	add	hl, bc
+    000004B3 23               [ 8] 1156 	inc	hl
+    000004B4 23               [ 8] 1157 	inc	hl
+    000004B5 36 00            [12] 1158 	ld	(hl), #0x00
+                                   1159 ;enemies.c:413: move_sprite(ptrEnemy->nSpriteID, 0, 0);
+    000004B7 1A               [ 8] 1160 	ld	a, (de)
+    000004B8 5F               [ 4] 1161 	ld	e, a
+                                   1162 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000004B9 01r00r00         [12] 1163 	ld	bc, #_shadow_OAM+0
+    000004BC AF               [ 4] 1164 	xor	a, a
+    000004BD 6B               [ 4] 1165 	ld	l, e
+    000004BE 67               [ 4] 1166 	ld	h, a
+    000004BF 29               [ 8] 1167 	add	hl, hl
+    000004C0 29               [ 8] 1168 	add	hl, hl
+    000004C1 09               [ 8] 1169 	add	hl, bc
+                                   1170 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
+    000004C2 AF               [ 4] 1171 	xor	a, a
+    000004C3 22               [ 8] 1172 	ld	(hl+), a
+    000004C4 77               [ 8] 1173 	ld	(hl), a
+                                   1174 ;enemies.c:416: ptrPlayer->nScore += 1;
+    000004C5 D1               [12] 1175 	pop	de
+    000004C6 D5               [16] 1176 	push	de
+    000004C7 21 14 00         [12] 1177 	ld	hl, #0x0014
+    000004CA 19               [ 8] 1178 	add	hl, de
+    000004CB 4D               [ 4] 1179 	ld	c,l
+    000004CC 44               [ 4] 1180 	ld	b,h
+    000004CD 2A               [ 8] 1181 	ld	a,	(hl+)
+    000004CE 66               [ 8] 1182 	ld	h, (hl)
+    000004CF 6F               [ 4] 1183 	ld	l, a
+    000004D0 23               [ 8] 1184 	inc	hl
+    000004D1 7D               [ 4] 1185 	ld	a, l
+    000004D2 02               [ 8] 1186 	ld	(bc), a
+    000004D3 03               [ 8] 1187 	inc	bc
+    000004D4 7C               [ 4] 1188 	ld	a, h
+    000004D5 02               [ 8] 1189 	ld	(bc), a
+                                   1190 ;enemies.c:417: m_nTotalKilled += 1;
+    000004D6 21r03r00         [12] 1191 	ld	hl, #_m_nTotalKilled
+    000004D9 34               [12] 1192 	inc	(hl)
+    000004DA 20 02            [12] 1193 	jr	NZ, 00105$
+    000004DC 23               [ 8] 1194 	inc	hl
+    000004DD 34               [12] 1195 	inc	(hl)
+    000004DE                       1196 00105$:
+                                   1197 ;enemies.c:420: m_bPlayKillSoundEffect = TRUE;
+    000004DE 21r0Fr00         [12] 1198 	ld	hl, #_m_bPlayKillSoundEffect
+    000004E1 36 01            [12] 1199 	ld	(hl), #0x01
+                                   1200 ;enemies.c:421: }
+    000004E3 33               [ 8] 1201 	inc	sp
+    000004E4 33               [ 8] 1202 	inc	sp
+    000004E5 C9               [16] 1203 	ret
+                                   1204 ;enemies.c:429: void IncreaseDifficulty(UINT8 nDamgeToPlayer)
+                                   1205 ;	---------------------------------
+                                   1206 ; Function IncreaseDifficulty
+                                   1207 ; ---------------------------------
+    000004E6                       1208 _IncreaseDifficulty::
+                                   1209 ;enemies.c:432: if (!m_bMaxSpeedReached)
+    000004E6 FAr09r00         [16] 1210 	ld	a, (#_m_bMaxSpeedReached)
+    000004E9 B7               [ 4] 1211 	or	a, a
+    000004EA 20 6E            [12] 1212 	jr	NZ, 00118$
+                                   1213 ;enemies.c:436: if (m_nTotalKilled >= m_nKillsForNextSpeed) 
+    000004EC 11r03r00         [12] 1214 	ld	de, #_m_nTotalKilled
+    000004EF 21r05r00         [12] 1215 	ld	hl, #_m_nKillsForNextSpeed
+    000004F2 1A               [ 8] 1216 	ld	a, (de)
+    000004F3 13               [ 8] 1217 	inc	de
+    000004F4 96               [ 8] 1218 	sub	a, (hl)
+    000004F5 23               [ 8] 1219 	inc	hl
+    000004F6 1A               [ 8] 1220 	ld	a, (de)
+    000004F7 9E               [ 8] 1221 	sbc	a, (hl)
+    000004F8 38 60            [12] 1222 	jr	C, 00118$
+                                   1223 ;enemies.c:438: m_nCurrentSpeed++;
+    000004FA 21r02r00         [12] 1224 	ld	hl, #_m_nCurrentSpeed
+    000004FD 34               [12] 1225 	inc	(hl)
+                                   1226 ;enemies.c:439: if (m_nCurrentSpeed == 2) m_nKillsForNextSpeed = 50;
+    000004FE 7E               [ 8] 1227 	ld	a, (hl)
+    000004FF D6 02            [ 8] 1228 	sub	a, #0x02
+    00000501 20 0A            [12] 1229 	jr	NZ, 00111$
+    00000503 21r05r00         [12] 1230 	ld	hl, #_m_nKillsForNextSpeed
+    00000506 3E 32            [ 8] 1231 	ld	a, #0x32
+    00000508 22               [ 8] 1232 	ld	(hl+), a
+    00000509 AF               [ 4] 1233 	xor	a, a
+    0000050A 77               [ 8] 1234 	ld	(hl), a
+    0000050B 18 3E            [12] 1235 	jr	00112$
+    0000050D                       1236 00111$:
+                                   1237 ;enemies.c:440: else if (m_nCurrentSpeed == 3) m_nKillsForNextSpeed = 125;
+    0000050D FAr02r00         [16] 1238 	ld	a, (#_m_nCurrentSpeed)
+    00000510 D6 03            [ 8] 1239 	sub	a, #0x03
+    00000512 20 0A            [12] 1240 	jr	NZ, 00108$
+    00000514 21r05r00         [12] 1241 	ld	hl, #_m_nKillsForNextSpeed
+    00000517 3E 7D            [ 8] 1242 	ld	a, #0x7d
+    00000519 22               [ 8] 1243 	ld	(hl+), a
+    0000051A AF               [ 4] 1244 	xor	a, a
+    0000051B 77               [ 8] 1245 	ld	(hl), a
+    0000051C 18 2D            [12] 1246 	jr	00112$
+    0000051E                       1247 00108$:
+                                   1248 ;enemies.c:441: else if (m_nCurrentSpeed == 4) m_nKillsForNextSpeed = 250;
+    0000051E FAr02r00         [16] 1249 	ld	a, (#_m_nCurrentSpeed)
+    00000521 D6 04            [ 8] 1250 	sub	a, #0x04
+    00000523 20 0A            [12] 1251 	jr	NZ, 00105$
+    00000525 21r05r00         [12] 1252 	ld	hl, #_m_nKillsForNextSpeed
+    00000528 3E FA            [ 8] 1253 	ld	a, #0xfa
+    0000052A 22               [ 8] 1254 	ld	(hl+), a
+    0000052B AF               [ 4] 1255 	xor	a, a
+    0000052C 77               [ 8] 1256 	ld	(hl), a
+    0000052D 18 1C            [12] 1257 	jr	00112$
+    0000052F                       1258 00105$:
+                                   1259 ;enemies.c:442: else if (m_nCurrentSpeed == 5) m_nKillsForNextSpeed = 400;
+    0000052F FAr02r00         [16] 1260 	ld	a, (#_m_nCurrentSpeed)
+    00000532 D6 05            [ 8] 1261 	sub	a, #0x05
+    00000534 20 0A            [12] 1262 	jr	NZ, 00102$
+    00000536 21r05r00         [12] 1263 	ld	hl, #_m_nKillsForNextSpeed
+    00000539 3E 90            [ 8] 1264 	ld	a, #0x90
+    0000053B 22               [ 8] 1265 	ld	(hl+), a
+    0000053C 36 01            [12] 1266 	ld	(hl), #0x01
+    0000053E 18 0B            [12] 1267 	jr	00112$
+    00000540                       1268 00102$:
+                                   1269 ;enemies.c:443: else m_nKillsForNextSpeed += 150;  // Gradual increase after
+    00000540 21r05r00         [12] 1270 	ld	hl, #_m_nKillsForNextSpeed
+    00000543 7E               [ 8] 1271 	ld	a, (hl)
+    00000544 C6 96            [ 8] 1272 	add	a, #0x96
+    00000546 22               [ 8] 1273 	ld	(hl+), a
+    00000547 7E               [ 8] 1274 	ld	a, (hl)
+    00000548 CE 00            [ 8] 1275 	adc	a, #0x00
+    0000054A 77               [ 8] 1276 	ld	(hl), a
+    0000054B                       1277 00112$:
+                                   1278 ;enemies.c:446: if (m_nCurrentSpeed >= MAX_SPEED) 
+    0000054B 21r02r00         [12] 1279 	ld	hl, #_m_nCurrentSpeed
+    0000054E 7E               [ 8] 1280 	ld	a, (hl)
+    0000054F D6 08            [ 8] 1281 	sub	a, #0x08
+    00000551 38 07            [12] 1282 	jr	C, 00118$
+                                   1283 ;enemies.c:450: m_nCurrentSpeed = MAX_SPEED;
+    00000553 36 08            [12] 1284 	ld	(hl), #0x08
+                                   1285 ;enemies.c:451: m_bMaxSpeedReached = TRUE;
+    00000555 21r09r00         [12] 1286 	ld	hl, #_m_bMaxSpeedReached
+    00000558 36 01            [12] 1287 	ld	(hl), #0x01
+    0000055A                       1288 00118$:
+                                   1289 ;enemies.c:457: if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % m_nKillsForNextSpawnRate == 0)
+    0000055A FAr0Ar00         [16] 1290 	ld	a, (#_m_bMaxSpawnRateReached)
+    0000055D B7               [ 4] 1291 	or	a, a
+    0000055E C0               [20] 1292 	ret	NZ
+    0000055F 21r04r00         [12] 1293 	ld	hl, #_m_nTotalKilled + 1
+    00000562 3A               [ 8] 1294 	ld	a, (hl-)
+    00000563 B6               [ 8] 1295 	or	a, (hl)
+    00000564 C8               [20] 1296 	ret	Z
+    00000565 FAr07r00         [16] 1297 	ld	a, (_m_nKillsForNextSpawnRate)
+    00000568 4F               [ 4] 1298 	ld	c, a
+    00000569 21r08r00         [12] 1299 	ld	hl, #_m_nKillsForNextSpawnRate + 1
+    0000056C 46               [ 8] 1300 	ld	b, (hl)
+    0000056D FAr03r00         [16] 1301 	ld	a, (_m_nTotalKilled)
+    00000570 5F               [ 4] 1302 	ld	e, a
+    00000571 21r04r00         [12] 1303 	ld	hl, #_m_nTotalKilled + 1
+    00000574 56               [ 8] 1304 	ld	d, (hl)
+    00000575 CDr00r00         [24] 1305 	call	__moduint
+    00000578 78               [ 4] 1306 	ld	a, b
+    00000579 B1               [ 4] 1307 	or	a, c
+    0000057A C0               [20] 1308 	ret	NZ
+                                   1309 ;enemies.c:460: if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
+    0000057B FAr03r00         [16] 1310 	ld	a, (#_m_nTotalKilled)
+    0000057E 21r0Br00         [12] 1311 	ld	hl, #_m_nLastSpawnRateKillCount
+    00000581 96               [ 8] 1312 	sub	a, (hl)
+    00000582 20 08            [12] 1313 	jr	NZ, 00272$
+    00000584 FAr04r00         [16] 1314 	ld	a, (#_m_nTotalKilled + 1)
+    00000587 21r0Cr00         [12] 1315 	ld	hl, #_m_nLastSpawnRateKillCount + 1
+    0000058A 96               [ 8] 1316 	sub	a, (hl)
+    0000058B C8               [20] 1317 	ret	Z
+    0000058C                       1318 00272$:
+                                   1319 ;enemies.c:463: if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
+    0000058C FAr0Er00         [16] 1320 	ld	a, (_m_nSpawnDelay)
+    0000058F 4F               [ 4] 1321 	ld	c, a
+    00000590 21r03r00         [12] 1322 	ld	hl, #_m_nTotalKilled
+    00000593 2A               [ 8] 1323 	ld	a, (hl+)
+    00000594 D6 96            [ 8] 1324 	sub	a, #0x96
+    00000596 7E               [ 8] 1325 	ld	a, (hl)
+    00000597 DE 00            [ 8] 1326 	sbc	a, #0x00
+    00000599 30 08            [12] 1327 	jr	NC, 00123$
+    0000059B 79               [ 4] 1328 	ld	a, c
+    0000059C C6 FB            [ 8] 1329 	add	a, #0xfb
+    0000059E EAr0Er00         [16] 1330 	ld	(#_m_nSpawnDelay),a
+    000005A1 18 18            [12] 1331 	jr	00124$
+    000005A3                       1332 00123$:
+                                   1333 ;enemies.c:464: else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
+    000005A3 21r03r00         [12] 1334 	ld	hl, #_m_nTotalKilled
+    000005A6 2A               [ 8] 1335 	ld	a, (hl+)
+    000005A7 D6 2C            [ 8] 1336 	sub	a, #0x2c
+    000005A9 7E               [ 8] 1337 	ld	a, (hl)
+    000005AA DE 01            [ 8] 1338 	sbc	a, #0x01
+    000005AC 30 08            [12] 1339 	jr	NC, 00120$
+    000005AE 79               [ 4] 1340 	ld	a, c
+    000005AF C6 FE            [ 8] 1341 	add	a, #0xfe
+    000005B1 EAr0Er00         [16] 1342 	ld	(#_m_nSpawnDelay),a
+    000005B4 18 05            [12] 1343 	jr	00124$
+    000005B6                       1344 00120$:
+                                   1345 ;enemies.c:465: else m_nSpawnDelay -= 1;
+    000005B6 79               [ 4] 1346 	ld	a, c
+    000005B7 3D               [ 4] 1347 	dec	a
+    000005B8 EAr0Er00         [16] 1348 	ld	(#_m_nSpawnDelay),a
+    000005BB                       1349 00124$:
+                                   1350 ;enemies.c:468: if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
+    000005BB 21r03r00         [12] 1351 	ld	hl, #_m_nTotalKilled
+    000005BE 2A               [ 8] 1352 	ld	a, (hl+)
+    000005BF D6 26            [ 8] 1353 	sub	a, #0x26
     000005C1 7E               [ 8] 1354 	ld	a, (hl)
-    000005C2 12               [ 8] 1355 	ld	(de), a
-                                   1356 ;enemies.c:404: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-    000005C3                       1357 00133$:
-                                   1358 ;enemies.c:405: }
-    000005C3 E8 0D            [16] 1359 	add	sp, #13
-    000005C5 C9               [16] 1360 	ret
-                                   1361 ;enemies.c:414: void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
-                                   1362 ;	---------------------------------
-                                   1363 ; Function KillEnemy
-                                   1364 ; ---------------------------------
-    000005C6                       1365 _KillEnemy::
-    000005C6 C5               [16] 1366 	push	bc
-                                   1367 ;enemies.c:417: ptrEnemy->bAlive = FALSE;
-    000005C7 6B               [ 4] 1368 	ld	l, e
-    000005C8 62               [ 4] 1369 	ld	h, d
-    000005C9 23               [ 8] 1370 	inc	hl
-    000005CA 23               [ 8] 1371 	inc	hl
-    000005CB 23               [ 8] 1372 	inc	hl
-    000005CC 36 00            [12] 1373 	ld	(hl), #0x00
-                                   1374 ;enemies.c:420: set_sprite_tile(ptrEnemy->nSpriteID, 0);
-    000005CE 13               [ 8] 1375 	inc	de
-    000005CF 13               [ 8] 1376 	inc	de
-    000005D0 1A               [ 8] 1377 	ld	a, (de)
-    000005D1 4F               [ 4] 1378 	ld	c, a
-                                   1379 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
-    000005D2 AF               [ 4] 1380 	xor	a, a
-    000005D3 69               [ 4] 1381 	ld	l, c
-    000005D4 67               [ 4] 1382 	ld	h, a
-    000005D5 29               [ 8] 1383 	add	hl, hl
-    000005D6 29               [ 8] 1384 	add	hl, hl
-    000005D7 01r00r00         [12] 1385 	ld	bc, #_shadow_OAM
-    000005DA 09               [ 8] 1386 	add	hl, bc
-    000005DB 23               [ 8] 1387 	inc	hl
-    000005DC 23               [ 8] 1388 	inc	hl
-    000005DD 36 00            [12] 1389 	ld	(hl), #0x00
-                                   1390 ;enemies.c:421: move_sprite(ptrEnemy->nSpriteID, 0, 0);
-    000005DF 1A               [ 8] 1391 	ld	a, (de)
-    000005E0 5F               [ 4] 1392 	ld	e, a
-                                   1393 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
-    000005E1 01r00r00         [12] 1394 	ld	bc, #_shadow_OAM+0
-    000005E4 AF               [ 4] 1395 	xor	a, a
-    000005E5 6B               [ 4] 1396 	ld	l, e
-    000005E6 67               [ 4] 1397 	ld	h, a
-    000005E7 29               [ 8] 1398 	add	hl, hl
-    000005E8 29               [ 8] 1399 	add	hl, hl
-    000005E9 09               [ 8] 1400 	add	hl, bc
-                                   1401 ;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
-    000005EA AF               [ 4] 1402 	xor	a, a
-    000005EB 22               [ 8] 1403 	ld	(hl+), a
-    000005EC 77               [ 8] 1404 	ld	(hl), a
-                                   1405 ;enemies.c:424: ptrPlayer->nScore += 1;
-    000005ED D1               [12] 1406 	pop	de
-    000005EE D5               [16] 1407 	push	de
-    000005EF 21 14 00         [12] 1408 	ld	hl, #0x0014
-    000005F2 19               [ 8] 1409 	add	hl, de
-    000005F3 4D               [ 4] 1410 	ld	c,l
-    000005F4 44               [ 4] 1411 	ld	b,h
-    000005F5 2A               [ 8] 1412 	ld	a,	(hl+)
-    000005F6 66               [ 8] 1413 	ld	h, (hl)
-    000005F7 6F               [ 4] 1414 	ld	l, a
-    000005F8 23               [ 8] 1415 	inc	hl
-    000005F9 7D               [ 4] 1416 	ld	a, l
-    000005FA 02               [ 8] 1417 	ld	(bc), a
-    000005FB 03               [ 8] 1418 	inc	bc
-    000005FC 7C               [ 4] 1419 	ld	a, h
-    000005FD 02               [ 8] 1420 	ld	(bc), a
-                                   1421 ;enemies.c:425: m_nTotalKilled += 1;
-    000005FE 21r03r00         [12] 1422 	ld	hl, #_m_nTotalKilled
-    00000601 34               [12] 1423 	inc	(hl)
-    00000602 20 02            [12] 1424 	jr	NZ, 00105$
-    00000604 23               [ 8] 1425 	inc	hl
-    00000605 34               [12] 1426 	inc	(hl)
-    00000606                       1427 00105$:
-                                   1428 ;enemies.c:428: m_bPlayKillSoundEffect = TRUE;
-    00000606 21r10r00         [12] 1429 	ld	hl, #_m_bPlayKillSoundEffect
-    00000609 36 01            [12] 1430 	ld	(hl), #0x01
-                                   1431 ;enemies.c:429: }
-    0000060B 33               [ 8] 1432 	inc	sp
-    0000060C 33               [ 8] 1433 	inc	sp
-    0000060D C9               [16] 1434 	ret
-                                   1435 ;enemies.c:434: void IncreaseDifficulty(void)
-                                   1436 ;	---------------------------------
-                                   1437 ; Function IncreaseDifficulty
-                                   1438 ; ---------------------------------
-    0000060E                       1439 _IncreaseDifficulty::
-                                   1440 ;enemies.c:437: if (!m_bMaxSpeedReached)
-    0000060E FAr0Ar00         [16] 1441 	ld	a, (#_m_bMaxSpeedReached)
-    00000611 B7               [ 4] 1442 	or	a, a
-    00000612 20 6E            [12] 1443 	jr	NZ, 00118$
-                                   1444 ;enemies.c:441: if (m_nTotalKilled >= m_nKillsForNextSpeed) 
-    00000614 11r03r00         [12] 1445 	ld	de, #_m_nTotalKilled
-    00000617 21r05r00         [12] 1446 	ld	hl, #_m_nKillsForNextSpeed
-    0000061A 1A               [ 8] 1447 	ld	a, (de)
-    0000061B 13               [ 8] 1448 	inc	de
-    0000061C 96               [ 8] 1449 	sub	a, (hl)
-    0000061D 23               [ 8] 1450 	inc	hl
-    0000061E 1A               [ 8] 1451 	ld	a, (de)
-    0000061F 9E               [ 8] 1452 	sbc	a, (hl)
-    00000620 38 60            [12] 1453 	jr	C, 00118$
-                                   1454 ;enemies.c:443: m_nCurrentSpeed++;
-    00000622 21r02r00         [12] 1455 	ld	hl, #_m_nCurrentSpeed
-    00000625 34               [12] 1456 	inc	(hl)
-                                   1457 ;enemies.c:444: if (m_nCurrentSpeed == 2) m_nKillsForNextSpeed = 50;
-    00000626 7E               [ 8] 1458 	ld	a, (hl)
-    00000627 D6 02            [ 8] 1459 	sub	a, #0x02
-    00000629 20 0A            [12] 1460 	jr	NZ, 00111$
-    0000062B 21r05r00         [12] 1461 	ld	hl, #_m_nKillsForNextSpeed
-    0000062E 3E 32            [ 8] 1462 	ld	a, #0x32
-    00000630 22               [ 8] 1463 	ld	(hl+), a
-    00000631 AF               [ 4] 1464 	xor	a, a
-    00000632 77               [ 8] 1465 	ld	(hl), a
-    00000633 18 3E            [12] 1466 	jr	00112$
-    00000635                       1467 00111$:
-                                   1468 ;enemies.c:445: else if (m_nCurrentSpeed == 3) m_nKillsForNextSpeed = 125;
-    00000635 FAr02r00         [16] 1469 	ld	a, (#_m_nCurrentSpeed)
-    00000638 D6 03            [ 8] 1470 	sub	a, #0x03
-    0000063A 20 0A            [12] 1471 	jr	NZ, 00108$
-    0000063C 21r05r00         [12] 1472 	ld	hl, #_m_nKillsForNextSpeed
-    0000063F 3E 7D            [ 8] 1473 	ld	a, #0x7d
-    00000641 22               [ 8] 1474 	ld	(hl+), a
-    00000642 AF               [ 4] 1475 	xor	a, a
-    00000643 77               [ 8] 1476 	ld	(hl), a
-    00000644 18 2D            [12] 1477 	jr	00112$
-    00000646                       1478 00108$:
-                                   1479 ;enemies.c:446: else if (m_nCurrentSpeed == 4) m_nKillsForNextSpeed = 250;
-    00000646 FAr02r00         [16] 1480 	ld	a, (#_m_nCurrentSpeed)
-    00000649 D6 04            [ 8] 1481 	sub	a, #0x04
-    0000064B 20 0A            [12] 1482 	jr	NZ, 00105$
-    0000064D 21r05r00         [12] 1483 	ld	hl, #_m_nKillsForNextSpeed
-    00000650 3E FA            [ 8] 1484 	ld	a, #0xfa
-    00000652 22               [ 8] 1485 	ld	(hl+), a
-    00000653 AF               [ 4] 1486 	xor	a, a
-    00000654 77               [ 8] 1487 	ld	(hl), a
-    00000655 18 1C            [12] 1488 	jr	00112$
-    00000657                       1489 00105$:
-                                   1490 ;enemies.c:447: else if (m_nCurrentSpeed == 5) m_nKillsForNextSpeed = 400;
-    00000657 FAr02r00         [16] 1491 	ld	a, (#_m_nCurrentSpeed)
-    0000065A D6 05            [ 8] 1492 	sub	a, #0x05
-    0000065C 20 0A            [12] 1493 	jr	NZ, 00102$
-    0000065E 21r05r00         [12] 1494 	ld	hl, #_m_nKillsForNextSpeed
-    00000661 3E 90            [ 8] 1495 	ld	a, #0x90
-    00000663 22               [ 8] 1496 	ld	(hl+), a
-    00000664 36 01            [12] 1497 	ld	(hl), #0x01
-    00000666 18 0B            [12] 1498 	jr	00112$
-    00000668                       1499 00102$:
-                                   1500 ;enemies.c:448: else m_nKillsForNextSpeed += 150;  // Gradual increase after
-    00000668 21r05r00         [12] 1501 	ld	hl, #_m_nKillsForNextSpeed
-    0000066B 7E               [ 8] 1502 	ld	a, (hl)
-    0000066C C6 96            [ 8] 1503 	add	a, #0x96
-    0000066E 22               [ 8] 1504 	ld	(hl+), a
-    0000066F 7E               [ 8] 1505 	ld	a, (hl)
-    00000670 CE 00            [ 8] 1506 	adc	a, #0x00
-    00000672 77               [ 8] 1507 	ld	(hl), a
-    00000673                       1508 00112$:
-                                   1509 ;enemies.c:451: if (m_nCurrentSpeed >= MAX_SPEED) 
-    00000673 21r02r00         [12] 1510 	ld	hl, #_m_nCurrentSpeed
-    00000676 7E               [ 8] 1511 	ld	a, (hl)
-    00000677 D6 08            [ 8] 1512 	sub	a, #0x08
-    00000679 38 07            [12] 1513 	jr	C, 00118$
-                                   1514 ;enemies.c:455: m_nCurrentSpeed = MAX_SPEED;
-    0000067B 36 08            [12] 1515 	ld	(hl), #0x08
-                                   1516 ;enemies.c:456: m_bMaxSpeedReached = TRUE;
-    0000067D 21r0Ar00         [12] 1517 	ld	hl, #_m_bMaxSpeedReached
-    00000680 36 01            [12] 1518 	ld	(hl), #0x01
-    00000682                       1519 00118$:
-                                   1520 ;enemies.c:462: if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % m_nKillsForNextSpawnRate == 0)
-    00000682 FAr0Br00         [16] 1521 	ld	a, (#_m_bMaxSpawnRateReached)
-    00000685 B7               [ 4] 1522 	or	a, a
-    00000686 C0               [20] 1523 	ret	NZ
-    00000687 21r04r00         [12] 1524 	ld	hl, #_m_nTotalKilled + 1
-    0000068A 3A               [ 8] 1525 	ld	a, (hl-)
-    0000068B B6               [ 8] 1526 	or	a, (hl)
-    0000068C C8               [20] 1527 	ret	Z
-    0000068D FAr07r00         [16] 1528 	ld	a, (_m_nKillsForNextSpawnRate)
-    00000690 4F               [ 4] 1529 	ld	c, a
-    00000691 21r08r00         [12] 1530 	ld	hl, #_m_nKillsForNextSpawnRate + 1
-    00000694 46               [ 8] 1531 	ld	b, (hl)
-    00000695 FAr03r00         [16] 1532 	ld	a, (_m_nTotalKilled)
-    00000698 5F               [ 4] 1533 	ld	e, a
-    00000699 21r04r00         [12] 1534 	ld	hl, #_m_nTotalKilled + 1
-    0000069C 56               [ 8] 1535 	ld	d, (hl)
-    0000069D CDr00r00         [24] 1536 	call	__moduint
-    000006A0 78               [ 4] 1537 	ld	a, b
-    000006A1 B1               [ 4] 1538 	or	a, c
-    000006A2 C0               [20] 1539 	ret	NZ
-                                   1540 ;enemies.c:465: if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
-    000006A3 FAr03r00         [16] 1541 	ld	a, (#_m_nTotalKilled)
-    000006A6 21r0Cr00         [12] 1542 	ld	hl, #_m_nLastSpawnRateKillCount
-    000006A9 96               [ 8] 1543 	sub	a, (hl)
-    000006AA 20 08            [12] 1544 	jr	NZ, 00272$
-    000006AC FAr04r00         [16] 1545 	ld	a, (#_m_nTotalKilled + 1)
-    000006AF 21r0Dr00         [12] 1546 	ld	hl, #_m_nLastSpawnRateKillCount + 1
-    000006B2 96               [ 8] 1547 	sub	a, (hl)
-    000006B3 C8               [20] 1548 	ret	Z
-    000006B4                       1549 00272$:
-                                   1550 ;enemies.c:468: if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
-    000006B4 FAr0Fr00         [16] 1551 	ld	a, (_m_nSpawnDelay)
-    000006B7 4F               [ 4] 1552 	ld	c, a
-    000006B8 21r03r00         [12] 1553 	ld	hl, #_m_nTotalKilled
-    000006BB 2A               [ 8] 1554 	ld	a, (hl+)
-    000006BC D6 96            [ 8] 1555 	sub	a, #0x96
-    000006BE 7E               [ 8] 1556 	ld	a, (hl)
-    000006BF DE 00            [ 8] 1557 	sbc	a, #0x00
-    000006C1 30 08            [12] 1558 	jr	NC, 00123$
-    000006C3 79               [ 4] 1559 	ld	a, c
-    000006C4 C6 FB            [ 8] 1560 	add	a, #0xfb
-    000006C6 EAr0Fr00         [16] 1561 	ld	(#_m_nSpawnDelay),a
-    000006C9 18 18            [12] 1562 	jr	00124$
-    000006CB                       1563 00123$:
-                                   1564 ;enemies.c:469: else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
-    000006CB 21r03r00         [12] 1565 	ld	hl, #_m_nTotalKilled
-    000006CE 2A               [ 8] 1566 	ld	a, (hl+)
-    000006CF D6 2C            [ 8] 1567 	sub	a, #0x2c
-    000006D1 7E               [ 8] 1568 	ld	a, (hl)
-    000006D2 DE 01            [ 8] 1569 	sbc	a, #0x01
-    000006D4 30 08            [12] 1570 	jr	NC, 00120$
-    000006D6 79               [ 4] 1571 	ld	a, c
-    000006D7 C6 FE            [ 8] 1572 	add	a, #0xfe
-    000006D9 EAr0Fr00         [16] 1573 	ld	(#_m_nSpawnDelay),a
-    000006DC 18 05            [12] 1574 	jr	00124$
-    000006DE                       1575 00120$:
-                                   1576 ;enemies.c:470: else m_nSpawnDelay -= 1;
-    000006DE 79               [ 4] 1577 	ld	a, c
-    000006DF 3D               [ 4] 1578 	dec	a
-    000006E0 EAr0Fr00         [16] 1579 	ld	(#_m_nSpawnDelay),a
-    000006E3                       1580 00124$:
-                                   1581 ;enemies.c:473: if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
-    000006E3 21r03r00         [12] 1582 	ld	hl, #_m_nTotalKilled
-    000006E6 2A               [ 8] 1583 	ld	a, (hl+)
-    000006E7 D6 26            [ 8] 1584 	sub	a, #0x26
-    000006E9 7E               [ 8] 1585 	ld	a, (hl)
-    000006EA DE 02            [ 8] 1586 	sbc	a, #0x02
-    000006EC 30 0A            [12] 1587 	jr	NC, 00135$
-    000006EE 21r07r00         [12] 1588 	ld	hl, #_m_nKillsForNextSpawnRate
-    000006F1 3E 0F            [ 8] 1589 	ld	a, #0x0f
-    000006F3 22               [ 8] 1590 	ld	(hl+), a
-    000006F4 AF               [ 4] 1591 	xor	a, a
-    000006F5 77               [ 8] 1592 	ld	(hl), a
-    000006F6 18 58            [12] 1593 	jr	00136$
-    000006F8                       1594 00135$:
-                                   1595 ;enemies.c:474: else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; m_nDamage = 40; }
-    000006F8 21r03r00         [12] 1596 	ld	hl, #_m_nTotalKilled
-    000006FB 2A               [ 8] 1597 	ld	a, (hl+)
-    000006FC D6 8A            [ 8] 1598 	sub	a, #0x8a
-    000006FE 7E               [ 8] 1599 	ld	a, (hl)
-    000006FF DE 02            [ 8] 1600 	sbc	a, #0x02
-    00000701 30 0F            [12] 1601 	jr	NC, 00132$
-    00000703 21r07r00         [12] 1602 	ld	hl, #_m_nKillsForNextSpawnRate
-    00000706 3E C8            [ 8] 1603 	ld	a, #0xc8
-    00000708 22               [ 8] 1604 	ld	(hl+), a
-    00000709 AF               [ 4] 1605 	xor	a, a
-    0000070A 77               [ 8] 1606 	ld	(hl), a
-    0000070B 21r09r00         [12] 1607 	ld	hl, #_m_nDamage
-    0000070E 36 28            [12] 1608 	ld	(hl), #0x28
-    00000710 18 3E            [12] 1609 	jr	00136$
-    00000712                       1610 00132$:
-                                   1611 ;enemies.c:475: else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; m_nDamage = 50; }
-    00000712 21r03r00         [12] 1612 	ld	hl, #_m_nTotalKilled
-    00000715 2A               [ 8] 1613 	ld	a, (hl+)
-    00000716 D6 B6            [ 8] 1614 	sub	a, #0xb6
-    00000718 7E               [ 8] 1615 	ld	a, (hl)
-    00000719 DE 03            [ 8] 1616 	sbc	a, #0x03
-    0000071B 30 0F            [12] 1617 	jr	NC, 00129$
-    0000071D 21r07r00         [12] 1618 	ld	hl, #_m_nKillsForNextSpawnRate
-    00000720 3E 90            [ 8] 1619 	ld	a, #0x90
-    00000722 22               [ 8] 1620 	ld	(hl+), a
-    00000723 36 01            [12] 1621 	ld	(hl), #0x01
-    00000725 21r09r00         [12] 1622 	ld	hl, #_m_nDamage
-    00000728 36 32            [12] 1623 	ld	(hl), #0x32
-    0000072A 18 24            [12] 1624 	jr	00136$
-    0000072C                       1625 00129$:
-                                   1626 ;enemies.c:476: else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
-    0000072C 21r03r00         [12] 1627 	ld	hl, #_m_nTotalKilled
-    0000072F 2A               [ 8] 1628 	ld	a, (hl+)
-    00000730 D6 D0            [ 8] 1629 	sub	a, #0xd0
-    00000732 7E               [ 8] 1630 	ld	a, (hl)
-    00000733 DE 07            [ 8] 1631 	sbc	a, #0x07
-    00000735 30 0F            [12] 1632 	jr	NC, 00126$
-    00000737 21r07r00         [12] 1633 	ld	hl, #_m_nKillsForNextSpawnRate
-    0000073A 3E F4            [ 8] 1634 	ld	a, #0xf4
-    0000073C 22               [ 8] 1635 	ld	(hl+), a
-    0000073D 36 01            [12] 1636 	ld	(hl), #0x01
-    0000073F 21r02r00         [12] 1637 	ld	hl, #_m_nCurrentSpeed
-    00000742 36 09            [12] 1638 	ld	(hl), #0x09
-    00000744 18 0A            [12] 1639 	jr	00136$
-    00000746                       1640 00126$:
-                                   1641 ;enemies.c:477: else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
-    00000746 21r0Br00         [12] 1642 	ld	hl, #_m_bMaxSpawnRateReached
-    00000749 36 01            [12] 1643 	ld	(hl), #0x01
-    0000074B 21r02r00         [12] 1644 	ld	hl, #_m_nCurrentSpeed
-    0000074E 36 0A            [12] 1645 	ld	(hl), #0x0a
-    00000750                       1646 00136$:
-                                   1647 ;enemies.c:480: m_nLastSpawnRateKillCount = m_nTotalKilled;
-    00000750 FAr03r00         [16] 1648 	ld	a, (#_m_nTotalKilled)
-    00000753 EAr0Cr00         [16] 1649 	ld	(#_m_nLastSpawnRateKillCount),a
-    00000756 FAr04r00         [16] 1650 	ld	a, (#_m_nTotalKilled + 1)
-    00000759 EAr0Dr00         [16] 1651 	ld	(#_m_nLastSpawnRateKillCount + 1),a
-                                   1652 ;enemies.c:483: }
-    0000075C C9               [16] 1653 	ret
-                                   1654 ;enemies.c:494: BOOLEAN IsEnemyAlive(UINT8 nEnemyIndex) 
-                                   1655 ;	---------------------------------
-                                   1656 ; Function IsEnemyAlive
-                                   1657 ; ---------------------------------
-    0000075D                       1658 _IsEnemyAlive::
-    0000075D 4F               [ 4] 1659 	ld	c, a
-                                   1660 ;enemies.c:496: return m_aoEnemies[nEnemyIndex].bAlive;
-    0000075E 06 00            [ 8] 1661 	ld	b, #0x00
-    00000760 69               [ 4] 1662 	ld	l, c
-    00000761 60               [ 4] 1663 	ld	h, b
-    00000762 29               [ 8] 1664 	add	hl, hl
-    00000763 09               [ 8] 1665 	add	hl, bc
-    00000764 29               [ 8] 1666 	add	hl, hl
-    00000765 29               [ 8] 1667 	add	hl, hl
-    00000766 09               [ 8] 1668 	add	hl, bc
-    00000767 11r00r00         [12] 1669 	ld	de, #_m_aoEnemies
-    0000076A 19               [ 8] 1670 	add	hl, de
-    0000076B 23               [ 8] 1671 	inc	hl
-    0000076C 23               [ 8] 1672 	inc	hl
-    0000076D 23               [ 8] 1673 	inc	hl
-    0000076E 7E               [ 8] 1674 	ld	a, (hl)
-                                   1675 ;enemies.c:497: }
-    0000076F C9               [16] 1676 	ret
-                                   1677 ;enemies.c:502: void SpawnNext(void) 
-                                   1678 ;	---------------------------------
-                                   1679 ; Function SpawnNext
-                                   1680 ; ---------------------------------
-    00000770                       1681 _SpawnNext::
-    00000770 3B               [ 8] 1682 	dec	sp
-    00000771 3B               [ 8] 1683 	dec	sp
-                                   1684 ;enemies.c:513: UINT8 nFreeSlot = MAX_ENEMIES;
-    00000772 0E 10            [ 8] 1685 	ld	c, #0x10
-                                   1686 ;enemies.c:517: for (i = 0; i < MAX_ENEMIES; i++) 
-    00000774 F8 00            [12] 1687 	ldhl	sp,	#0
-    00000776 AF               [ 4] 1688 	xor	a, a
-    00000777 22               [ 8] 1689 	ld	(hl+), a
-    00000778 77               [ 8] 1690 	ld	(hl), a
-    00000779                       1691 00106$:
-                                   1692 ;enemies.c:522: if (!m_aoEnemies[i].bAlive) 
-    00000779 F8 01            [12] 1693 	ldhl	sp,	#1
-    0000077B 5E               [ 8] 1694 	ld	e, (hl)
-    0000077C 16 00            [ 8] 1695 	ld	d, #0x00
-    0000077E 6B               [ 4] 1696 	ld	l, e
-    0000077F 62               [ 4] 1697 	ld	h, d
-    00000780 29               [ 8] 1698 	add	hl, hl
-    00000781 19               [ 8] 1699 	add	hl, de
-    00000782 29               [ 8] 1700 	add	hl, hl
-    00000783 29               [ 8] 1701 	add	hl, hl
-    00000784 19               [ 8] 1702 	add	hl, de
-    00000785 11r00r00         [12] 1703 	ld	de, #_m_aoEnemies
-    00000788 19               [ 8] 1704 	add	hl, de
-    00000789 23               [ 8] 1705 	inc	hl
-    0000078A 23               [ 8] 1706 	inc	hl
-    0000078B 23               [ 8] 1707 	inc	hl
-    0000078C 7E               [ 8] 1708 	ld	a, (hl)
-    0000078D B7               [ 4] 1709 	or	a, a
-    0000078E 20 05            [12] 1710 	jr	NZ, 00107$
-                                   1711 ;enemies.c:524: nFreeSlot = i;
-    00000790 F8 00            [12] 1712 	ldhl	sp,	#0
-    00000792 4E               [ 8] 1713 	ld	c, (hl)
-                                   1714 ;enemies.c:525: break;
-    00000793 18 0A            [12] 1715 	jr	00103$
-    00000795                       1716 00107$:
-                                   1717 ;enemies.c:517: for (i = 0; i < MAX_ENEMIES; i++) 
-    00000795 F8 01            [12] 1718 	ldhl	sp,	#1
-    00000797 34               [12] 1719 	inc	(hl)
-    00000798 3A               [ 8] 1720 	ld	a, (hl-)
-    00000799 22               [ 8] 1721 	ld	(hl+), a
-    0000079A 7E               [ 8] 1722 	ld	a, (hl)
-    0000079B D6 10            [ 8] 1723 	sub	a, #0x10
-    0000079D 38 DA            [12] 1724 	jr	C, 00106$
-    0000079F                       1725 00103$:
-                                   1726 ;enemies.c:531: if (nFreeSlot == MAX_ENEMIES) return;
-    0000079F 79               [ 4] 1727 	ld	a, c
-    000007A0 D6 10            [ 8] 1728 	sub	a, #0x10
-    000007A2 28 0C            [12] 1729 	jr	Z, 00108$
-                                   1730 ;enemies.c:534: nSpawnIndex = GetNextSpawnIndex();
-    000007A4 C5               [16] 1731 	push	bc
-    000007A5 CDrA4r00         [24] 1732 	call	_GetNextSpawnIndex
-    000007A8 C1               [12] 1733 	pop	bc
-                                   1734 ;enemies.c:537: SpawnEnemy(nFreeSlot, nSpawnIndex);
-    000007A9 5F               [ 4] 1735 	ld	e, a
-    000007AA 79               [ 4] 1736 	ld	a, c
-    000007AB 33               [ 8] 1737 	inc	sp
-    000007AC 33               [ 8] 1738 	inc	sp
-    000007AD C3r07r01         [16] 1739 	jp	_SpawnEnemy
-    000007B0                       1740 00108$:
-                                   1741 ;enemies.c:538: }
-    000007B0 33               [ 8] 1742 	inc	sp
-    000007B1 33               [ 8] 1743 	inc	sp
-    000007B2 C9               [16] 1744 	ret
-                                   1745 ;enemies.c:543: void TickSpawnTimer(void) 
-                                   1746 ;	---------------------------------
-                                   1747 ; Function TickSpawnTimer
-                                   1748 ; ---------------------------------
-    000007B3                       1749 _TickSpawnTimer::
-                                   1750 ;enemies.c:545: if (m_nSpawnTimer > 0) 
-    000007B3 21r0Er00         [12] 1751 	ld	hl, #_m_nSpawnTimer
-    000007B6 7E               [ 8] 1752 	ld	a, (hl)
-    000007B7 B7               [ 4] 1753 	or	a, a
-    000007B8 C8               [20] 1754 	ret	Z
-                                   1755 ;enemies.c:547: m_nSpawnTimer--;
-    000007B9 35               [12] 1756 	dec	(hl)
-                                   1757 ;enemies.c:549: }
-    000007BA C9               [16] 1758 	ret
-                                   1759 	.area _CODE
-                                   1760 	.area _INITIALIZER
-    00000000                       1761 __xinit__m_nNextSpriteID:
-    00000000 07                    1762 	.db #0x07	; 7
-    00000001                       1763 __xinit__m_nSpawnQueuePos:
-    00000001 00                    1764 	.db #0x00	; 0
-    00000002                       1765 __xinit__m_nCurrentSpeed:
-    00000002 01                    1766 	.db #0x01	; 1
-    00000003                       1767 __xinit__m_nTotalKilled:
-    00000003 00 00                 1768 	.dw #0x0000
-    00000005                       1769 __xinit__m_nKillsForNextSpeed:
-    00000005 0F 00                 1770 	.dw #0x000f
-    00000007                       1771 __xinit__m_nKillsForNextSpawnRate:
-    00000007 0F 00                 1772 	.dw #0x000f
-    00000009                       1773 __xinit__m_nDamage:
-    00000009 19                    1774 	.db #0x19	; 25
-    0000000A                       1775 __xinit__m_bMaxSpeedReached:
-    0000000A 00                    1776 	.db #0x00	;  0
-    0000000B                       1777 __xinit__m_bMaxSpawnRateReached:
-    0000000B 00                    1778 	.db #0x00	;  0
-    0000000C                       1779 __xinit__m_nLastSpawnRateKillCount:
-    0000000C 00 00                 1780 	.dw #0x0000
-    0000000E                       1781 __xinit__m_nSpawnTimer:
-    0000000E 00                    1782 	.db #0x00	; 0
-    0000000F                       1783 __xinit__m_nSpawnDelay:
-    0000000F 64                    1784 	.db #0x64	; 100	'd'
-    00000010                       1785 __xinit__m_bPlayKillSoundEffect:
-    00000010 00                    1786 	.db #0x00	;  0
-    00000011                       1787 __xinit__m_bShowSpray:
-    00000011 00                    1788 	.db #0x00	;  0
-                                   1789 	.area _CABS (ABS)
+    000005C2 DE 02            [ 8] 1355 	sbc	a, #0x02
+    000005C4 30 0A            [12] 1356 	jr	NC, 00135$
+    000005C6 21r07r00         [12] 1357 	ld	hl, #_m_nKillsForNextSpawnRate
+    000005C9 3E 0F            [ 8] 1358 	ld	a, #0x0f
+    000005CB 22               [ 8] 1359 	ld	(hl+), a
+    000005CC AF               [ 4] 1360 	xor	a, a
+    000005CD 77               [ 8] 1361 	ld	(hl), a
+    000005CE 18 4E            [12] 1362 	jr	00136$
+    000005D0                       1363 00135$:
+                                   1364 ;enemies.c:469: else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; nDamgeToPlayer = 40; }
+    000005D0 21r03r00         [12] 1365 	ld	hl, #_m_nTotalKilled
+    000005D3 2A               [ 8] 1366 	ld	a, (hl+)
+    000005D4 D6 8A            [ 8] 1367 	sub	a, #0x8a
+    000005D6 7E               [ 8] 1368 	ld	a, (hl)
+    000005D7 DE 02            [ 8] 1369 	sbc	a, #0x02
+    000005D9 30 0A            [12] 1370 	jr	NC, 00132$
+    000005DB 21r07r00         [12] 1371 	ld	hl, #_m_nKillsForNextSpawnRate
+    000005DE 3E C8            [ 8] 1372 	ld	a, #0xc8
+    000005E0 22               [ 8] 1373 	ld	(hl+), a
+    000005E1 AF               [ 4] 1374 	xor	a, a
+    000005E2 77               [ 8] 1375 	ld	(hl), a
+    000005E3 18 39            [12] 1376 	jr	00136$
+    000005E5                       1377 00132$:
+                                   1378 ;enemies.c:470: else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; nDamgeToPlayer = 50; }
+    000005E5 21r03r00         [12] 1379 	ld	hl, #_m_nTotalKilled
+    000005E8 2A               [ 8] 1380 	ld	a, (hl+)
+    000005E9 D6 B6            [ 8] 1381 	sub	a, #0xb6
+    000005EB 7E               [ 8] 1382 	ld	a, (hl)
+    000005EC DE 03            [ 8] 1383 	sbc	a, #0x03
+    000005EE 30 0A            [12] 1384 	jr	NC, 00129$
+    000005F0 21r07r00         [12] 1385 	ld	hl, #_m_nKillsForNextSpawnRate
+    000005F3 3E 90            [ 8] 1386 	ld	a, #0x90
+    000005F5 22               [ 8] 1387 	ld	(hl+), a
+    000005F6 36 01            [12] 1388 	ld	(hl), #0x01
+    000005F8 18 24            [12] 1389 	jr	00136$
+    000005FA                       1390 00129$:
+                                   1391 ;enemies.c:471: else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
+    000005FA 21r03r00         [12] 1392 	ld	hl, #_m_nTotalKilled
+    000005FD 2A               [ 8] 1393 	ld	a, (hl+)
+    000005FE D6 D0            [ 8] 1394 	sub	a, #0xd0
+    00000600 7E               [ 8] 1395 	ld	a, (hl)
+    00000601 DE 07            [ 8] 1396 	sbc	a, #0x07
+    00000603 30 0F            [12] 1397 	jr	NC, 00126$
+    00000605 21r07r00         [12] 1398 	ld	hl, #_m_nKillsForNextSpawnRate
+    00000608 3E F4            [ 8] 1399 	ld	a, #0xf4
+    0000060A 22               [ 8] 1400 	ld	(hl+), a
+    0000060B 36 01            [12] 1401 	ld	(hl), #0x01
+    0000060D 21r02r00         [12] 1402 	ld	hl, #_m_nCurrentSpeed
+    00000610 36 09            [12] 1403 	ld	(hl), #0x09
+    00000612 18 0A            [12] 1404 	jr	00136$
+    00000614                       1405 00126$:
+                                   1406 ;enemies.c:472: else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
+    00000614 21r0Ar00         [12] 1407 	ld	hl, #_m_bMaxSpawnRateReached
+    00000617 36 01            [12] 1408 	ld	(hl), #0x01
+    00000619 21r02r00         [12] 1409 	ld	hl, #_m_nCurrentSpeed
+    0000061C 36 0A            [12] 1410 	ld	(hl), #0x0a
+    0000061E                       1411 00136$:
+                                   1412 ;enemies.c:475: m_nLastSpawnRateKillCount = m_nTotalKilled;
+    0000061E FAr03r00         [16] 1413 	ld	a, (#_m_nTotalKilled)
+    00000621 EAr0Br00         [16] 1414 	ld	(#_m_nLastSpawnRateKillCount),a
+    00000624 FAr04r00         [16] 1415 	ld	a, (#_m_nTotalKilled + 1)
+    00000627 EAr0Cr00         [16] 1416 	ld	(#_m_nLastSpawnRateKillCount + 1),a
+                                   1417 ;enemies.c:478: }
+    0000062A C9               [16] 1418 	ret
+                                   1419 ;enemies.c:489: BOOLEAN IsEnemyAlive(UINT8 nEnemyIndex) 
+                                   1420 ;	---------------------------------
+                                   1421 ; Function IsEnemyAlive
+                                   1422 ; ---------------------------------
+    0000062B                       1423 _IsEnemyAlive::
+    0000062B 4F               [ 4] 1424 	ld	c, a
+                                   1425 ;enemies.c:491: return m_aoEnemies[nEnemyIndex].bAlive;
+    0000062C 06 00            [ 8] 1426 	ld	b, #0x00
+    0000062E 69               [ 4] 1427 	ld	l, c
+    0000062F 60               [ 4] 1428 	ld	h, b
+    00000630 29               [ 8] 1429 	add	hl, hl
+    00000631 09               [ 8] 1430 	add	hl, bc
+    00000632 29               [ 8] 1431 	add	hl, hl
+    00000633 29               [ 8] 1432 	add	hl, hl
+    00000634 09               [ 8] 1433 	add	hl, bc
+    00000635 11r00r00         [12] 1434 	ld	de, #_m_aoEnemies
+    00000638 19               [ 8] 1435 	add	hl, de
+    00000639 23               [ 8] 1436 	inc	hl
+    0000063A 23               [ 8] 1437 	inc	hl
+    0000063B 23               [ 8] 1438 	inc	hl
+    0000063C 7E               [ 8] 1439 	ld	a, (hl)
+                                   1440 ;enemies.c:492: }
+    0000063D C9               [16] 1441 	ret
+                                   1442 ;enemies.c:497: void SpawnNext(void) 
+                                   1443 ;	---------------------------------
+                                   1444 ; Function SpawnNext
+                                   1445 ; ---------------------------------
+    0000063E                       1446 _SpawnNext::
+    0000063E 3B               [ 8] 1447 	dec	sp
+    0000063F 3B               [ 8] 1448 	dec	sp
+                                   1449 ;enemies.c:508: UINT8 nFreeSlot = MAX_ENEMIES;
+    00000640 0E 10            [ 8] 1450 	ld	c, #0x10
+                                   1451 ;enemies.c:512: for (i = 0; i < MAX_ENEMIES; i++) 
+    00000642 F8 00            [12] 1452 	ldhl	sp,	#0
+    00000644 AF               [ 4] 1453 	xor	a, a
+    00000645 22               [ 8] 1454 	ld	(hl+), a
+    00000646 77               [ 8] 1455 	ld	(hl), a
+    00000647                       1456 00106$:
+                                   1457 ;enemies.c:517: if (!m_aoEnemies[i].bAlive) 
+    00000647 F8 01            [12] 1458 	ldhl	sp,	#1
+    00000649 5E               [ 8] 1459 	ld	e, (hl)
+    0000064A 16 00            [ 8] 1460 	ld	d, #0x00
+    0000064C 6B               [ 4] 1461 	ld	l, e
+    0000064D 62               [ 4] 1462 	ld	h, d
+    0000064E 29               [ 8] 1463 	add	hl, hl
+    0000064F 19               [ 8] 1464 	add	hl, de
+    00000650 29               [ 8] 1465 	add	hl, hl
+    00000651 29               [ 8] 1466 	add	hl, hl
+    00000652 19               [ 8] 1467 	add	hl, de
+    00000653 11r00r00         [12] 1468 	ld	de, #_m_aoEnemies
+    00000656 19               [ 8] 1469 	add	hl, de
+    00000657 23               [ 8] 1470 	inc	hl
+    00000658 23               [ 8] 1471 	inc	hl
+    00000659 23               [ 8] 1472 	inc	hl
+    0000065A 7E               [ 8] 1473 	ld	a, (hl)
+    0000065B B7               [ 4] 1474 	or	a, a
+    0000065C 20 05            [12] 1475 	jr	NZ, 00107$
+                                   1476 ;enemies.c:519: nFreeSlot = i;
+    0000065E F8 00            [12] 1477 	ldhl	sp,	#0
+    00000660 4E               [ 8] 1478 	ld	c, (hl)
+                                   1479 ;enemies.c:520: break;
+    00000661 18 0A            [12] 1480 	jr	00103$
+    00000663                       1481 00107$:
+                                   1482 ;enemies.c:512: for (i = 0; i < MAX_ENEMIES; i++) 
+    00000663 F8 01            [12] 1483 	ldhl	sp,	#1
+    00000665 34               [12] 1484 	inc	(hl)
+    00000666 3A               [ 8] 1485 	ld	a, (hl-)
+    00000667 22               [ 8] 1486 	ld	(hl+), a
+    00000668 7E               [ 8] 1487 	ld	a, (hl)
+    00000669 D6 10            [ 8] 1488 	sub	a, #0x10
+    0000066B 38 DA            [12] 1489 	jr	C, 00106$
+    0000066D                       1490 00103$:
+                                   1491 ;enemies.c:526: if (nFreeSlot == MAX_ENEMIES) return;
+    0000066D 79               [ 4] 1492 	ld	a, c
+    0000066E D6 10            [ 8] 1493 	sub	a, #0x10
+    00000670 28 0C            [12] 1494 	jr	Z, 00108$
+                                   1495 ;enemies.c:529: nSpawnIndex = GetNextSpawnIndex();
+    00000672 C5               [16] 1496 	push	bc
+    00000673 CDrA4r00         [24] 1497 	call	_GetNextSpawnIndex
+    00000676 C1               [12] 1498 	pop	bc
+                                   1499 ;enemies.c:532: SpawnEnemy(nFreeSlot, nSpawnIndex);
+    00000677 5F               [ 4] 1500 	ld	e, a
+    00000678 79               [ 4] 1501 	ld	a, c
+    00000679 33               [ 8] 1502 	inc	sp
+    0000067A 33               [ 8] 1503 	inc	sp
+    0000067B C3r07r01         [16] 1504 	jp	_SpawnEnemy
+    0000067E                       1505 00108$:
+                                   1506 ;enemies.c:533: }
+    0000067E 33               [ 8] 1507 	inc	sp
+    0000067F 33               [ 8] 1508 	inc	sp
+    00000680 C9               [16] 1509 	ret
+                                   1510 ;enemies.c:538: void TickSpawnTimer(void) 
+                                   1511 ;	---------------------------------
+                                   1512 ; Function TickSpawnTimer
+                                   1513 ; ---------------------------------
+    00000681                       1514 _TickSpawnTimer::
+                                   1515 ;enemies.c:540: if (m_nSpawnTimer > 0) 
+    00000681 21r0Dr00         [12] 1516 	ld	hl, #_m_nSpawnTimer
+    00000684 7E               [ 8] 1517 	ld	a, (hl)
+    00000685 B7               [ 4] 1518 	or	a, a
+    00000686 C8               [20] 1519 	ret	Z
+                                   1520 ;enemies.c:542: m_nSpawnTimer--;
+    00000687 35               [12] 1521 	dec	(hl)
+                                   1522 ;enemies.c:544: }
+    00000688 C9               [16] 1523 	ret
+                                   1524 	.area _CODE
+                                   1525 	.area _INITIALIZER
+    00000000                       1526 __xinit__m_nNextSpriteID:
+    00000000 07                    1527 	.db #0x07	; 7
+    00000001                       1528 __xinit__m_nSpawnQueuePos:
+    00000001 00                    1529 	.db #0x00	; 0
+    00000002                       1530 __xinit__m_nCurrentSpeed:
+    00000002 01                    1531 	.db #0x01	; 1
+    00000003                       1532 __xinit__m_nTotalKilled:
+    00000003 00 00                 1533 	.dw #0x0000
+    00000005                       1534 __xinit__m_nKillsForNextSpeed:
+    00000005 0F 00                 1535 	.dw #0x000f
+    00000007                       1536 __xinit__m_nKillsForNextSpawnRate:
+    00000007 0F 00                 1537 	.dw #0x000f
+    00000009                       1538 __xinit__m_bMaxSpeedReached:
+    00000009 00                    1539 	.db #0x00	;  0
+    0000000A                       1540 __xinit__m_bMaxSpawnRateReached:
+    0000000A 00                    1541 	.db #0x00	;  0
+    0000000B                       1542 __xinit__m_nLastSpawnRateKillCount:
+    0000000B 00 00                 1543 	.dw #0x0000
+    0000000D                       1544 __xinit__m_nSpawnTimer:
+    0000000D 00                    1545 	.db #0x00	; 0
+    0000000E                       1546 __xinit__m_nSpawnDelay:
+    0000000E 64                    1547 	.db #0x64	; 100	'd'
+    0000000F                       1548 __xinit__m_bPlayKillSoundEffect:
+    0000000F 00                    1549 	.db #0x00	;  0
+    00000010                       1550 __xinit__m_bShowSpray:
+    00000010 00                    1551 	.db #0x00	;  0
+                                   1552 	.area _CABS (ABS)

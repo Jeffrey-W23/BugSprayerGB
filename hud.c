@@ -22,7 +22,7 @@
 #define TILE_E     91
 
 // New static unisigned int 16 for the current health of the hud.
-static UINT16 m_nCurrentHealth = 999;
+static UINT16 m_nCurrentHealth = 998;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ static UINT16 m_nCurrentHealth = 999;
 void InitHud(void) 
 {
     // Set the initial health.
-    m_nCurrentHealth = 999;
-    SetHealth(999);
+    m_nCurrentHealth = 998;
+    SetHealth(998);
     SetScore(0);
 }
 

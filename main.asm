@@ -85,6 +85,8 @@ _m_nLoadedScore::
 	.ds 2
 _m_nLoadedShotsTaken::
 	.ds 2
+_m_nDamgeToPlayer:
+	.ds 1
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
@@ -105,12 +107,12 @@ _m_nLoadedShotsTaken::
 ; code
 ;--------------------------------------------------------
 	.area _CODE
-;main.c:72: void SetDialog(char* cpDialog, UINT8 nW, UINT8 nH, UINT8 nX, UINT8 nY)
+;main.c:78: void SetDialog(char* cpDialog, UINT8 nW, UINT8 nH, UINT8 nX, UINT8 nY)
 ;	---------------------------------
 ; Function SetDialog
 ; ---------------------------------
 _SetDialog::
-;main.c:75: set_win_tiles(0, 0, nW, nH, cpDialog);
+;main.c:81: set_win_tiles(0, 0, nW, nH, cpDialog);
 	push	de
 	ldhl	sp,	#4
 	ld	h, (hl)
@@ -123,7 +125,7 @@ _SetDialog::
 	push	af
 	call	_set_win_tiles
 	add	sp, #6
-;main.c:76: move_win(nX, nY);
+;main.c:82: move_win(nX, nY);
 	ldhl	sp,	#4
 	ld	a, (hl-)
 	ld	c, a
@@ -132,8 +134,8 @@ _SetDialog::
 ;c:\gbdk2020\include\gb\gb.h:1739: WX_REG=x, WY_REG=y;
 	ld	a, c
 	ldh	(_WY_REG + 0), a
-;main.c:76: move_win(nX, nY);
-;main.c:77: }
+;main.c:82: move_win(nX, nY);
+;main.c:83: }
 	pop	hl
 	add	sp, #3
 	jp	(hl)
@@ -8184,25 +8186,25 @@ _m_caSprites:
 	.db #0x36	; 54	'6'
 	.db #0x00	; 0
 	.db #0x36	; 54	'6'
-;main.c:85: void PerformantDelay(UINT8 nLoops)
+;main.c:91: void PerformantDelay(UINT8 nLoops)
 ;	---------------------------------
 ; Function PerformantDelay
 ; ---------------------------------
 _PerformantDelay::
 	ld	c, a
-;main.c:91: for (i = 0; i < nLoops; i++)
+;main.c:97: for (i = 0; i < nLoops; i++)
 	ld	b, #0x00
 00103$:
 	ld	a, b
 	sub	a, c
 	ret	NC
-;main.c:95: wait_vbl_done();
+;main.c:101: wait_vbl_done();
 	call	_wait_vbl_done
-;main.c:91: for (i = 0; i < nLoops; i++)
+;main.c:97: for (i = 0; i < nLoops; i++)
 	inc	b
-;main.c:97: }
+;main.c:103: }
 	jr	00103$
-;main.c:119: void FadeDrawLayer(BYTE bLayer, BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UINT8 nValue4, UINT8 nDelay)
+;main.c:125: void FadeDrawLayer(BYTE bLayer, BYTE bMode, UINT8 nValue1, UINT8 nValue2, UINT8 nValue3, UINT8 nValue4, UINT8 nDelay)
 ;	---------------------------------
 ; Function FadeDrawLayer
 ; ---------------------------------
@@ -8210,17 +8212,17 @@ _FadeDrawLayer::
 	dec	sp
 	dec	sp
 	ld	c, a
-;main.c:127: if (bMode == 1)
+;main.c:133: if (bMode == 1)
 	dec	e
 	jr	NZ, 00102$
-;main.c:129: nLoopAmount = 4;
+;main.c:135: nLoopAmount = 4;
 	ld	b, #0x04
 	jr	00103$
 00102$:
-;main.c:136: nLoopAmount = 3;
+;main.c:142: nLoopAmount = 3;
 	ld	b, #0x03
 00103$:
-;main.c:140: for(m_nFadeIndex = 0; m_nFadeIndex < nLoopAmount; m_nFadeIndex++)
+;main.c:146: for(m_nFadeIndex = 0; m_nFadeIndex < nLoopAmount; m_nFadeIndex++)
 	xor	a, a
 	ld	(#_m_nFadeIndex),a
 00119$:
@@ -8228,34 +8230,34 @@ _FadeDrawLayer::
 	ld	a, (hl)
 	sub	a, b
 	jp	NC, 00121$
-;main.c:147: switch(m_nFadeIndex)
+;main.c:153: switch(m_nFadeIndex)
 	ld	a, #0x03
 	sub	a, (hl)
 	ld	a, #0x00
 	rla
-;main.c:150: BGP_REG = nValue1;
+;main.c:156: BGP_REG = nValue1;
 	ldhl	sp,	#4
 	ld	e, (hl)
-;main.c:154: BGP_REG = nValue2;
+;main.c:160: BGP_REG = nValue2;
 	inc	hl
 	push	af
 	ld	a, (hl)
 	ldhl	sp,	#2
 	ld	(hl), a
-;main.c:158: BGP_REG = nValue3;
+;main.c:164: BGP_REG = nValue3;
 	ldhl	sp,	#8
 	ld	a, (hl)
 	ldhl	sp,	#3
 	ld	(hl), a
 	pop	af
-;main.c:162: BGP_REG = nValue4;
+;main.c:168: BGP_REG = nValue4;
 	ldhl	sp,	#7
 	ld	d, (hl)
-;main.c:143: if (bLayer == 0)
+;main.c:149: if (bLayer == 0)
 	inc	c
 	dec	c
 	jr	NZ, 00115$
-;main.c:147: switch(m_nFadeIndex)
+;main.c:153: switch(m_nFadeIndex)
 	or	a, a
 	jr	NZ, 00116$
 	push	de
@@ -8276,38 +8278,38 @@ _FadeDrawLayer::
 	.dw	00105$
 	.dw	00106$
 	.dw	00107$
-;main.c:149: case 0:
+;main.c:155: case 0:
 00104$:
-;main.c:150: BGP_REG = nValue1;
+;main.c:156: BGP_REG = nValue1;
 	ld	a, e
 	ldh	(_BGP_REG + 0), a
-;main.c:151: break;
+;main.c:157: break;
 	jr	00116$
-;main.c:153: case 1:
+;main.c:159: case 1:
 00105$:
-;main.c:154: BGP_REG = nValue2;
+;main.c:160: BGP_REG = nValue2;
 	ldhl	sp,	#0
 	ld	a, (hl)
 	ldh	(_BGP_REG + 0), a
-;main.c:155: break;
+;main.c:161: break;
 	jr	00116$
-;main.c:157: case 2:
+;main.c:163: case 2:
 00106$:
-;main.c:158: BGP_REG = nValue3;
+;main.c:164: BGP_REG = nValue3;
 	ldhl	sp,	#1
 	ld	a, (hl)
 	ldh	(_BGP_REG + 0), a
-;main.c:159: break;
+;main.c:165: break;
 	jr	00116$
-;main.c:161: case 3:
+;main.c:167: case 3:
 00107$:
-;main.c:162: BGP_REG = nValue4;
+;main.c:168: BGP_REG = nValue4;
 	ld	a, d
 	ldh	(_BGP_REG + 0), a
-;main.c:164: }
+;main.c:170: }
 	jr	00116$
 00115$:
-;main.c:171: switch(m_nFadeIndex)
+;main.c:177: switch(m_nFadeIndex)
 	or	a, a
 	jr	NZ, 00116$
 	push	de
@@ -8328,69 +8330,69 @@ _FadeDrawLayer::
 	.dw	00110$
 	.dw	00111$
 	.dw	00112$
-;main.c:173: case 0:
+;main.c:179: case 0:
 00109$:
-;main.c:174: OBP0_REG = nValue1;
+;main.c:180: OBP0_REG = nValue1;
 	ld	a, e
 	ldh	(_OBP0_REG + 0), a
-;main.c:175: break;
+;main.c:181: break;
 	jr	00116$
-;main.c:177: case 1:
+;main.c:183: case 1:
 00110$:
-;main.c:178: OBP0_REG = nValue2;
+;main.c:184: OBP0_REG = nValue2;
 	ldhl	sp,	#0
 	ld	a, (hl)
 	ldh	(_OBP0_REG + 0), a
-;main.c:179: break;
+;main.c:185: break;
 	jr	00116$
-;main.c:181: case 2:
+;main.c:187: case 2:
 00111$:
-;main.c:182: OBP0_REG = nValue3;
+;main.c:188: OBP0_REG = nValue3;
 	ldhl	sp,	#1
 	ld	a, (hl)
 	ldh	(_OBP0_REG + 0), a
-;main.c:183: break;
+;main.c:189: break;
 	jr	00116$
-;main.c:185: case 3:
+;main.c:191: case 3:
 00112$:
-;main.c:186: OBP0_REG = nValue4;
+;main.c:192: OBP0_REG = nValue4;
 	ld	a, d
 	ldh	(_OBP0_REG + 0), a
-;main.c:188: }
+;main.c:194: }
 00116$:
-;main.c:192: PerformantDelay(nDelay);
+;main.c:198: PerformantDelay(nDelay);
 	push	bc
 	ldhl	sp,	#10
 	ld	a, (hl)
 	call	_PerformantDelay
 	pop	bc
-;main.c:140: for(m_nFadeIndex = 0; m_nFadeIndex < nLoopAmount; m_nFadeIndex++)
+;main.c:146: for(m_nFadeIndex = 0; m_nFadeIndex < nLoopAmount; m_nFadeIndex++)
 	ld	hl, #_m_nFadeIndex
 	inc	(hl)
 	jp	00119$
 00121$:
-;main.c:194: }
+;main.c:200: }
 	inc	sp
 	inc	sp
 	pop	hl
 	add	sp, #5
 	jp	(hl)
-;main.c:199: void DisplaySplashScreen(void)
+;main.c:205: void DisplaySplashScreen(void)
 ;	---------------------------------
 ; Function DisplaySplashScreen
 ; ---------------------------------
 _DisplaySplashScreen::
-;main.c:210: BGP_REG = 0x27;
+;main.c:216: BGP_REG = 0x27;
 	ld	a, #0x27
 	ldh	(_BGP_REG + 0), a
-;main.c:213: set_bkg_data(0, 55, m_caSplashTiles);
+;main.c:219: set_bkg_data(0, 55, m_caSplashTiles);
 	ld	de, #_m_caSplashTiles
 	push	de
 	ld	hl, #0x3700
 	push	hl
 	call	_set_bkg_data
 	add	sp, #4
-;main.c:214: set_bkg_tiles(0, 0, 20, 18, m_caSplashMap);
+;main.c:220: set_bkg_tiles(0, 0, 20, 18, m_caSplashMap);
 	ld	de, #_m_caSplashMap
 	push	de
 	ld	hl, #0x1214
@@ -8400,68 +8402,68 @@ _DisplaySplashScreen::
 	push	af
 	call	_set_bkg_tiles
 	add	sp, #6
-;main.c:217: SHOW_BKG;
+;main.c:223: SHOW_BKG;
 	ldh	a, (_LCDC_REG + 0)
 	or	a, #0x01
 	ldh	(_LCDC_REG + 0), a
-;main.c:220: PerformantDelay(65);
+;main.c:226: PerformantDelay(65);
 	ld	a, #0x41
 	call	_PerformantDelay
-;main.c:224: NR10_REG = 0x78;
+;main.c:230: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:225: NR11_REG = 0x81;
+;main.c:231: NR11_REG = 0x81;
 	ld	a, #0x81
 	ldh	(_NR11_REG + 0), a
-;main.c:226: NR12_REG = 0x42;
+;main.c:232: NR12_REG = 0x42;
 	ld	a, #0x42
 	ldh	(_NR12_REG + 0), a
-;main.c:227: NR13_REG = 0x9E;
+;main.c:233: NR13_REG = 0x9E;
 	ld	a, #0x9e
 	ldh	(_NR13_REG + 0), a
-;main.c:228: NR14_REG = 0x87;
+;main.c:234: NR14_REG = 0x87;
 	ld	a, #0x87
 	ldh	(_NR14_REG + 0), a
-;main.c:231: PerformantDelay(10);
+;main.c:237: PerformantDelay(10);
 	ld	a, #0x0a
 	call	_PerformantDelay
-;main.c:234: NR10_REG = 0x78;
+;main.c:240: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:235: NR11_REG = 0x81;
+;main.c:241: NR11_REG = 0x81;
 	ld	a, #0x81
 	ldh	(_NR11_REG + 0), a
-;main.c:236: NR12_REG = 0x42;
+;main.c:242: NR12_REG = 0x42;
 	ld	a, #0x42
 	ldh	(_NR12_REG + 0), a
-;main.c:237: NR13_REG = 0x72;
+;main.c:243: NR13_REG = 0x72;
 	ld	a, #0x72
 	ldh	(_NR13_REG + 0), a
-;main.c:238: NR14_REG = 0x86;
+;main.c:244: NR14_REG = 0x86;
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:241: PerformantDelay(8);
+;main.c:247: PerformantDelay(8);
 	ld	a, #0x08
 	call	_PerformantDelay
-;main.c:244: NR10_REG = 0x78;
+;main.c:250: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:245: NR11_REG = 0x81;
+;main.c:251: NR11_REG = 0x81;
 	ld	a, #0x81
 	ldh	(_NR11_REG + 0), a
-;main.c:246: NR12_REG = 0x42;
+;main.c:252: NR12_REG = 0x42;
 	ld	a, #0x42
 	ldh	(_NR12_REG + 0), a
-;main.c:247: NR13_REG = 0xAA;
+;main.c:253: NR13_REG = 0xAA;
 	ld	a, #0xaa
 	ldh	(_NR13_REG + 0), a
-;main.c:248: NR14_REG = 0x85;
+;main.c:254: NR14_REG = 0x85;
 	ld	a, #0x85
 	ldh	(_NR14_REG + 0), a
-;main.c:251: PerformantDelay(135);
+;main.c:257: PerformantDelay(135);
 	ld	a, #0x87
 	call	_PerformantDelay
-;main.c:252: FadeDrawLayer(0, 1, 0x67, 0xBB, 0xFB, 0xFF, 15);
+;main.c:258: FadeDrawLayer(0, 1, 0x67, 0xBB, 0xFB, 0xFF, 15);
 	ld	hl, #0xfff
 	push	hl
 	ld	hl, #0xfbbb
@@ -8472,21 +8474,21 @@ _DisplaySplashScreen::
 	ld	e, #0x01
 	xor	a, a
 	call	_FadeDrawLayer
-;main.c:253: }
+;main.c:259: }
 	ret
-;main.c:258: void DisplayStartScreen(void)
+;main.c:264: void DisplayStartScreen(void)
 ;	---------------------------------
 ; Function DisplayStartScreen
 ; ---------------------------------
 _DisplayStartScreen::
-;main.c:265: set_bkg_data(0, 127, m_caStartScreenTiles);
+;main.c:271: set_bkg_data(0, 127, m_caStartScreenTiles);
 	ld	de, #_m_caStartScreenTiles
 	push	de
 	ld	hl, #0x7f00
 	push	hl
 	call	_set_bkg_data
 	add	sp, #4
-;main.c:266: set_bkg_tiles(0, 0, 20, 18, m_caStartScreen);
+;main.c:272: set_bkg_tiles(0, 0, 20, 18, m_caStartScreen);
 	ld	de, #_m_caStartScreen
 	push	de
 	ld	hl, #0x1214
@@ -8496,16 +8498,16 @@ _DisplayStartScreen::
 	push	af
 	call	_set_bkg_tiles
 	add	sp, #6
-;main.c:275: }
+;main.c:281: }
 	di
-;main.c:273: hUGE_init(&song1);
+;main.c:279: hUGE_init(&song1);
 	ld	de, #_song1
 	call	_hUGE_init
-;main.c:274: add_VBL(hUGE_dosound);
+;main.c:280: add_VBL(hUGE_dosound);
 	ld	de, #_hUGE_dosound
 	call	_add_VBL
 	ei
-;main.c:278: FadeDrawLayer(0, 0, 0xFB, 0xBB, 0xE4, 0x00, 15);
+;main.c:284: FadeDrawLayer(0, 0, 0xFB, 0xBB, 0xE4, 0x00, 15);
 	ld	a, #0x0f
 	push	af
 	inc	sp
@@ -8516,21 +8518,21 @@ _DisplayStartScreen::
 	xor	a, a
 	ld	e, a
 	call	_FadeDrawLayer
-;main.c:281: PerformantDelay(25);
+;main.c:287: PerformantDelay(25);
 	ld	a, #0x19
 	call	_PerformantDelay
-;main.c:284: SPRITES_8x8; 
+;main.c:290: SPRITES_8x8; 
 	ldh	a, (_LCDC_REG + 0)
 	and	a, #0xfb
 	ldh	(_LCDC_REG + 0), a
-;main.c:285: set_sprite_data(0, 95, m_caSprites);
+;main.c:291: set_sprite_data(0, 95, m_caSprites);
 	ld	de, #_m_caSprites
 	push	de
 	ld	hl, #0x5f00
 	push	hl
 	call	_set_sprite_data
 	add	sp, #4
-;main.c:288: SHOW_SPRITES;
+;main.c:294: SHOW_SPRITES;
 	ldh	a, (_LCDC_REG + 0)
 	or	a, #0x02
 	ldh	(_LCDC_REG + 0), a
@@ -8634,14 +8636,14 @@ _DisplayStartScreen::
 	ld	a, #0x87
 	ld	(hl+), a
 	ld	(hl), #0x86
-;main.c:304: waitpad(J_START);
+;main.c:310: waitpad(J_START);
 	ld	a, #0x80
 	call	_waitpad
-;main.c:307: hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+;main.c:313: hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
 	ld	a,#0x01
 	ld	e,a
 	call	_hUGE_mute_channel
-;main.c:312: for(i = 0; i < 12; i++) 
+;main.c:318: for(i = 0; i < 12; i++) 
 	ld	c, #0x00
 00124$:
 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
@@ -8662,66 +8664,66 @@ _DisplayStartScreen::
 	xor	a, a
 	ld	(hl+), a
 	ld	(hl), a
-;main.c:312: for(i = 0; i < 12; i++) 
+;main.c:318: for(i = 0; i < 12; i++) 
 	inc	c
 	ld	a, c
 	sub	a, #0x0c
 	jr	C, 00124$
-;main.c:320: NR10_REG = 0x78;
+;main.c:326: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:321: NR11_REG = 0x82;
+;main.c:327: NR11_REG = 0x82;
 	ld	a, #0x82
 	ldh	(_NR11_REG + 0), a
-;main.c:322: NR12_REG = 0x44;
+;main.c:328: NR12_REG = 0x44;
 	ld	a, #0x44
 	ldh	(_NR12_REG + 0), a
-;main.c:323: NR13_REG = 0x9D;
+;main.c:329: NR13_REG = 0x9D;
 	ld	a, #0x9d
 	ldh	(_NR13_REG + 0), a
-;main.c:324: NR14_REG = 0x86;
+;main.c:330: NR14_REG = 0x86;
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:327: PerformantDelay(5);
+;main.c:333: PerformantDelay(5);
 	ld	a, #0x05
 	call	_PerformantDelay
-;main.c:330: NR10_REG = 0x78;
+;main.c:336: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:331: NR11_REG = 0x82;
+;main.c:337: NR11_REG = 0x82;
 	ld	a, #0x82
 	ldh	(_NR11_REG + 0), a
-;main.c:332: NR12_REG = 0x44;
+;main.c:338: NR12_REG = 0x44;
 	ld	a, #0x44
 	ldh	(_NR12_REG + 0), a
-;main.c:333: NR13_REG = 0x54;
+;main.c:339: NR13_REG = 0x54;
 	ld	a, #0x54
 	ldh	(_NR13_REG + 0), a
-;main.c:334: NR14_REG = 0x86;
+;main.c:340: NR14_REG = 0x86;
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:337: PerformantDelay(3);
+;main.c:343: PerformantDelay(3);
 	ld	a, #0x03
 	call	_PerformantDelay
-;main.c:340: NR10_REG = 0x78;
+;main.c:346: NR10_REG = 0x78;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
-;main.c:341: NR11_REG = 0x82;
+;main.c:347: NR11_REG = 0x82;
 	ld	a, #0x82
 	ldh	(_NR11_REG + 0), a
-;main.c:342: NR12_REG = 0x44;
+;main.c:348: NR12_REG = 0x44;
 	ld	a, #0x44
 	ldh	(_NR12_REG + 0), a
-;main.c:343: NR13_REG = 0xD6;
+;main.c:349: NR13_REG = 0xD6;
 	ld	a, #0xd6
 	ldh	(_NR13_REG + 0), a
-;main.c:344: NR14_REG = 0x86;
+;main.c:350: NR14_REG = 0x86;
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:347: PerformantDelay(10);
+;main.c:353: PerformantDelay(10);
 	ld	a, #0x0a
 	call	_PerformantDelay
-;main.c:350: FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
+;main.c:356: FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
 	ld	a, #0x0f
 	push	af
 	inc	sp
@@ -8732,9 +8734,9 @@ _DisplayStartScreen::
 	ld	e, #0x01
 	xor	a, a
 	call	_FadeDrawLayer
-;main.c:351: }
+;main.c:357: }
 	ret
-;main.c:360: void ShowScoreGrade(UINT16 nScore, UINT16 nShotsTaken)
+;main.c:366: void ShowScoreGrade(UINT16 nScore, UINT16 nShotsTaken)
 ;	---------------------------------
 ; Function ShowScoreGrade
 ; ---------------------------------
@@ -8744,21 +8746,21 @@ _ShowScoreGrade::
 	ld	a, e
 	ld	(hl+), a
 	ld	(hl), d
-;main.c:363: UINT16 nAccuracy = 0;
+;main.c:369: UINT16 nAccuracy = 0;
 	xor	a, a
 	ldhl	sp,	#0
 	ld	(hl+), a
-;main.c:366: char cGrade = 'F';
+;main.c:372: char cGrade = 'F';
 	ld	(hl+), a
-;main.c:367: char cPlusMinus = ' ';
+;main.c:373: char cPlusMinus = ' ';
 	ld	a, #0x46
 	ld	(hl+), a
 	ld	(hl), #0x20
-;main.c:370: if (nShotsTaken != 0)
+;main.c:376: if (nShotsTaken != 0)
 	ld	a, b
 	or	a, c
 	jr	Z, 00102$
-;main.c:373: nAccuracy = (nScore * 100) / nShotsTaken;
+;main.c:379: nAccuracy = (nScore * 100) / nShotsTaken;
 	inc	hl
 	ld	a, (hl+)
 	ld	e, a
@@ -8779,7 +8781,7 @@ _ShowScoreGrade::
 	pop	hl
 	push	bc
 00102$:
-;main.c:377: if (nAccuracy >= 95) { cGrade = 'S'; cPlusMinus = nAccuracy >= 98 ? 'S' : ' ' ; }
+;main.c:383: if (nAccuracy >= 95) { cGrade = 'S'; cPlusMinus = nAccuracy >= 98 ? 'S' : ' ' ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x5f
@@ -8804,7 +8806,7 @@ _ShowScoreGrade::
 	ld	(hl), #0x20
 	jp	00119$
 00118$:
-;main.c:378: else if (nAccuracy >= 90) { cGrade = 'A'; cPlusMinus = nAccuracy >= 93 ? '+' : (nAccuracy <= 91 ? '-' : ' ') ; }
+;main.c:384: else if (nAccuracy >= 90) { cGrade = 'A'; cPlusMinus = nAccuracy >= 93 ? '+' : (nAccuracy <= 91 ? '-' : ' ') ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x5a
@@ -8840,7 +8842,7 @@ _ShowScoreGrade::
 	ld	(hl), c
 	jp	00119$
 00115$:
-;main.c:379: else if (nAccuracy >= 80) { cGrade = 'B'; cPlusMinus = nAccuracy >= 85 ? '+' : (nAccuracy <= 82 ? '-' : ' ') ; }
+;main.c:385: else if (nAccuracy >= 80) { cGrade = 'B'; cPlusMinus = nAccuracy >= 85 ? '+' : (nAccuracy <= 82 ? '-' : ' ') ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x50
@@ -8880,7 +8882,7 @@ _ShowScoreGrade::
 	ld	(hl), c
 	jp	00119$
 00112$:
-;main.c:380: else if (nAccuracy >= 70) { cGrade = 'C'; cPlusMinus = nAccuracy >= 75 ? '+' : (nAccuracy <= 72 ? '-' : ' ') ; }
+;main.c:386: else if (nAccuracy >= 70) { cGrade = 'C'; cPlusMinus = nAccuracy >= 75 ? '+' : (nAccuracy <= 72 ? '-' : ' ') ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x46
@@ -8920,7 +8922,7 @@ _ShowScoreGrade::
 	ld	(hl), c
 	jr	00119$
 00109$:
-;main.c:381: else if (nAccuracy >= 60) { cGrade = 'D'; cPlusMinus = nAccuracy >= 65 ? '+' : (nAccuracy <= 62 ? '-' : ' ') ; }
+;main.c:387: else if (nAccuracy >= 60) { cGrade = 'D'; cPlusMinus = nAccuracy >= 65 ? '+' : (nAccuracy <= 62 ? '-' : ' ') ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x3c
@@ -8956,7 +8958,7 @@ _ShowScoreGrade::
 	ld	(hl), c
 	jr	00119$
 00106$:
-;main.c:382: else if (nAccuracy >= 50) { cGrade = 'E'; cPlusMinus = nAccuracy >= 55 ? '+' : (nAccuracy <= 52 ? '-' : ' ') ; }
+;main.c:388: else if (nAccuracy >= 50) { cGrade = 'E'; cPlusMinus = nAccuracy >= 55 ? '+' : (nAccuracy <= 52 ? '-' : ' ') ; }
 	ldhl	sp,	#0
 	ld	a, (hl+)
 	sub	a, #0x32
@@ -8995,7 +8997,7 @@ _ShowScoreGrade::
 	ldhl	sp,	#3
 	ld	(hl), c
 00119$:
-;main.c:385: printf("%c%c", cGrade, cPlusMinus);
+;main.c:391: printf("%c%c", cGrade, cPlusMinus);
 	ldhl	sp,	#3
 	ld	a, (hl-)
 	ld	c, a
@@ -9012,22 +9014,22 @@ _ShowScoreGrade::
 	ld	de, #___str_0
 	push	de
 	call	_printf
-;main.c:386: }
+;main.c:392: }
 	add	sp, #12
 	ret
 ___str_0:
 	.ascii "%c%c"
 	.db 0x00
-;main.c:391: void DisplayGameOverScreen(void)
+;main.c:397: void DisplayGameOverScreen(void)
 ;	---------------------------------
 ; Function DisplayGameOverScreen
 ; ---------------------------------
 _DisplayGameOverScreen::
 	add	sp, #-4
-;main.c:394: PerformantDelay(10);
+;main.c:400: PerformantDelay(10);
 	ld	a, #0x0a
 	call	_PerformantDelay
-;main.c:397: NR41_REG = 0x15; NR42_REG = 0xFF; NR43_REG = 0x73; NR44_REG = 0xC0;
+;main.c:403: NR41_REG = 0x15; NR42_REG = 0xFF; NR43_REG = 0x73; NR44_REG = 0xC0;
 	ld	a, #0x15
 	ldh	(_NR41_REG + 0), a
 	ld	a, #0xff
@@ -9036,10 +9038,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR43_REG + 0), a
 	ld	a, #0xc0
 	ldh	(_NR44_REG + 0), a
-;main.c:400: PerformantDelay(50);
+;main.c:406: PerformantDelay(50);
 	ld	a, #0x32
 	call	_PerformantDelay
-;main.c:403: FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
+;main.c:409: FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
 	ld	a, #0x0f
 	push	af
 	inc	sp
@@ -9050,13 +9052,13 @@ _DisplayGameOverScreen::
 	ld	e, #0x01
 	xor	a, a
 	call	_FadeDrawLayer
-;main.c:407: printf("     GAME  OVER     \n"); printf(" \n"); printf(" \n");
+;main.c:413: printf("     GAME  OVER     \n"); printf(" \n"); printf(" \n");
 	ld	de, #___str_29
 	call	_puts
-;main.c:410: PerformantDelay(20);
+;main.c:416: PerformantDelay(20);
 	ld	a, #0x14
 	call	_PerformantDelay
-;main.c:411: FadeDrawLayer(0, 1, 0x00, 0x40, 0x90, 0xE4, 1);
+;main.c:417: FadeDrawLayer(0, 1, 0x00, 0x40, 0x90, 0xE4, 1);
 	ld	hl, #0x1e4
 	push	hl
 	ld	hl, #0x9040
@@ -9067,7 +9069,7 @@ _DisplayGameOverScreen::
 	ld	e, #0x01
 	xor	a, a
 	call	_FadeDrawLayer
-;main.c:416: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84;
+;main.c:422: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84;
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9078,10 +9080,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x84
 	ldh	(_NR14_REG + 0), a
-;main.c:417: PerformantDelay(15);
+;main.c:423: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:420: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84; 
+;main.c:426: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84; 
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9092,10 +9094,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x84
 	ldh	(_NR14_REG + 0), a
-;main.c:421: PerformantDelay(15);
+;main.c:427: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:424: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83; 
+;main.c:430: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83; 
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9106,10 +9108,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x83
 	ldh	(_NR14_REG + 0), a
-;main.c:425: PerformantDelay(15);
+;main.c:431: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:428: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83;
+;main.c:434: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83;
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9120,10 +9122,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x83
 	ldh	(_NR14_REG + 0), a
-;main.c:429: PerformantDelay(15);
+;main.c:435: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:432: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85; 
+;main.c:438: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85; 
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9134,10 +9136,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x85
 	ldh	(_NR14_REG + 0), a
-;main.c:433: PerformantDelay(15);
+;main.c:439: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:436: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84;
+;main.c:442: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84;
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9148,10 +9150,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x84
 	ldh	(_NR14_REG + 0), a
-;main.c:437: PerformantDelay(15);
+;main.c:443: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:440: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x90; NR14_REG = 0x81;
+;main.c:446: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x90; NR14_REG = 0x81;
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9162,10 +9164,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x81
 	ldh	(_NR14_REG + 0), a
-;main.c:441: PerformantDelay(15);
+;main.c:447: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:444: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85;
+;main.c:450: NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85;
 	ld	a, #0x7c
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0xc5
@@ -9176,10 +9178,10 @@ _DisplayGameOverScreen::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x85
 	ldh	(_NR14_REG + 0), a
-;main.c:445: PerformantDelay(60);
+;main.c:451: PerformantDelay(60);
 	ld	a, #0x3c
 	call	_PerformantDelay
-;main.c:448: FadeDrawLayer(1, 1, 0xE4, 0x90, 0x40, 0x00, 15);
+;main.c:454: FadeDrawLayer(1, 1, 0xE4, 0x90, 0x40, 0x00, 15);
 	ld	a, #0x0f
 	push	af
 	inc	sp
@@ -9190,22 +9192,22 @@ _DisplayGameOverScreen::
 	ld	a,#0x01
 	ld	e,a
 	call	_FadeDrawLayer
-;main.c:449: PerformantDelay(2);
+;main.c:455: PerformantDelay(2);
 	ld	a, #0x02
 	call	_PerformantDelay
-;main.c:450: HIDE_SPRITES;
+;main.c:456: HIDE_SPRITES;
 	ldh	a, (_LCDC_REG + 0)
 	and	a, #0xfd
 	ldh	(_LCDC_REG + 0), a
-;main.c:453: PerformantDelay(100);
+;main.c:459: PerformantDelay(100);
 	ld	a, #0x64
 	call	_PerformantDelay
-;main.c:458: printf("     SCORE:");
+;main.c:464: printf("     SCORE:");
 	ld	de, #___str_10
 	push	de
 	call	_printf
 	pop	hl
-;main.c:463: m_oPlayer.nScore % 10);
+;main.c:469: m_oPlayer.nScore % 10);
 	ld	hl, #(_m_oPlayer + 20)
 	ld	a,	(hl+)
 	ld	h, (hl)
@@ -9214,7 +9216,7 @@ _DisplayGameOverScreen::
 	ld	bc, #0x000a
 	ld	e, l
 	ld	d, h
-;main.c:462: (m_oPlayer.nScore / 100) % 10, (m_oPlayer.nScore / 10) % 10, 
+;main.c:468: (m_oPlayer.nScore / 100) % 10, (m_oPlayer.nScore / 10) % 10, 
 	call	__moduint
 	ldhl	sp,	#2
 	ld	a, c
@@ -9243,7 +9245,7 @@ _DisplayGameOverScreen::
 	ld	e, c
 	ld	d, b
 	ld	bc, #0x000a
-;main.c:461: printf("%u%u%u%u     ", m_oPlayer.nScore / 1000, 
+;main.c:467: printf("%u%u%u%u     ", m_oPlayer.nScore / 1000, 
 	call	__moduint
 	ld	e, c
 	ld	d, b
@@ -9268,23 +9270,23 @@ _DisplayGameOverScreen::
 	push	de
 	call	_printf
 	add	sp, #10
-;main.c:472: printf(" \n"); printf(" \n"); printf(" \n");
+;main.c:478: printf(" \n"); printf(" \n"); printf(" \n");
 	ld	de, #___str_25
 	call	_puts
-;main.c:473: printf("    HIGH  SCORE: ");printf(" \n");printf(" \n");
+;main.c:479: printf("    HIGH  SCORE: ");printf(" \n");printf(" \n");
 	ld	de, #___str_15
 	push	de
 	call	_printf
 	pop	hl
 	ld	de, #___str_24
 	call	_puts
-;main.c:478: m_nLoadedScore % 10);
+;main.c:484: m_nLoadedScore % 10);
 	ld	bc, #0x000a
 	ld	a, (_m_nLoadedScore)
 	ld	e, a
 	ld	hl, #_m_nLoadedScore + 1
 	ld	d, (hl)
-;main.c:477: (m_nLoadedScore / 100) % 10, (m_nLoadedScore / 10) % 10, 
+;main.c:483: (m_nLoadedScore / 100) % 10, (m_nLoadedScore / 10) % 10, 
 	call	__moduint
 	pop	hl
 	push	bc
@@ -9311,7 +9313,7 @@ _DisplayGameOverScreen::
 	ld	e, c
 	ld	d, b
 	ld	bc, #0x000a
-;main.c:476: printf("        %u%u%u%u  ", m_nLoadedScore / 1000, 
+;main.c:482: printf("        %u%u%u%u  ", m_nLoadedScore / 1000, 
 	call	__moduint
 	push	bc
 	ld	bc, #0x03e8
@@ -9335,30 +9337,30 @@ _DisplayGameOverScreen::
 	push	de
 	call	_printf
 	add	sp, #10
-;main.c:485: printf("    PRESS  START     \n");
+;main.c:491: printf("    PRESS  START     \n");
 	ld	de, #___str_31
 	call	_puts
-;main.c:488: waitpad(J_START);
+;main.c:494: waitpad(J_START);
 	ld	a, #0x80
 	call	_waitpad
-;main.c:491: NR41_REG = 0x13;
+;main.c:497: NR41_REG = 0x13;
 	ld	a, #0x13
 	ldh	(_NR41_REG + 0), a
-;main.c:492: NR42_REG = 0x35;
+;main.c:498: NR42_REG = 0x35;
 	ld	a, #0x35
 	ldh	(_NR42_REG + 0), a
-;main.c:493: NR43_REG = 0x28;
+;main.c:499: NR43_REG = 0x28;
 	ld	a, #0x28
 	ldh	(_NR43_REG + 0), a
-;main.c:494: NR44_REG = 0xC0;
+;main.c:500: NR44_REG = 0xC0;
 	ld	a, #0xc0
 	ldh	(_NR44_REG + 0), a
-;main.c:497: PerformantDelay(15);
+;main.c:503: PerformantDelay(15);
 	ld	a, #0x0f
 	call	_PerformantDelay
-;main.c:500: reset();
+;main.c:506: reset();
 	call	_reset
-;main.c:501: }
+;main.c:507: }
 	add	sp, #4
 	ret
 ___str_10:
@@ -9407,22 +9409,22 @@ ___str_31:
 	.db 0x0a
 	.ascii "    PRESS  START     "
 	.db 0x00
-;main.c:506: void LoadHighScoreData(void) 
+;main.c:512: void LoadHighScoreData(void) 
 ;	---------------------------------
 ; Function LoadHighScoreData
 ; ---------------------------------
 _LoadHighScoreData::
 	add	sp, #-4
-;main.c:509: UINT16 nLoadedScore = 0;
+;main.c:515: UINT16 nLoadedScore = 0;
 	xor	a, a
 	ldhl	sp,	#0
 	ld	(hl+), a
-;main.c:510: UINT16 nLoadedShotsTaken = 0;
+;main.c:516: UINT16 nLoadedShotsTaken = 0;
 	ld	(hl+), a
 	xor	a, a
 	ld	(hl+), a
 	ld	(hl), a
-;main.c:513: LoadGameData(&nLoadedScore, &nLoadedShotsTaken);
+;main.c:519: LoadGameData(&nLoadedScore, &nLoadedShotsTaken);
 	ldhl	sp,	#2
 	ld	c, l
 	ld	b, h
@@ -9430,42 +9432,42 @@ _LoadHighScoreData::
 	ld	e, l
 	ld	d, h
 	call	_LoadGameData
-;main.c:516: m_nLoadedScore = nLoadedScore;
+;main.c:522: m_nLoadedScore = nLoadedScore;
 	ldhl	sp,	#0
 	ld	a, (hl)
 	ld	(#_m_nLoadedScore),a
 	ldhl	sp,	#1
 	ld	a, (hl)
 	ld	(#_m_nLoadedScore + 1),a
-;main.c:517: m_nLoadedShotsTaken = nLoadedShotsTaken;
+;main.c:523: m_nLoadedShotsTaken = nLoadedShotsTaken;
 	ldhl	sp,	#2
 	ld	a, (hl)
 	ld	(#_m_nLoadedShotsTaken),a
 	ldhl	sp,	#3
 	ld	a, (hl)
 	ld	(#_m_nLoadedShotsTaken + 1),a
-;main.c:518: }
+;main.c:524: }
 	add	sp, #4
 	ret
-;main.c:523: void Initialize(void)
+;main.c:529: void Initialize(void)
 ;	---------------------------------
 ; Function Initialize
 ; ---------------------------------
 _Initialize::
-;main.c:530: NR52_REG = 0x80; // Turn on the sound.
+;main.c:536: NR52_REG = 0x80; // Turn on the sound.
 	ld	a, #0x80
 	ldh	(_NR52_REG + 0), a
-;main.c:531: NR50_REG = 0x77; // Set the volume of the left and right channel
+;main.c:537: NR50_REG = 0x77; // Set the volume of the left and right channel
 	ld	a, #0x77
 	ldh	(_NR50_REG + 0), a
-;main.c:532: NR51_REG = 0xFF; // Set usage to both channels
+;main.c:538: NR51_REG = 0xFF; // Set usage to both channels
 	ld	a, #0xff
 	ldh	(_NR51_REG + 0), a
-;main.c:535: LoadHighScoreData();
+;main.c:541: LoadHighScoreData();
 	call	_LoadHighScoreData
-;main.c:538: DisplaySplashScreen();
+;main.c:544: DisplaySplashScreen();
 	call	_DisplaySplashScreen
-;main.c:541: DisplayStartScreen();
+;main.c:547: DisplayStartScreen();
 	call	_DisplayStartScreen
 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
 	ld	hl, #(_shadow_OAM + 26)
@@ -9547,18 +9549,18 @@ _Initialize::
 	ld	a, #0x69
 	ld	(hl+), a
 	ld	(hl), #0x7c
-;main.c:556: HIDE_BKG;
+;main.c:562: HIDE_BKG;
 	ldh	a, (_LCDC_REG + 0)
 	and	a, #0xfe
 	ldh	(_LCDC_REG + 0), a
-;main.c:559: VBK_REG = 0;
+;main.c:565: VBK_REG = 0;
 	xor	a, a
 	ldh	(_VBK_REG + 0), a
-;main.c:562: DISPLAY_ON;
+;main.c:568: DISPLAY_ON;
 	ldh	a, (_LCDC_REG + 0)
 	or	a, #0x80
 	ldh	(_LCDC_REG + 0), a
-;main.c:565: initrand(DIV_REG | (LY_REG << 8));
+;main.c:571: initrand(DIV_REG | (LY_REG << 8));
 	ldh	a, (_LY_REG + 0)
 	ld	b, a
 	ldh	a, (_DIV_REG + 0)
@@ -9566,34 +9568,34 @@ _Initialize::
 	push	bc
 	call	_initrand
 	pop	hl
-;main.c:568: InitPlayer(&m_oPlayer);
+;main.c:574: InitPlayer(&m_oPlayer);
 	ld	de, #_m_oPlayer+0
 	push	de
 	call	_InitPlayer
 	pop	de
-;main.c:569: UpdatePlayer(&m_oPlayer);
+;main.c:575: UpdatePlayer(&m_oPlayer);
 	call	_UpdatePlayer
-;main.c:570: InitHud();
+;main.c:576: InitHud();
 	call	_InitHud
-;main.c:573: for(i = 0; i < MAX_ENEMIES; i++) 
+;main.c:579: for(i = 0; i < MAX_ENEMIES; i++) 
 	ld	c, #0x00
 00121$:
-;main.c:575: InitEnemy(i);
+;main.c:581: InitEnemy(i);
 	push	bc
 	ld	a, c
 	call	_InitEnemy
 	pop	bc
-;main.c:573: for(i = 0; i < MAX_ENEMIES; i++) 
+;main.c:579: for(i = 0; i < MAX_ENEMIES; i++) 
 	inc	c
 	ld	a, c
 	sub	a, #0x10
 	jr	C, 00121$
-;main.c:579: InitEnemiesSpawnQueue();
+;main.c:585: InitEnemiesSpawnQueue();
 	call	_InitEnemiesSpawnQueue
-;main.c:582: m_nPrevJoy = 0;
+;main.c:588: m_nPrevJoy = 0;
 	xor	a, a
 	ld	(#_m_nPrevJoy),a
-;main.c:587: for(i = 5; i < 14; i++) 
+;main.c:593: for(i = 5; i < 14; i++) 
 	ld	c, #0x05
 00123$:
 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
@@ -9614,19 +9616,19 @@ _Initialize::
 	xor	a, a
 	ld	(hl+), a
 	ld	(hl), a
-;main.c:587: for(i = 5; i < 14; i++) 
+;main.c:593: for(i = 5; i < 14; i++) 
 	inc	c
 	ld	a, c
 	sub	a, #0x0e
 	jr	C, 00123$
-;main.c:594: set_bkg_data(0, 127, m_caBgTiles);
+;main.c:600: set_bkg_data(0, 127, m_caBgTiles);
 	ld	de, #_m_caBgTiles
 	push	de
 	ld	hl, #0x7f00
 	push	hl
 	call	_set_bkg_data
 	add	sp, #4
-;main.c:595: set_bkg_tiles(0, 0, 20, 18, m_caBackground);
+;main.c:601: set_bkg_tiles(0, 0, 20, 18, m_caBackground);
 	ld	de, #_m_caBackground
 	push	de
 	ld	hl, #0x1214
@@ -9636,11 +9638,11 @@ _Initialize::
 	push	af
 	call	_set_bkg_tiles
 	add	sp, #6
-;main.c:598: SHOW_BKG;
+;main.c:604: SHOW_BKG;
 	ldh	a, (_LCDC_REG + 0)
 	or	a, #0x01
 	ldh	(_LCDC_REG + 0), a
-;main.c:599: FadeDrawLayer(0, 0, 0x00, 0x40, 0x90, 0xE4, 8);
+;main.c:605: FadeDrawLayer(0, 0, 0x00, 0x40, 0x90, 0xE4, 8);
 	ld	hl, #0x8e4
 	push	hl
 	ld	hl, #0x9040
@@ -9651,56 +9653,56 @@ _Initialize::
 	xor	a, a
 	ld	e, a
 	call	_FadeDrawLayer
-;main.c:602: BGP_REG = 0xE4;
+;main.c:608: BGP_REG = 0xE4;
 	ld	a, #0xe4
 	ldh	(_BGP_REG + 0), a
-;main.c:603: }
+;main.c:609: }
 	ret
-;main.c:608: void main(void) 
+;main.c:614: void main(void) 
 ;	---------------------------------
 ; Function main
 ; ---------------------------------
 _main::
-	add	sp, #-8
-;main.c:620: BOOLEAN bPaused = FALSE;
+	add	sp, #-13
+;main.c:626: BOOLEAN bPaused = FALSE;
 	ldhl	sp,	#0
 	ld	(hl), #0x00
-;main.c:621: UINT8 nBlinkTimer = 0;
-	ldhl	sp,	#7
+;main.c:627: UINT8 nBlinkTimer = 0;
+	ldhl	sp,	#12
 	ld	(hl), #0x00
-;main.c:622: UINT8 nBlinkState = 0;  
+;main.c:628: UINT8 nBlinkState = 0;  
 	ldhl	sp,	#1
 	ld	(hl), #0x00
-;main.c:626: Initialize();
+;main.c:632: Initialize();
 	call	_Initialize
-;main.c:629: while(1) 
+;main.c:635: while(1) 
 00135$:
-;main.c:632: if (m_oPlayer.nHealth == 0)
+;main.c:638: if (m_oPlayer.nHealth == 0)
 	ld	hl, #(_m_oPlayer + 17)
 	ld	a, (hl+)
-;main.c:644: if (m_oPlayer.nScore > m_nLoadedScore) 
-;main.c:632: if (m_oPlayer.nHealth == 0)
+;main.c:650: if (m_oPlayer.nScore > m_nLoadedScore) 
+;main.c:638: if (m_oPlayer.nHealth == 0)
 	or	a, (hl)
 	jr	NZ, 00104$
-;main.c:635: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+;main.c:641: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
 	ld	e, #0x01
 	xor	a, a
 	call	_hUGE_mute_channel
-;main.c:636: hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+;main.c:642: hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
 	ld	a,#0x01
 	ld	e,a
 	call	_hUGE_mute_channel
-;main.c:637: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+;main.c:643: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
 	ld	e, #0x01
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:641: SetHealth(0);
+;main.c:647: SetHealth(0);
 	ld	de, #0x0000
 	call	_SetHealth
-;main.c:644: if (m_oPlayer.nScore > m_nLoadedScore) 
+;main.c:650: if (m_oPlayer.nScore > m_nLoadedScore) 
 	ld	de, #(_m_oPlayer + 20)
 	ld	a, (de)
-	ldhl	sp,	#5
+	ldhl	sp,	#10
 	ld	(hl+), a
 	inc	de
 	ld	a, (de)
@@ -9713,34 +9715,34 @@ _main::
 	ld	a, (de)
 	sbc	a, (hl)
 	jr	NC, 00102$
-;main.c:647: SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+;main.c:653: SaveGameData(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
 	ld	hl, #_m_oPlayer + 22
 	ld	a, (hl+)
 	ld	c, a
 	ld	b, (hl)
-	ldhl	sp,	#5
+	ldhl	sp,	#10
 	ld	a, (hl+)
 	ld	e, a
 	ld	d, (hl)
 	call	_SaveGameData
-;main.c:648: LoadHighScoreData();
+;main.c:654: LoadHighScoreData();
 	call	_LoadHighScoreData
 00102$:
-;main.c:652: DisplayGameOverScreen();
+;main.c:658: DisplayGameOverScreen();
 	call	_DisplayGameOverScreen
 00104$:
-;main.c:656: m_nJoy = joypad();
+;main.c:662: m_nJoy = joypad();
 	call	_joypad
 	ld	hl, #_m_nJoy
 	ld	(hl), a
-;main.c:659: if ((m_nJoy & J_START) && !(m_nPrevJoy & J_START))
+;main.c:665: if ((m_nJoy & J_START) && !(m_nPrevJoy & J_START))
 	ld	a, (hl)
 	rlca
 	jp	NC, 00109$
 	ld	a, (_m_nPrevJoy)
 	rlca
 	jp	C, 00109$
-;main.c:664: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xD6; NR14_REG = 0x86;
+;main.c:670: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xD6; NR14_REG = 0x86;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0x82
@@ -9751,10 +9753,10 @@ _main::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:665: PerformantDelay(3);
+;main.c:671: PerformantDelay(3);
 	ld	a, #0x03
 	call	_PerformantDelay
-;main.c:668: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x54; NR14_REG = 0x86;
+;main.c:674: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x54; NR14_REG = 0x86;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0x82
@@ -9765,10 +9767,10 @@ _main::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:669: PerformantDelay(3);
+;main.c:675: PerformantDelay(3);
 	ld	a, #0x03
 	call	_PerformantDelay
-;main.c:672: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x9D; NR14_REG = 0x86;
+;main.c:678: NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x9D; NR14_REG = 0x86;
 	ld	a, #0x78
 	ldh	(_NR10_REG + 0), a
 	ld	a, #0x82
@@ -9779,20 +9781,20 @@ _main::
 	ldh	(_NR13_REG + 0), a
 	ld	a, #0x86
 	ldh	(_NR14_REG + 0), a
-;main.c:675: bPaused = !bPaused;
+;main.c:681: bPaused = !bPaused;
 	ldhl	sp,	#0
 	ld	a, (hl)
 	sub	a, #0x01
 	ld	a, #0x00
 	rla
 	ld	(hl), a
-;main.c:676: nBlinkTimer = 0;
-	ldhl	sp,	#7
+;main.c:682: nBlinkTimer = 0;
+	ldhl	sp,	#12
 	ld	(hl), #0x00
-;main.c:677: nBlinkState = 0;
+;main.c:683: nBlinkState = 0;
 	ldhl	sp,	#1
-;main.c:678: BGP_REG = 0xE4;
-;main.c:681: if (bPaused)
+;main.c:684: BGP_REG = 0xE4;
+;main.c:687: if (bPaused)
 	xor	a, a
 	ld	(hl-), a
 	ld	a, #0xe4
@@ -9800,241 +9802,295 @@ _main::
 	ld	a, (hl)
 	or	a, a
 	jr	Z, 00106$
-;main.c:683: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+;main.c:689: hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
 	ld	e, #0x01
 	xor	a, a
 	call	_hUGE_mute_channel
-;main.c:684: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+;main.c:690: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
 	ld	e, #0x01
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:685: hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+;main.c:691: hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
 	ld	e, #0x01
 	ld	a, #0x03
 	call	_hUGE_mute_channel
 	jr	00109$
 00106$:
-;main.c:689: hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
+;main.c:695: hUGE_mute_channel(HT_CH1, HT_CH_PLAY);
 	xor	a, a
 	ld	e, a
 	call	_hUGE_mute_channel
-;main.c:690: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+;main.c:696: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
 	ld	e, #0x00
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:691: hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
+;main.c:697: hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
 	ld	e, #0x00
 	ld	a, #0x03
 	call	_hUGE_mute_channel
 00109$:
-;main.c:696: if (!bPaused)
+;main.c:702: if (!bPaused)
 	ldhl	sp,	#0
 	ld	a, (hl)
 	or	a, a
 	jp	NZ, 00132$
-;main.c:699: HandlePlayerInput(&m_oPlayer, m_nJoy);
+;main.c:705: HandlePlayerInput(&m_oPlayer, m_nJoy);
 	ld	a, (_m_nJoy)
 	ld	de, #_m_oPlayer
 	call	_HandlePlayerInput
-;main.c:702: TickSpawnTimer();
+;main.c:708: TickSpawnTimer();
 	call	_TickSpawnTimer
-;main.c:705: if (m_nSpawnTimer <= 0) 
+;main.c:711: if (m_nSpawnTimer <= 0) 
 	ld	a, (#_m_nSpawnTimer)
 	or	a, a
-	jr	NZ, 00149$
-;main.c:708: SpawnNext();
+	jr	NZ, 00154$
+;main.c:714: SpawnNext();
 	call	_SpawnNext
-;main.c:711: m_nSpawnTimer = m_nSpawnDelay;
+;main.c:717: m_nSpawnTimer = m_nSpawnDelay;
 	ld	a, (#_m_nSpawnDelay)
 	ld	(#_m_nSpawnTimer),a
-;main.c:715: for (o = 0; o < MAX_ENEMIES; o++) 
-00149$:
-	ldhl	sp,	#6
+;main.c:721: for (o = 0; o < MAX_ENEMIES; o++) 
+00154$:
+	ldhl	sp,	#11
 	ld	(hl), #0x00
 00137$:
-;main.c:718: if (IsEnemyAlive(o)) 
-	ldhl	sp,	#6
+;main.c:724: if (IsEnemyAlive(o)) 
+	ldhl	sp,	#11
 	ld	a, (hl)
 	call	_IsEnemyAlive
 	or	a, a
 	jr	Z, 00138$
-;main.c:721: UpdateEnemy(o, &m_oPlayer);
+;main.c:727: UpdateEnemy(o, &m_oPlayer);
 	ld	de, #_m_oPlayer
-	ldhl	sp,	#6
+	ldhl	sp,	#11
 	ld	a, (hl)
 	call	_UpdateEnemy
 00138$:
-;main.c:715: for (o = 0; o < MAX_ENEMIES; o++) 
-	ldhl	sp,	#6
+;main.c:721: for (o = 0; o < MAX_ENEMIES; o++) 
+	ldhl	sp,	#11
 	inc	(hl)
 	ld	a, (hl)
 	sub	a, #0x10
 	jr	C, 00137$
-;main.c:726: IncreaseDifficulty();
+;main.c:732: IncreaseDifficulty(m_nDamgeToPlayer);
+	ld	a, (_m_nDamgeToPlayer)
 	call	_IncreaseDifficulty
-;main.c:729: ShowSprayEffect(m_bShowSpray);
+;main.c:735: ShowSprayEffect(m_bShowSpray);
 	ld	a, (_m_bShowSpray)
 	call	_ShowSprayEffect
-;main.c:733: if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
+;main.c:739: if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
 	ld	a, (#_m_bPlayKillSoundEffect)
 	or	a, a
 	jr	Z, 00117$
 	ld	a, (#(_m_oPlayer + 24) + 0)
 	or	a, a
 	jr	NZ, 00117$
-;main.c:735: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+;main.c:741: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
 	ld	e, #0x01
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:738: NR21_REG = 0x84;
+;main.c:744: NR21_REG = 0x84;
 	ld	a, #0x84
 	ldh	(_NR21_REG + 0), a
-;main.c:739: NR22_REG = 0x26;
+;main.c:745: NR22_REG = 0x26;
 	ld	a, #0x26
 	ldh	(_NR22_REG + 0), a
-;main.c:740: NR23_REG = 0x2D;
+;main.c:746: NR23_REG = 0x2D;
 	ld	a, #0x2d
 	ldh	(_NR23_REG + 0), a
-;main.c:741: NR24_REG = 0x81;
+;main.c:747: NR24_REG = 0x81;
 	ld	a, #0x81
 	ldh	(_NR24_REG + 0), a
-;main.c:743: NR41_REG = 0x05;
+;main.c:749: NR41_REG = 0x05;
 	ld	a, #0x05
 	ldh	(_NR41_REG + 0), a
-;main.c:744: NR41_REG = 0xA7;
+;main.c:750: NR41_REG = 0xA7;
 	ld	a, #0xa7
 	ldh	(_NR41_REG + 0), a
-;main.c:745: NR41_REG = 0xC0;
+;main.c:751: NR41_REG = 0xC0;
 	ld	a, #0xc0
 	ldh	(_NR41_REG + 0), a
-;main.c:746: NR41_REG = 0xC0;
+;main.c:752: NR41_REG = 0xC0;
 	ld	a, #0xc0
 	ldh	(_NR41_REG + 0), a
-;main.c:748: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+;main.c:754: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
 	ld	e, #0x00
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:751: m_bPlayKillSoundEffect = FALSE;
-;main.c:754: m_bShowSpray = FALSE;
+;main.c:757: m_bPlayKillSoundEffect = FALSE;
+;main.c:760: m_bShowSpray = FALSE;
 	xor	a, a
 	ld	(#_m_bPlayKillSoundEffect), a
 	ld	(#_m_bShowSpray),a
 00117$:
-;main.c:758: nCurrentHealth = m_oPlayer.nHealth / 10;
-	ld	hl, #(_m_oPlayer + 17)
-	ld	a,	(hl+)
-	ld	h, (hl)
-	ld	e, a
-	ld	bc, #0x000a
-	ld	d, h
-;main.c:759: nCurrentScore = m_oPlayer.nScore;
-	call	__divuint
+;main.c:764: nCurrentHealth = m_oPlayer.nHealth / 10;
+	ld	de, #(_m_oPlayer + 17)
+	ld	a, (de)
 	ldhl	sp,	#2
+	ld	(hl+), a
+	inc	de
+	ld	a, (de)
+	ld	(hl-), a
+	ld	bc, #0x000a
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+;main.c:765: nCurrentScore = m_oPlayer.nScore;
+	call	__divuint
+	ldhl	sp,	#4
 	ld	a, c
 	ld	(hl+), a
 	ld	(hl), b
 	ld	de, #(_m_oPlayer + 20)
 	ld	a, (de)
-	ldhl	sp,	#4
+	ldhl	sp,	#6
 	ld	(hl+), a
 	inc	de
 	ld	a, (de)
 	ld	(hl), a
-;main.c:762: if (m_oPlayer.bTakenDamage)
+;main.c:768: if (m_oPlayer.bTakenDamage)
 	ld	a, (#(_m_oPlayer + 24) + 0)
-	ldhl	sp,#6
-	ld	(hl), a
-	ld	a, (hl)
 	or	a, a
 	jr	Z, 00120$
-;main.c:764: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+;main.c:772: m_oPlayer.nHealth = (m_oPlayer.nHealth < m_nDamgeToPlayer || 
+	ld	bc, #(_m_oPlayer + 17)
+	ld	a, (_m_nDamgeToPlayer)
+	ld	e, a
+	ld	d, #0x00
+	ldhl	sp,	#2
+	ld	a, (hl+)
+	sub	a, e
+	ld	a, (hl)
+	sbc	a, d
+	jr	C, 00144$
+;main.c:773: m_oPlayer.nHealth > 999) ? 0 : m_oPlayer.nHealth - m_nDamgeToPlayer;
+	dec	hl
+	ld	a, #0xe7
+	sub	a, (hl)
+	inc	hl
+	ld	a, #0x03
+	sbc	a, (hl)
+	jr	NC, 00141$
+00144$:
+	xor	a, a
+	ldhl	sp,	#8
+	ld	(hl+), a
+	ld	(hl), a
+	jr	00142$
+00141$:
+	ld	a, (_m_nDamgeToPlayer)
+	ldhl	sp,	#10
+	ld	(hl+), a
+	ld	(hl), #0x00
+	ldhl	sp,#2
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ldhl	sp,	#10
+	ld	a,	(hl+)
+	ld	h, (hl)
+	ld	l, a
+	ld	a, e
+	sub	a, l
+	ld	e, a
+	ld	a, d
+	sbc	a, h
+	ldhl	sp,	#9
+	ld	(hl-), a
+	ld	(hl), e
+00142$:
+	ldhl	sp,	#8
+	ld	a, (hl+)
+	ld	(bc), a
+	inc	bc
+	ld	a, (hl)
+	ld	(bc), a
+;main.c:775: hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
 	ld	e, #0x01
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:767: NR10_REG = 0x0D;
+;main.c:778: NR10_REG = 0x0D;
 	ld	a, #0x0d
 	ldh	(_NR10_REG + 0), a
-;main.c:768: NR11_REG = 0xC2;
+;main.c:779: NR11_REG = 0xC2;
 	ld	a, #0xc2
 	ldh	(_NR11_REG + 0), a
-;main.c:769: NR12_REG = 0x54;
+;main.c:780: NR12_REG = 0x54;
 	ld	a, #0x54
 	ldh	(_NR12_REG + 0), a
-;main.c:770: NR13_REG = 0x63;
+;main.c:781: NR13_REG = 0x63;
 	ld	a, #0x63
 	ldh	(_NR13_REG + 0), a
-;main.c:771: NR14_REG = 0x82;
+;main.c:782: NR14_REG = 0x82;
 	ld	a, #0x82
 	ldh	(_NR14_REG + 0), a
-;main.c:773: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+;main.c:784: hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
 	ld	e, #0x00
 	ld	a, #0x02
 	call	_hUGE_mute_channel
-;main.c:776: m_oPlayer.bTakenDamage = FALSE;
+;main.c:787: m_oPlayer.bTakenDamage = FALSE;
 	ld	hl, #(_m_oPlayer + 24)
 	ld	(hl), #0x00
 00120$:
-;main.c:780: if (nCurrentHealth != m_nPrevHealth)
-	ldhl	sp,	#2
-	ld	a, (hl)
-	ld	hl, #_m_nPrevHealth
+;main.c:791: if (nCurrentHealth != m_nPrevHealth)
+	ld	a, (#_m_nPrevHealth)
+	ldhl	sp,	#4
 	sub	a, (hl)
-	jr	NZ, 00285$
-	ldhl	sp,	#3
-	ld	a, (hl)
-	ld	hl, #_m_nPrevHealth + 1
+	jr	NZ, 00298$
+	ld	a, (#_m_nPrevHealth + 1)
+	ldhl	sp,	#5
 	sub	a, (hl)
 	jr	Z, 00122$
-00285$:
-;main.c:783: SetHealth(nCurrentHealth);
-	ldhl	sp,	#2
+00298$:
+;main.c:794: SetHealth(nCurrentHealth);
+	ldhl	sp,	#4
 	ld	a, (hl+)
 	ld	e, a
 	ld	d, (hl)
 	call	_SetHealth
-;main.c:786: m_nPrevHealth = nCurrentHealth;
-	ldhl	sp,	#2
+;main.c:797: m_nPrevHealth = nCurrentHealth;
+	ldhl	sp,	#4
 	ld	a, (hl)
 	ld	(#_m_nPrevHealth),a
-	ldhl	sp,	#3
+	ldhl	sp,	#5
 	ld	a, (hl)
 	ld	(#_m_nPrevHealth + 1),a
 00122$:
-;main.c:790: if (nCurrentScore != m_nPrevScore) 
+;main.c:801: if (nCurrentScore != m_nPrevScore) 
 	ld	a, (#_m_nPrevScore)
-	ldhl	sp,	#4
+	ldhl	sp,	#6
 	sub	a, (hl)
-	jr	NZ, 00286$
+	jr	NZ, 00299$
 	ld	a, (#_m_nPrevScore + 1)
-	ldhl	sp,	#5
+	ldhl	sp,	#7
 	sub	a, (hl)
 	jr	Z, 00133$
-00286$:
-;main.c:793: SetScore(nCurrentScore);
-	ldhl	sp,	#4
+00299$:
+;main.c:804: SetScore(nCurrentScore);
+	ldhl	sp,	#6
 	ld	a, (hl+)
 	ld	e, a
 	ld	d, (hl)
 	call	_SetScore
-;main.c:796: m_nPrevScore = nCurrentScore;
-	ldhl	sp,	#4
+;main.c:807: m_nPrevScore = nCurrentScore;
+	ldhl	sp,	#6
 	ld	a, (hl)
 	ld	(#_m_nPrevScore),a
-	ldhl	sp,	#5
+	ldhl	sp,	#7
 	ld	a, (hl)
 	ld	(#_m_nPrevScore + 1),a
 	jr	00133$
 00132$:
-;main.c:804: nBlinkTimer++;
-	ldhl	sp,	#7
+;main.c:815: nBlinkTimer++;
+	ldhl	sp,	#12
 	inc	(hl)
-;main.c:806: if (nBlinkTimer >= 20) 
+;main.c:817: if (nBlinkTimer >= 20) 
 	ld	a, (hl)
 	sub	a, #0x14
 	jr	C, 00133$
-;main.c:808: nBlinkTimer = 0;
+;main.c:819: nBlinkTimer = 0;
 	ld	(hl), #0x00
-;main.c:809: nBlinkState = (nBlinkState + 1) % 3;
+;main.c:820: nBlinkState = (nBlinkState + 1) % 3;
 	ldhl	sp,	#1
 	ld	a, (hl)
 	inc	a
@@ -10042,7 +10098,7 @@ _main::
 	call	__moduchar
 	ldhl	sp,	#1
 	ld	(hl), c
-;main.c:811: switch(nBlinkState) 
+;main.c:822: switch(nBlinkState) 
 	ld	a, (hl)
 	or	a, a
 	jr	Z, 00125$
@@ -10055,30 +10111,30 @@ _main::
 	sub	a, #0x02
 	jr	Z, 00127$
 	jr	00133$
-;main.c:813: case 0: BGP_REG = 0xE4; break;  // Normal
+;main.c:824: case 0: BGP_REG = 0xE4; break;  // Normal
 00125$:
 	ld	a, #0xe4
 	ldh	(_BGP_REG + 0), a
 	jr	00133$
-;main.c:814: case 1: BGP_REG = 0xB0; break;  // Dims
+;main.c:825: case 1: BGP_REG = 0xB0; break;  // Dims
 00126$:
 	ld	a, #0xb0
 	ldh	(_BGP_REG + 0), a
 	jr	00133$
-;main.c:815: case 2: BGP_REG = 0xE4; break;  // Normal
+;main.c:826: case 2: BGP_REG = 0xE4; break;  // Normal
 00127$:
 	ld	a, #0xe4
 	ldh	(_BGP_REG + 0), a
-;main.c:816: }
+;main.c:827: }
 00133$:
-;main.c:821: m_nPrevJoy = m_nJoy;
+;main.c:832: m_nPrevJoy = m_nJoy;
 	ld	a, (#_m_nJoy)
 	ld	(#_m_nPrevJoy),a
-;main.c:825: wait_vbl_done();
+;main.c:836: wait_vbl_done();
 	call	_wait_vbl_done
 	jp	00135$
-;main.c:827: }
-	add	sp, #8
+;main.c:838: }
+	add	sp, #13
 	ret
 	.area _CODE
 	.area _INITIALIZER
@@ -10090,4 +10146,6 @@ __xinit__m_nLoadedScore:
 	.dw #0x0000
 __xinit__m_nLoadedShotsTaken:
 	.dw #0x0000
+__xinit__m_nDamgeToPlayer:
+	.db #0x19	; 25
 	.area _CABS (ABS)

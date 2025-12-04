@@ -1,5 +1,5 @@
 @echo off
-echo Building BugSprayer with hUGEDriver...
+echo Building BugSprayer ROM ...
 
 REM Compile your source files WITH include path
 c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o player.o player.c
