@@ -9,14 +9,14 @@ Symbol Table
     .__.H$L.                                                    =   00000000 L
   0 _GetNextSpawnIndex                                              000000A4 GR
   0 _GetSprite                                                      0000023A GR
-  0 _IncreaseDifficulty                                             000004E6 GR
+  0 _IncreaseDifficulty                                             0000054A GR
   0 _InitEnemiesSpawnQueue                                          00000000 GR
   0 _InitEnemy                                                      000000C7 GR
-  0 _IsEnemyAlive                                                   0000062B GR
-  0 _KillEnemy                                                      0000049E GR
+  0 _IsEnemyAlive                                                   0000068F GR
+  0 _KillEnemy                                                      000004C6 GR
   0 _SpawnEnemy                                                     00000107 GR
-  0 _SpawnNext                                                      0000063E GR
-  0 _TickSpawnTimer                                                 00000681 GR
+  0 _SpawnNext                                                      000006A2 GR
+  0 _TickSpawnTimer                                                 000006E5 GR
   0 _UpdateEnemy                                                    00000261 GR
     __modsint                                                       ******** GX
     __moduchar                                                      ******** GX
@@ -60,7 +60,7 @@ Hexadecimal [32-Bits]
 
 Area Table
 
-   0 _CODE                                      size      689   flags    0
+   0 _CODE                                      size      6ED   flags    0
    1 _DATA                                      size      110   flags    0
    2 _INITIALIZED                               size       11   flags    0
    3 _DABS                                      size        0   flags    8

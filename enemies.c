@@ -350,14 +350,8 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
     // touching, so time to apply damge to player.
     else
     {
-        // Damage the player.
-        ptrPlayer->bTakenDamage = TRUE;
-
-        // Increase shots taken count for grade calculation.
-        ptrPlayer->nTotalShotsTaken++;
-
         // Kill the enemy.
-        KillEnemy(ptrEnemy, ptrPlayer);
+        KillEnemy(FALSE, ptrEnemy, ptrPlayer);
 
         // Break out of update      
         // No need to keep updating
@@ -375,14 +369,8 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
             // Check if the enemy is in kill range of the player.
             if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
             {
-                // Increase shots taken count for grade calculation.
-                ptrPlayer->nTotalShotsTaken++;
-
                 // Kill the enemy.
-                KillEnemy(ptrEnemy, ptrPlayer);
-                
-                // Show the spray affect
-                m_bShowSpray = TRUE;
+                KillEnemy(TRUE, ptrEnemy, ptrPlayer);
                 
                 // Break out of update
                 // No need to keep updating
@@ -400,11 +388,15 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
 // KillEnemy: Kill an Enemy object, marking its position in the array as free.
 //
 // Params:
+//      bDoesPlayerScore: Does the player score from this kill?
 //      nEnemyIndex: The position of the enemy in the enemies array.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
+void KillEnemy(BOOLEAN bDoesPlayerScore, Enemy* ptrEnemy, Player* ptrPlayer)
 {
+    // Increase shots taken count for grade calculation.
+    ptrPlayer->nTotalShotsTaken++;
+
     // Mark this enemy as dead.
     ptrEnemy->bAlive = FALSE;
 
@@ -412,9 +404,23 @@ void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
     set_sprite_tile(ptrEnemy->nSpriteID, 0);
     move_sprite(ptrEnemy->nSpriteID, 0, 0);
     
-    // Update score values.
-    ptrPlayer->nScore += 1;
-    m_nTotalKilled += 1;
+    // Only count a kill/score if the player kills.
+    if (bDoesPlayerScore)
+    {
+        // Update score values.
+        ptrPlayer->nScore += 1;
+        m_nTotalKilled += 1;
+
+        // Show the spray affect
+        m_bShowSpray = TRUE;
+    }
+
+    // Only damage the player when a kill happens with no score.
+    else
+    {
+        // Damage the player.
+        ptrPlayer->bTakenDamage = TRUE;
+    }
 
     // Request playing of the enemy kill sound.
     m_bPlayKillSoundEffect = TRUE;

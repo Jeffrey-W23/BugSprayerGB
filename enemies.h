@@ -111,10 +111,11 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer);
 // KillEnemy: Kill an Enemy object, marking its position in the array as free.
 //
 // Params:
+//      bDoesPlayerScore: Does the player score from this kill?
 //      ptrEnemy: Pointer to the current enemy getting killed.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer);
+void KillEnemy(BOOLEAN bDoesPlayerScore, Enemy* ptrEnemy, Player* ptrPlayer);
 
 //--------------------------------------------------------------------------------------
 // IncreaseDifficulty: Increase the spawn rate and speed of enemies based on progress.

@@ -659,13 +659,15 @@ _UpdateEnemy::
 	inc	hl
 	ld	(hl), a
 ;enemies.c:305: if (!ptrEnemy->bAlive) return;
-	pop	hl
-	push	hl
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	c, (hl)
-	ld	a, c
+	pop	bc
+	push	bc
+	inc	bc
+	inc	bc
+	inc	bc
+	ld	a, (bc)
+	ldhl	sp,	#12
+	ld	(hl), a
+	ld	a, (hl)
 	or	a, a
 	jp	Z, 00133$
 ;enemies.c:308: if (!ptrEnemy->bCantMove) 
@@ -970,44 +972,22 @@ _UpdateEnemy::
 	ld	(hl), #0x01
 	jr	00121$
 00120$:
-;enemies.c:354: ptrPlayer->bTakenDamage = TRUE;
-	ldhl	sp,#13
-	ld	a, (hl+)
-	ld	e, a
-	ld	d, (hl)
-	ld	hl, #0x0018
-	add	hl, de
-	ld	(hl), #0x01
-;enemies.c:357: ptrPlayer->nTotalShotsTaken++;
-	ldhl	sp,#13
-	ld	a, (hl+)
-	ld	e, a
-	ld	d, (hl)
-	ld	hl, #0x0016
-	add	hl, de
-	ld	c,l
-	ld	b,h
-	ld	a,	(hl+)
-	ld	h, (hl)
-	ld	l, a
-	inc	hl
-	ld	a, l
-	ld	(bc), a
-	inc	bc
-	ld	a, h
-	ld	(bc), a
-;enemies.c:360: KillEnemy(ptrEnemy, ptrPlayer);
+;enemies.c:354: KillEnemy(FALSE, ptrEnemy, ptrPlayer);
 	ldhl	sp,	#13
 	ld	a, (hl+)
-	ld	c, a
-	ld	b, (hl)
-	pop	de
+	ld	e, a
+	ld	d, (hl)
 	push	de
+	ldhl	sp,	#2
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	xor	a, a
 	call	_KillEnemy
-;enemies.c:365: return;
+;enemies.c:359: return;
 	jp	00133$
 00121$:
-;enemies.c:369: if (!ptrEnemy->bCantMove)
+;enemies.c:363: if (!ptrEnemy->bCantMove)
 	ldhl	sp,#2
 	ld	a, (hl+)
 	ld	e, a
@@ -1020,56 +1000,173 @@ _UpdateEnemy::
 	ld	d, (hl)
 	push	af
 	ld	a, (de)
-	ld	(hl), a
+	ldhl	sp,	#10
 ;enemies.c:321: ptrEnemy->nY += ptrEnemy->nDirY;
+	ld	(hl+), a
 	ld	a, (bc)
-	ld	e, a
+	ld	(hl), a
 	pop	af
-;enemies.c:369: if (!ptrEnemy->bCantMove)
+;enemies.c:363: if (!ptrEnemy->bCantMove)
 	or	a, a
 	jr	NZ, 00130$
-;enemies.c:373: if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
+;enemies.c:367: if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
+	pop	de
 	push	de
-	ldhl	sp,#2
-	ld	a, (hl+)
-	ld	e, a
-	ld	d, (hl)
 	ld	hl, #0x0008
 	add	hl, de
-	pop	de
 	ld	c, l
 	ld	b, h
 	ld	a, (bc)
-	ld	d, a
-	push	de
-	ldhl	sp,#15
+	ldhl	sp,	#10
+	ld	(hl), a
+	ldhl	sp,#13
 	ld	a, (hl+)
 	ld	e, a
 	ld	d, (hl)
 	ld	hl, #0x0013
 	add	hl, de
-	pop	de
-	ld	c, l
-	ld	b, h
-	ld	a, (bc)
-	sub	a, d
-	jr	NZ, 00130$
-;enemies.c:376: if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
+	push	hl
+	ld	a, l
+	ldhl	sp,	#13
+	ld	(hl), a
+	pop	hl
+	ld	a, h
 	ldhl	sp,	#12
+	ld	(hl-), a
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ld	a, (de)
+	ld	(hl-), a
+	dec	hl
+	ld	a, (hl+)
+	inc	hl
+	sub	a, (hl)
+	jr	NZ, 00130$
+;enemies.c:370: if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
+	ldhl	sp,	#8
 	ld	a, (hl)
 	sub	a, #0x3e
 	jr	C, 00130$
 	ld	a, #0x64
 	sub	a, (hl)
 	jr	C, 00130$
-	ld	a, e
+	inc	hl
+	ld	a, (hl)
 	sub	a, #0x3c
 	jr	C, 00130$
 	ld	a, #0x64
-	sub	a, e
+	sub	a, (hl)
 	jr	C, 00130$
-;enemies.c:379: ptrPlayer->nTotalShotsTaken++;
+;enemies.c:373: KillEnemy(TRUE, ptrEnemy, ptrPlayer);
+	ldhl	sp,	#13
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	push	de
+	ldhl	sp,	#2
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ld	a, #0x01
+	call	_KillEnemy
+;enemies.c:378: return;
+	jr	00133$
+00130$:
+;enemies.c:384: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+	ldhl	sp,	#9
+	ld	a, (hl)
+	ldhl	sp,	#12
+	ld	(hl), a
+	ldhl	sp,	#8
+	ld	a, (hl)
+	ldhl	sp,	#11
+	ld	(hl), a
+	pop	hl
+	push	hl
 	inc	hl
+	inc	hl
+	ld	c, (hl)
+;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+	ldhl	sp,	#9
+	ld	a, c
+	ld	(hl+), a
+	xor	a, a
+	ld	(hl-), a
+	ld	a, (hl-)
+	dec	hl
+	ld	(hl+), a
+	ld	(hl), #0x00
+	ld	a, #0x02
+00270$:
+	ldhl	sp,	#7
+	sla	(hl)
+	inc	hl
+	rl	(hl)
+	dec	a
+	jr	NZ, 00270$
+	dec	hl
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ld	hl, #_shadow_OAM
+	add	hl, de
+	push	hl
+	ld	a, l
+	ldhl	sp,	#11
+	ld	(hl), a
+	pop	hl
+	ld	a, h
+	ldhl	sp,	#10
+;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
+	ld	(hl-), a
+	ld	a, (hl+)
+	ld	e, a
+	ld	a, (hl+)
+	inc	hl
+	ld	d, a
+	ld	a, (hl-)
+	dec	hl
+	dec	hl
+	ld	(de), a
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ld	l, e
+	ld	h, d
+	inc	hl
+	push	hl
+	ld	a, l
+	ldhl	sp,	#9
+	ld	(hl), a
+	pop	hl
+	ld	a, h
+	ldhl	sp,	#8
+	ld	(hl-), a
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ldhl	sp,	#11
+	ld	a, (hl)
+	ld	(de), a
+;enemies.c:384: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
+00133$:
+;enemies.c:385: }
+	add	sp, #15
+	ret
+;enemies.c:395: void KillEnemy(BOOLEAN bDoesPlayerScore, Enemy* ptrEnemy, Player* ptrPlayer)
+;	---------------------------------
+; Function KillEnemy
+; ---------------------------------
+_KillEnemy::
+	add	sp, #-3
+	ldhl	sp,	#2
+	ld	(hl), a
+	inc	sp
+	inc	sp
+	push	de
+;enemies.c:398: ptrPlayer->nTotalShotsTaken++;
+	ldhl	sp,#5
 	ld	a, (hl+)
 	ld	e, a
 	ld	d, (hl)
@@ -1086,78 +1183,34 @@ _UpdateEnemy::
 	inc	bc
 	ld	a, h
 	ld	(bc), a
-;enemies.c:382: KillEnemy(ptrEnemy, ptrPlayer);
-	ldhl	sp,	#13
-	ld	a, (hl+)
-	ld	c, a
-	ld	b, (hl)
-	pop	de
-	push	de
-	call	_KillEnemy
-;enemies.c:385: m_bShowSpray = TRUE;
-	ld	hl, #_m_bShowSpray
-	ld	(hl), #0x01
-;enemies.c:390: return;
-	jr	00133$
-00130$:
-;enemies.c:396: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-	ldhl	sp,	#12
-	ld	c, (hl)
-	pop	hl
-	push	hl
-	inc	hl
-	inc	hl
-	ld	b, (hl)
-;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
-	ld	l, b
-	xor	a, a
-	ld	h, a
-	add	hl, hl
-	add	hl, hl
-	push	de
-	ld	de, #_shadow_OAM
-	add	hl, de
-	pop	de
-;c:\gbdk2020\include\gb\gb.h:1974: itm->y=y, itm->x=x;
-	ld	a, e
-	ld	(hl+), a
-	ld	(hl), c
-;enemies.c:396: move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
-00133$:
-;enemies.c:397: }
-	add	sp, #15
-	ret
-;enemies.c:406: void KillEnemy(Enemy* ptrEnemy, Player* ptrPlayer)
-;	---------------------------------
-; Function KillEnemy
-; ---------------------------------
-_KillEnemy::
+;enemies.c:401: ptrEnemy->bAlive = FALSE;
+	pop	bc
 	push	bc
-;enemies.c:409: ptrEnemy->bAlive = FALSE;
-	ld	l, e
-	ld	h, d
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl), #0x00
-;enemies.c:412: set_sprite_tile(ptrEnemy->nSpriteID, 0);
-	inc	de
-	inc	de
-	ld	a, (de)
-	ld	c, a
+	inc	bc
+	inc	bc
+	inc	bc
+	xor	a, a
+	ld	(bc), a
+;enemies.c:404: set_sprite_tile(ptrEnemy->nSpriteID, 0);
+	pop	bc
+	push	bc
+	inc	bc
+	inc	bc
+	ld	a, (bc)
+	ld	e, a
 ;c:\gbdk2020\include\gb\gb.h:1887: shadow_OAM[nb].tile=tile;
 	xor	a, a
-	ld	l, c
+	ld	l, e
 	ld	h, a
 	add	hl, hl
 	add	hl, hl
-	ld	bc, #_shadow_OAM
-	add	hl, bc
+	ld	de, #_shadow_OAM
+	add	hl, de
 	inc	hl
 	inc	hl
 	ld	(hl), #0x00
-;enemies.c:413: move_sprite(ptrEnemy->nSpriteID, 0, 0);
-	ld	a, (de)
+;enemies.c:405: move_sprite(ptrEnemy->nSpriteID, 0, 0);
+	ld	a, (bc)
 	ld	e, a
 ;c:\gbdk2020\include\gb\gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
 	ld	bc, #_shadow_OAM+0
@@ -1171,9 +1224,16 @@ _KillEnemy::
 	xor	a, a
 	ld	(hl+), a
 	ld	(hl), a
-;enemies.c:416: ptrPlayer->nScore += 1;
-	pop	de
-	push	de
+;enemies.c:408: if (bDoesPlayerScore)
+	ldhl	sp,	#2
+	ld	a, (hl)
+	or	a, a
+	jr	Z, 00102$
+;enemies.c:411: ptrPlayer->nScore += 1;
+	ldhl	sp,#5
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
 	ld	hl, #0x0014
 	add	hl, de
 	ld	c,l
@@ -1187,30 +1247,47 @@ _KillEnemy::
 	inc	bc
 	ld	a, h
 	ld	(bc), a
-;enemies.c:417: m_nTotalKilled += 1;
+;enemies.c:412: m_nTotalKilled += 1;
 	ld	hl, #_m_nTotalKilled
 	inc	(hl)
-	jr	NZ, 00105$
+	jr	NZ, 00115$
 	inc	hl
 	inc	(hl)
-00105$:
-;enemies.c:420: m_bPlayKillSoundEffect = TRUE;
+00115$:
+;enemies.c:415: m_bShowSpray = TRUE;
+	ld	hl, #_m_bShowSpray
+	ld	(hl), #0x01
+	jr	00103$
+00102$:
+;enemies.c:422: ptrPlayer->bTakenDamage = TRUE;
+	ldhl	sp,#5
+	ld	a, (hl+)
+	ld	e, a
+	ld	d, (hl)
+	ld	hl, #0x0018
+	add	hl, de
+	ld	c, l
+	ld	b, h
+	ld	(hl), #0x01
+00103$:
+;enemies.c:426: m_bPlayKillSoundEffect = TRUE;
 	ld	hl, #_m_bPlayKillSoundEffect
 	ld	(hl), #0x01
-;enemies.c:421: }
-	inc	sp
-	inc	sp
-	ret
-;enemies.c:429: void IncreaseDifficulty(UINT8 nDamgeToPlayer)
+;enemies.c:427: }
+	add	sp, #3
+	pop	hl
+	pop	af
+	jp	(hl)
+;enemies.c:435: void IncreaseDifficulty(UINT8 nDamgeToPlayer)
 ;	---------------------------------
 ; Function IncreaseDifficulty
 ; ---------------------------------
 _IncreaseDifficulty::
-;enemies.c:432: if (!m_bMaxSpeedReached)
+;enemies.c:438: if (!m_bMaxSpeedReached)
 	ld	a, (#_m_bMaxSpeedReached)
 	or	a, a
 	jr	NZ, 00118$
-;enemies.c:436: if (m_nTotalKilled >= m_nKillsForNextSpeed) 
+;enemies.c:442: if (m_nTotalKilled >= m_nKillsForNextSpeed) 
 	ld	de, #_m_nTotalKilled
 	ld	hl, #_m_nKillsForNextSpeed
 	ld	a, (de)
@@ -1220,10 +1297,10 @@ _IncreaseDifficulty::
 	ld	a, (de)
 	sbc	a, (hl)
 	jr	C, 00118$
-;enemies.c:438: m_nCurrentSpeed++;
+;enemies.c:444: m_nCurrentSpeed++;
 	ld	hl, #_m_nCurrentSpeed
 	inc	(hl)
-;enemies.c:439: if (m_nCurrentSpeed == 2) m_nKillsForNextSpeed = 50;
+;enemies.c:445: if (m_nCurrentSpeed == 2) m_nKillsForNextSpeed = 50;
 	ld	a, (hl)
 	sub	a, #0x02
 	jr	NZ, 00111$
@@ -1234,7 +1311,7 @@ _IncreaseDifficulty::
 	ld	(hl), a
 	jr	00112$
 00111$:
-;enemies.c:440: else if (m_nCurrentSpeed == 3) m_nKillsForNextSpeed = 125;
+;enemies.c:446: else if (m_nCurrentSpeed == 3) m_nKillsForNextSpeed = 125;
 	ld	a, (#_m_nCurrentSpeed)
 	sub	a, #0x03
 	jr	NZ, 00108$
@@ -1245,7 +1322,7 @@ _IncreaseDifficulty::
 	ld	(hl), a
 	jr	00112$
 00108$:
-;enemies.c:441: else if (m_nCurrentSpeed == 4) m_nKillsForNextSpeed = 250;
+;enemies.c:447: else if (m_nCurrentSpeed == 4) m_nKillsForNextSpeed = 250;
 	ld	a, (#_m_nCurrentSpeed)
 	sub	a, #0x04
 	jr	NZ, 00105$
@@ -1256,7 +1333,7 @@ _IncreaseDifficulty::
 	ld	(hl), a
 	jr	00112$
 00105$:
-;enemies.c:442: else if (m_nCurrentSpeed == 5) m_nKillsForNextSpeed = 400;
+;enemies.c:448: else if (m_nCurrentSpeed == 5) m_nKillsForNextSpeed = 400;
 	ld	a, (#_m_nCurrentSpeed)
 	sub	a, #0x05
 	jr	NZ, 00102$
@@ -1266,7 +1343,7 @@ _IncreaseDifficulty::
 	ld	(hl), #0x01
 	jr	00112$
 00102$:
-;enemies.c:443: else m_nKillsForNextSpeed += 150;  // Gradual increase after
+;enemies.c:449: else m_nKillsForNextSpeed += 150;  // Gradual increase after
 	ld	hl, #_m_nKillsForNextSpeed
 	ld	a, (hl)
 	add	a, #0x96
@@ -1275,18 +1352,18 @@ _IncreaseDifficulty::
 	adc	a, #0x00
 	ld	(hl), a
 00112$:
-;enemies.c:446: if (m_nCurrentSpeed >= MAX_SPEED) 
+;enemies.c:452: if (m_nCurrentSpeed >= MAX_SPEED) 
 	ld	hl, #_m_nCurrentSpeed
 	ld	a, (hl)
 	sub	a, #0x08
 	jr	C, 00118$
-;enemies.c:450: m_nCurrentSpeed = MAX_SPEED;
+;enemies.c:456: m_nCurrentSpeed = MAX_SPEED;
 	ld	(hl), #0x08
-;enemies.c:451: m_bMaxSpeedReached = TRUE;
+;enemies.c:457: m_bMaxSpeedReached = TRUE;
 	ld	hl, #_m_bMaxSpeedReached
 	ld	(hl), #0x01
 00118$:
-;enemies.c:457: if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % m_nKillsForNextSpawnRate == 0)
+;enemies.c:463: if (!m_bMaxSpawnRateReached && m_nTotalKilled != 0 && m_nTotalKilled % m_nKillsForNextSpawnRate == 0)
 	ld	a, (#_m_bMaxSpawnRateReached)
 	or	a, a
 	ret	NZ
@@ -1306,7 +1383,7 @@ _IncreaseDifficulty::
 	ld	a, b
 	or	a, c
 	ret	NZ
-;enemies.c:460: if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
+;enemies.c:466: if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
 	ld	a, (#_m_nTotalKilled)
 	ld	hl, #_m_nLastSpawnRateKillCount
 	sub	a, (hl)
@@ -1316,7 +1393,7 @@ _IncreaseDifficulty::
 	sub	a, (hl)
 	ret	Z
 00272$:
-;enemies.c:463: if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
+;enemies.c:469: if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
 	ld	a, (_m_nSpawnDelay)
 	ld	c, a
 	ld	hl, #_m_nTotalKilled
@@ -1330,7 +1407,7 @@ _IncreaseDifficulty::
 	ld	(#_m_nSpawnDelay),a
 	jr	00124$
 00123$:
-;enemies.c:464: else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
+;enemies.c:470: else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
 	ld	hl, #_m_nTotalKilled
 	ld	a, (hl+)
 	sub	a, #0x2c
@@ -1342,12 +1419,12 @@ _IncreaseDifficulty::
 	ld	(#_m_nSpawnDelay),a
 	jr	00124$
 00120$:
-;enemies.c:465: else m_nSpawnDelay -= 1;
+;enemies.c:471: else m_nSpawnDelay -= 1;
 	ld	a, c
 	dec	a
 	ld	(#_m_nSpawnDelay),a
 00124$:
-;enemies.c:468: if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
+;enemies.c:474: if (m_nTotalKilled < 550) m_nKillsForNextSpawnRate = 15;
 	ld	hl, #_m_nTotalKilled
 	ld	a, (hl+)
 	sub	a, #0x26
@@ -1361,7 +1438,7 @@ _IncreaseDifficulty::
 	ld	(hl), a
 	jr	00136$
 00135$:
-;enemies.c:469: else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; nDamgeToPlayer = 40; }
+;enemies.c:475: else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; nDamgeToPlayer = 40; }
 	ld	hl, #_m_nTotalKilled
 	ld	a, (hl+)
 	sub	a, #0x8a
@@ -1375,7 +1452,7 @@ _IncreaseDifficulty::
 	ld	(hl), a
 	jr	00136$
 00132$:
-;enemies.c:470: else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; nDamgeToPlayer = 50; }
+;enemies.c:476: else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; nDamgeToPlayer = 50; }
 	ld	hl, #_m_nTotalKilled
 	ld	a, (hl+)
 	sub	a, #0xb6
@@ -1388,7 +1465,7 @@ _IncreaseDifficulty::
 	ld	(hl), #0x01
 	jr	00136$
 00129$:
-;enemies.c:471: else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
+;enemies.c:477: else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
 	ld	hl, #_m_nTotalKilled
 	ld	a, (hl+)
 	sub	a, #0xd0
@@ -1403,26 +1480,26 @@ _IncreaseDifficulty::
 	ld	(hl), #0x09
 	jr	00136$
 00126$:
-;enemies.c:472: else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
+;enemies.c:478: else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
 	ld	hl, #_m_bMaxSpawnRateReached
 	ld	(hl), #0x01
 	ld	hl, #_m_nCurrentSpeed
 	ld	(hl), #0x0a
 00136$:
-;enemies.c:475: m_nLastSpawnRateKillCount = m_nTotalKilled;
+;enemies.c:481: m_nLastSpawnRateKillCount = m_nTotalKilled;
 	ld	a, (#_m_nTotalKilled)
 	ld	(#_m_nLastSpawnRateKillCount),a
 	ld	a, (#_m_nTotalKilled + 1)
 	ld	(#_m_nLastSpawnRateKillCount + 1),a
-;enemies.c:478: }
+;enemies.c:484: }
 	ret
-;enemies.c:489: BOOLEAN IsEnemyAlive(UINT8 nEnemyIndex) 
+;enemies.c:495: BOOLEAN IsEnemyAlive(UINT8 nEnemyIndex) 
 ;	---------------------------------
 ; Function IsEnemyAlive
 ; ---------------------------------
 _IsEnemyAlive::
 	ld	c, a
-;enemies.c:491: return m_aoEnemies[nEnemyIndex].bAlive;
+;enemies.c:497: return m_aoEnemies[nEnemyIndex].bAlive;
 	ld	b, #0x00
 	ld	l, c
 	ld	h, b
@@ -1437,24 +1514,24 @@ _IsEnemyAlive::
 	inc	hl
 	inc	hl
 	ld	a, (hl)
-;enemies.c:492: }
+;enemies.c:498: }
 	ret
-;enemies.c:497: void SpawnNext(void) 
+;enemies.c:503: void SpawnNext(void) 
 ;	---------------------------------
 ; Function SpawnNext
 ; ---------------------------------
 _SpawnNext::
 	dec	sp
 	dec	sp
-;enemies.c:508: UINT8 nFreeSlot = MAX_ENEMIES;
+;enemies.c:514: UINT8 nFreeSlot = MAX_ENEMIES;
 	ld	c, #0x10
-;enemies.c:512: for (i = 0; i < MAX_ENEMIES; i++) 
+;enemies.c:518: for (i = 0; i < MAX_ENEMIES; i++) 
 	ldhl	sp,	#0
 	xor	a, a
 	ld	(hl+), a
 	ld	(hl), a
 00106$:
-;enemies.c:517: if (!m_aoEnemies[i].bAlive) 
+;enemies.c:523: if (!m_aoEnemies[i].bAlive) 
 	ldhl	sp,	#1
 	ld	e, (hl)
 	ld	d, #0x00
@@ -1473,13 +1550,13 @@ _SpawnNext::
 	ld	a, (hl)
 	or	a, a
 	jr	NZ, 00107$
-;enemies.c:519: nFreeSlot = i;
+;enemies.c:525: nFreeSlot = i;
 	ldhl	sp,	#0
 	ld	c, (hl)
-;enemies.c:520: break;
+;enemies.c:526: break;
 	jr	00103$
 00107$:
-;enemies.c:512: for (i = 0; i < MAX_ENEMIES; i++) 
+;enemies.c:518: for (i = 0; i < MAX_ENEMIES; i++) 
 	ldhl	sp,	#1
 	inc	(hl)
 	ld	a, (hl-)
@@ -1488,38 +1565,38 @@ _SpawnNext::
 	sub	a, #0x10
 	jr	C, 00106$
 00103$:
-;enemies.c:526: if (nFreeSlot == MAX_ENEMIES) return;
+;enemies.c:532: if (nFreeSlot == MAX_ENEMIES) return;
 	ld	a, c
 	sub	a, #0x10
 	jr	Z, 00108$
-;enemies.c:529: nSpawnIndex = GetNextSpawnIndex();
+;enemies.c:535: nSpawnIndex = GetNextSpawnIndex();
 	push	bc
 	call	_GetNextSpawnIndex
 	pop	bc
-;enemies.c:532: SpawnEnemy(nFreeSlot, nSpawnIndex);
+;enemies.c:538: SpawnEnemy(nFreeSlot, nSpawnIndex);
 	ld	e, a
 	ld	a, c
 	inc	sp
 	inc	sp
 	jp	_SpawnEnemy
 00108$:
-;enemies.c:533: }
+;enemies.c:539: }
 	inc	sp
 	inc	sp
 	ret
-;enemies.c:538: void TickSpawnTimer(void) 
+;enemies.c:544: void TickSpawnTimer(void) 
 ;	---------------------------------
 ; Function TickSpawnTimer
 ; ---------------------------------
 _TickSpawnTimer::
-;enemies.c:540: if (m_nSpawnTimer > 0) 
+;enemies.c:546: if (m_nSpawnTimer > 0) 
 	ld	hl, #_m_nSpawnTimer
 	ld	a, (hl)
 	or	a, a
 	ret	Z
-;enemies.c:542: m_nSpawnTimer--;
+;enemies.c:548: m_nSpawnTimer--;
 	dec	(hl)
-;enemies.c:544: }
+;enemies.c:550: }
 	ret
 	.area _CODE
 	.area _INITIALIZER
