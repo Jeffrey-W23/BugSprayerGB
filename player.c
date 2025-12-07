@@ -56,11 +56,11 @@ void InitPlayer(BYTE bMode, Player* ptrPlayer)
 
         // Set the inital values of the spray bullet.
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 95);
+        set_sprite_tile(5, 99);
         move_sprite(5, 0, 0);
     }
 
-    // else if mode 0, meaning the top screen mode.
+    // else if mode 1, meaning the top screen mode.
     else
     {
         ptrPlayer->nX = 80; ptrPlayer->nY = 38;
@@ -294,7 +294,7 @@ void UpdateSprayBullet(Player* ptrPlayer)
         ptrPlayer->nSprayY < 44 || ptrPlayer->nSprayY > 138)
     {
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 95);
+        set_sprite_tile(5, 99);
         return;
     }
 

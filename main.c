@@ -288,7 +288,7 @@ void DisplayStartScreen(void)
 
     // Set sprite data based on spritesheet
     SPRITES_8x8; 
-    set_sprite_data(0, 95, m_caSprites);
+    set_sprite_data(0, 99, m_caSprites);
 
     // Display the sprite layer
     SHOW_SPRITES;
@@ -411,7 +411,7 @@ void DisplayGameOverScreen(void)
 
     // Print various bits of text to make the game over screen.
     printf(" \n"); printf(" \n"); printf(" \n"); printf(" \n");
-    printf("     GAME  OVER     \n"); printf(" \n"); printf(" \n");
+    printf("     GAME  OVER     \n"); printf(" \n");
     
     // Fade back in the gameover screen.
     PerformantDelay(20);
@@ -681,16 +681,39 @@ void main(void)
             nBlinkState = 0;
             BGP_REG = 0xE4;
 
-            // Mute all music while paused.
+            // WHEN PAUSED
             if (bPaused)
             {
+                // Paused the music.
                 hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
                 hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+
+                // My sprite sheets are full, use sprite layer instead.
+                // Set the "Paused.." text
+                set_sprite_tile(0, 95); move_sprite(0, 54, 105); // P
+                set_sprite_tile(1, 89); move_sprite(1, 64, 105); // A
+                set_sprite_tile(2, 96); move_sprite(2, 74, 105); // U
+                set_sprite_tile(3, 97); move_sprite(3, 84, 105); // S
+                set_sprite_tile(4, 98); move_sprite(4, 94, 105); // E
+                set_sprite_tile(5, 90); move_sprite(5, 104, 105); // D
+                set_sprite_tile(39, 94); move_sprite(39, 114, 105); // ..
             }
+
+            // WHEN UNPAUSED
             else
             {
+                // Unpaused the music.
                 hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
                 hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
+
+                // Disable the paused text from the sprite layer.
+                set_sprite_tile(0, 99); move_sprite(0, 0, 0); // P
+                set_sprite_tile(1, 89); move_sprite(1, 0, 0); // A
+                set_sprite_tile(2, 99); move_sprite(2, 0, 0); // U
+                set_sprite_tile(3, 99); move_sprite(3, 0, 0); // S
+                set_sprite_tile(4, 99); move_sprite(4, 0, 0); // E
+                set_sprite_tile(5, 99); move_sprite(5, 0, 0); // D
+                set_sprite_tile(39, 99); move_sprite(39, 0, 0); // ..
             }
         }
 
@@ -737,7 +760,7 @@ void main(void)
             // Show the spray effect if an enemy is killed.
             if (!m_oPlayer.bSprayActive) 
             {
-                set_sprite_tile(5, 95);
+                set_sprite_tile(5, 99);
             }
             
             // Check if an enemy sound effect is needed.

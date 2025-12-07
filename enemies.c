@@ -235,7 +235,7 @@ void SpawnEnemy(UINT8 nEnemyIndex, UINT8 nSpawnIndex)
     ptrEnemy->nSpriteID = m_nNextSpriteID++;
     
     // If the next sprite id ends up too large we can reset.
-    if (m_nNextSpriteID >= 40) m_nNextSpriteID = 7;
+    if (m_nNextSpriteID >= 38) m_nNextSpriteID = 7;
     
     // Store the spawnIndex.
     ptrEnemy->nIndex = nSpawnIndex;
@@ -377,7 +377,7 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
 
             // Reset the bullet for next fire.
             ptrPlayer->bSprayActive = FALSE;
-            set_sprite_tile(5, 95);
+            set_sprite_tile(5, 99);
             move_sprite(5, 0, 0);
             
             // Break out of the method.
