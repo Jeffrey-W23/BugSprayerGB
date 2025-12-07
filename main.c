@@ -572,7 +572,7 @@ void Initialize(void)
     initrand(DIV_REG | (LY_REG << 8));
 
     // Initiate the player and hud objects
-    InitPlayer(&m_oPlayer);
+    InitPlayer(0, &m_oPlayer);
     UpdatePlayer(&m_oPlayer);
     InitHud();
 
@@ -698,7 +698,7 @@ void main(void)
         if (!bPaused)
         {
             // Check for player input, and update player sprites.
-            HandlePlayerInput(&m_oPlayer, m_nJoy);
+            HandlePlayerInput(0, &m_oPlayer, m_nJoy);
 
             // If a spray bullet is active, update
             // its state and position.

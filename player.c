@@ -261,7 +261,7 @@ void FireSprayBullet(Player* ptrPlayer)
 
     // Update the position and direction of the bullet.
     ptrPlayer->nSprayX      = m_anSpraySpawnPosX[d];
-    ptrPlayer->nSprayY      = m_anSpraySpawnPosX[d];
+    ptrPlayer->nSprayY      = m_anSpraySpawnPosY[d];
     ptrPlayer->nSprayDirX   = m_anSprayDirX[d];
     ptrPlayer->nSprayDirY   = m_anSprayDirY[d];
 
