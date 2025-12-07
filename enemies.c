@@ -358,25 +358,30 @@ void UpdateEnemy(UINT8 nEnemyIndex, Player* ptrPlayer)
         // now that enemy is dead.
         return;
     }
-    
-    // Ensure the enemy is moving.
-    if (!ptrEnemy->bCantMove)
+
+    // If the bullet spray is currently active
+    // we want to check if this bullet has hit
+    // the current enemy.
+    if (ptrPlayer->bSprayActive)
     {
-        // Check the enemy direction against player direction.
-        // We only want to kill the enemy the player faces.
-        if ((ptrEnemy->nIndex == ptrPlayer->nDirCheck))
+        // Get the current position of the bullet.
+        UINT8 nSprayX = ptrPlayer->nSprayX;
+        UINT8 nSprayY = ptrPlayer->nSprayY;
+
+        // Check to see if the bullet has hit the enemy.
+        if (nSprayX >= ptrEnemy->nX - 4 && nSprayX <= ptrEnemy->nX + 12 &&
+            nSprayY >= ptrEnemy->nY - 4 && nSprayY <= ptrEnemy->nY + 12)
         {
-            // Check if the enemy is in kill range of the player.
-            if (ptrEnemy->nX >= 62 && ptrEnemy->nX <= 100 && ptrEnemy->nY >= 60 && ptrEnemy->nY <= 100) 
-            {
-                // Kill the enemy.
-                KillEnemy(TRUE, ptrEnemy, ptrPlayer);
-                
-                // Break out of update
-                // No need to keep updating
-                // now that enemy is dead.
-                return;
-            }
+            // Mark the enemy as killed, and we are scoring.
+            KillEnemy(TRUE, ptrEnemy, ptrPlayer);
+
+            // Reset the bullet for next fire.
+            ptrPlayer->bSprayActive = FALSE;
+            set_sprite_tile(5, 95);
+            move_sprite(5, 0, 0);
+            
+            // Break out of the method.
+            return;
         }
     }
 

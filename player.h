@@ -29,15 +29,21 @@ typedef struct Player
     UINT16 nScore;
     UINT16 nTotalShotsTaken;
     BOOLEAN bTakenDamage;
+    BOOLEAN bSprayActive;
+    UINT8 nSprayX;
+    UINT8 nSprayY;
+    INT8 nSprayDirX;
+    INT8 nSprayDirY;
 } Player;
 
 //--------------------------------------------------------------------------------------
 // InitPlayer: Initiate the Player object, updating all its stats and information.
 //
 // Params:
+//      bMode: The gameMode to prepare the player object for.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void InitPlayer(Player* ptrPlayer);
+void InitPlayer(BYTE bMode, Player* ptrPlayer);
 
 //--------------------------------------------------------------------------------------
 // UpdatePlayer: Update the player object each frame, updating direction, sprites,
@@ -52,18 +58,27 @@ void UpdatePlayer(Player* ptrPlayer);
 // HandlePlayerInput: Check for input for updating the player rotation.
 //
 // Params:
+//      bMode: The gameMode to prepare the player object for.
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //      nJoy: The Joypad for checking input.
 //--------------------------------------------------------------------------------------
-void HandlePlayerInput(Player* ptrPlayer, UINT8 nJoy);
+void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy);
 
 //--------------------------------------------------------------------------------------
-// ShowSprayEffect: Show the spray sprite next to the player on enemy kills.
+// FireSprayBullet: Initiate the spray bullet, spawning it and preparing it for movement.
 //
 // Params:
-//      bShowSpray: To show the spray or not.
+//      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
-void ShowSprayEffect(BOOLEAN bShowSpray);
+void FireSprayBullet(Player* ptrPlayer);
+
+//--------------------------------------------------------------------------------------
+// UpdateSprayBullet: Update the position and state of the spray bullet during active fire.
+//
+// Params:
+//      ptrPlayer: Pointer of the player object, for passing in the main player object.
+//--------------------------------------------------------------------------------------
+void UpdateSprayBullet(Player* ptrPlayer);
 
 // Close the Header.
 #endif

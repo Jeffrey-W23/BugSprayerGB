@@ -52,6 +52,7 @@ typedef struct
     UINT8 nSubPixelY;
     UINT8 nSpriteNumber;
     BOOLEAN bMainSpriteSet;
+    BOOLEAN bHitByBullet;
 } Enemy;
 
 //--------------------------------------------------------------------------------------

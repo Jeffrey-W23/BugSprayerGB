@@ -470,22 +470,22 @@ void DisplayGameOverScreen(void)
         m_oPlayer.nScore % 10);
         
     // Grade title with spacing.
-    //printf(" \n"); printf("      GRADE:");
+    printf(" \n"); printf("      GRADE:");
         
     // Show the current score accuracy grade.
-    //ShowScoreGrade(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+    ShowScoreGrade(m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
 
     // Highscore title and spacing.
     printf(" \n"); printf(" \n"); printf(" \n");
     printf("    HIGH  SCORE: ");printf(" \n");printf(" \n");
 
     // Show the highscore with 0 to ensure we show all 4 digits.
-    printf("        %u%u%u%u  ", m_nLoadedScore / 1000, 
+    printf("      %u%u%u%u  ", m_nLoadedScore / 1000, 
         (m_nLoadedScore / 100) % 10, (m_nLoadedScore / 10) % 10, 
         m_nLoadedScore % 10);
     
     // Show the highscore accuracy grade.
-    //ShowScoreGrade(m_nLoadedScore, m_nLoadedShotsTaken);
+    ShowScoreGrade(m_nLoadedScore, m_nLoadedShotsTaken);
     
     // Press start title with spacing.
     printf("      \n"); printf(" \n");
@@ -700,6 +700,13 @@ void main(void)
             // Check for player input, and update player sprites.
             HandlePlayerInput(&m_oPlayer, m_nJoy);
 
+            // If a spray bullet is active, update
+            // its state and position.
+            if (m_oPlayer.bSprayActive)
+            {
+                UpdateSprayBullet(&m_oPlayer);
+            }
+
             // Tick the spawn timer each frame. 
             TickSpawnTimer();
             
@@ -728,7 +735,10 @@ void main(void)
             IncreaseDifficulty(m_nDamgeToPlayer);
 
             // Show the spray effect if an enemy is killed.
-            ShowSprayEffect(m_bShowSpray);
+            if (!m_oPlayer.bSprayActive) 
+            {
+                set_sprite_tile(5, 95);
+            }
             
             // Check if an enemy sound effect is needed.
             // Play once per frame instead of every enemy.
