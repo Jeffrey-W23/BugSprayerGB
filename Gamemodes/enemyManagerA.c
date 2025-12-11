@@ -6,12 +6,12 @@
 //--------------------------------------------------------------------------------------
 
 // Define the header.
-#include "enemyManagerA.h"
+#include "../Gamemodes/enemyManagerA.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <gb/gb.h>
 #include <rand.h>
-#include "enemies.h"
+#include "../Entities/enemies.h"
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------

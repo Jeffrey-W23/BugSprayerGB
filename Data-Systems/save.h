@@ -11,17 +11,17 @@
 // includes, using, etc
 #include <gb/gb.h>
 
-
-
-
-
+// PUBLIC VARIABLES //
+//--------------------------------------------------------------------------------------
+// New unsigned int 16 for temp storing the highscore data for gameModeA
 extern UINT16 m_nHighScoreA;
+
+// New unsigned int 16 for temp storing the highscore data for gameModeB
 extern UINT16 m_nHighScoreB;
+
+// New unsigned int 16 for temp storing the data for shots taken.
 extern UINT16 m_nSavedShotsB;
-
-
-
-
+//--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
 // InitSaveData: Initiate the saving/loading system.

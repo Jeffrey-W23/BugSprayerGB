@@ -11,7 +11,7 @@
 
 // includes, using, etc
 #include <gb/gb.h>
-#include "player.h"
+#include "../Entities/player.h"
 
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------

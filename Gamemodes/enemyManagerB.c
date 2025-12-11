@@ -6,9 +6,8 @@
 //--------------------------------------------------------------------------------------
 
 // includes, using, etc
-#include "enemyManagerB.h"
-#include "enemy.h"
-#include "enemies.h"
+#include "../Gamemodes/enemyManagerB.h"
+#include "../Entities/enemies.h"
 #include <rand.h>
 
 // PRIVATE VARIABLES //
