@@ -80,5 +80,14 @@ void FireSprayBullet(Player* ptrPlayer);
 //--------------------------------------------------------------------------------------
 void UpdateSprayBullet(Player* ptrPlayer);
 
+//--------------------------------------------------------------------------------------
+// ShowSprayEffect: Show the spray sprite next to the player on enemy kills.
+//
+// Params:
+//      ptrPlayer: Pointer of the player object, for passing in the main player object.
+//      bShowSpray: To show the spray or not.
+//--------------------------------------------------------------------------------------
+void ShowSprayEffect(Player* ptrPlayer, BOOLEAN bShowSpray);
+
 // Close the Header.
 #endif

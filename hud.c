@@ -12,14 +12,7 @@
 //--------------------------------------------------------------------------------------
 // Const ints for easily letter setting for the HUD.
 #define TILE_0     74
-#define TILE_H     84
-#define TILE_P     85
 #define TILE_COLON 86
-#define TILE_S     87
-#define TILE_C     88
-#define TILE_O     89
-#define TILE_R     90
-#define TILE_E     91
 
 // New static unisigned int 16 for the current health of the hud.
 static UINT16 m_nCurrentHealth = 998;
@@ -49,17 +42,51 @@ void SetHealth(UINT16 nHealth)
     UINT8 ones = nHealth % 10;
     
     // Prepare array of ints for storing sprites in order.
-    UINT8 tiles[5];
+    UINT8 tiles[4];
 
     // Set each of the letters, and health in display order.
-    tiles[0] = TILE_H;
-    tiles[1] = TILE_P;
-    tiles[2] = TILE_COLON;
-    tiles[3] = TILE_0 + tens;
-    tiles[4] = TILE_0 + ones;
+    tiles[0] = 84;
+    tiles[1] = 86;
+    tiles[2] = TILE_0 + tens;
+    tiles[3] = TILE_0 + ones;
 
     // Update the background sprite layer.
-    set_bkg_tiles(1, 17, 5, 1, tiles);
+    set_bkg_tiles(2, 17, 4, 1, tiles);
+}
+
+//--------------------------------------------------------------------------------------
+// SetHealthHearts: Set data and display everything needed for the Health UI as hearts.
+//
+// Params:
+//      nHealth: int for setting the health UI on the background layer.
+//--------------------------------------------------------------------------------------
+void SetHealthHearts(UINT8 nHealth) 
+{
+    // Delcare Iterator needed 
+    // for for loop in method.
+    UINT8 o;
+
+    // Prepare array of ints for storing sprites in order.
+    UINT8 tiles[7];
+
+    // Set each of the letters, and health in display order.
+    tiles[0] = 84;
+    tiles[1] = 86;
+
+    // Loop through amount of heart slots
+    for (o = 0; o < 5; o++) 
+    {
+        // Apply heart in slot
+        if (o < nHealth)
+            tiles[o+2] = 122;
+
+        // Apply empty slot
+        else
+            tiles[o+2] = 121;
+    }
+
+    // Update the background sprite layer.
+    set_bkg_tiles(2, 17, 7, 1, tiles);
 }
 
 //--------------------------------------------------------------------------------------
@@ -77,18 +104,15 @@ void SetScore(UINT16 nScore)
     UINT8 ones = nScore % 10;
 
     // Set each of the letters, and score in display order.
-    UINT8 tiles[10];
-    tiles[0] = TILE_S;
-    tiles[1] = TILE_C;
-    tiles[2] = TILE_O;
-    tiles[3] = TILE_R;
-    tiles[4] = TILE_E;
-    tiles[5] = TILE_COLON;
-    tiles[6] = TILE_0 + thousands;
-    tiles[7] = TILE_0 + hundreds;
-    tiles[8] = TILE_0 + tens;
-    tiles[9] = TILE_0 + ones;
+    UINT8 tiles[7];
+    tiles[0] = 90;
+    tiles[1] = 91;
+    tiles[2] = TILE_COLON;
+    tiles[3] = TILE_0 + thousands;
+    tiles[4] = TILE_0 + hundreds;
+    tiles[5] = TILE_0 + tens;
+    tiles[6] = TILE_0 + ones;
 
     // Update the background sprite layer.
-    set_bkg_tiles(9, 17, 10, 1, tiles);
+    set_bkg_tiles(11, 17, 7, 1, tiles);
 }

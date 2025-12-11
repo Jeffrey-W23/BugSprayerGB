@@ -26,6 +26,14 @@ void InitHud(void);
 void SetHealth(UINT16 hp);
 
 //--------------------------------------------------------------------------------------
+// SetHealthHearts: Set data and display everything needed for the Health UI as hearts.
+//
+// Params:
+//      nHealth: int for setting the health UI on the background layer.
+//--------------------------------------------------------------------------------------
+void SetHealthHearts(UINT8 hp);
+
+//--------------------------------------------------------------------------------------
 // SetScore: Set data and display everything needed for the Score UI.
 //
 // Params:

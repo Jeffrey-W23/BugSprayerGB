@@ -1,6 +1,6 @@
 /*
 
- SPRITES.H
+ GAMESELECTTILES.H
 
  Include File.
 
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 126
+  Tiles                : 0 to 124
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -22,14 +22,14 @@
 
 */
 
-#ifndef __Sprites_h_INCLUDE
-#define __Sprites_h_INCLUDE
+#ifndef __GameSelectTiles_h_INCLUDE
+#define __GameSelectTiles_h_INCLUDE
 
 /* Bank of tiles. */
-#define m_caSpritesBank 0
+#define m_caGameSelectTilesBank 0
 /* Start of tile array. */
-extern const unsigned char m_caSprites[];
+extern const unsigned char m_caGameSelectTiles[];
 
 #endif
 
-/* End of SPRITES.H */
+/* End of GAMESELECTTILES.H */

@@ -9,15 +9,15 @@
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
-// New bool for if the b button has been pressed.
-static BOOLEAN m_bButtonBPressed = FALSE;
+// New bool for if the spary is currently showing.
+static BOOLEAN m_bIsSprayShowing = FALSE;
 
 // New unsigned int 8 for storing the last movement of joypad.
 static UINT8 m_nPrevJoy = 0;
 
 // New const arrays of unsigned int 8s, used for the spawn positions of the spray bullet.
-const UINT8 m_anSpraySpawnPosX[8] = { 72, 80, 88, 68, 92, 70, 80, 90 };
-const UINT8 m_anSpraySpawnPosY[8] = { 72, 70, 72, 82, 82, 92, 94, 92 };
+const UINT8 m_anSpraySpawnPosX[8] = { 75, 84, 92, 74, 94, 76, 84, 92 };
+const UINT8 m_anSpraySpawnPosY[8] = { 75, 74, 75, 84, 84, 92, 94, 91 };
 
 // New const array of unsigned int 8s for the different sprites for each spray bullet direction.
 const UINT8 m_ansprayTileIDs[8] = {40, 33, 34, 39, 35, 38, 37, 36};
@@ -50,22 +50,24 @@ void InitPlayer(BYTE bMode, Player* ptrPlayer)
     if (bMode == 0)
     {
         // Set the intital values for the player.
-        ptrPlayer->nX = 76; ptrPlayer->nY = 78;
+        ptrPlayer->nX = 80; ptrPlayer->nY = 80;
         ptrPlayer->nDirection = 0; ptrPlayer->nDirCheck = 4;
         ptrPlayer->nHealth = 998; 
 
         // Set the inital values of the spray bullet.
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 99);
+        set_sprite_tile(5, 111);
         move_sprite(5, 0, 0);
     }
 
     // else if mode 1, meaning the top screen mode.
     else
     {
-        ptrPlayer->nX = 80; ptrPlayer->nY = 38;
+        ptrPlayer->nX = 80; ptrPlayer->nY = 46;
         ptrPlayer->nDirection = 2; ptrPlayer->nDirCheck = 6;
-        ptrPlayer->nHealth = 998;
+        ptrPlayer->nHealth = 3;
+        ptrPlayer->nSprayX = 76;
+        ptrPlayer->nSprayY = 62;
     }
 
     // Set all player inital values.
@@ -143,7 +145,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 1;
             ptrPlayer->nDirCheck = 7;
-            move_sprite(5, 90, 92);
         }
 
         // DOWN-LEFT
@@ -151,7 +152,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 3;
             ptrPlayer->nDirCheck = 5;
-            move_sprite(5, 70, 92);
         }
         
         // UP-LEFT
@@ -159,7 +159,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 5;
             ptrPlayer->nDirCheck = 0;
-            move_sprite(5, 70, 72);
         }
         
         // UP-RIGHT
@@ -167,7 +166,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 7;
             ptrPlayer->nDirCheck = 2;
-            move_sprite(5, 90, 72);
         }
         
         // RIGHT
@@ -175,7 +173,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 0;
             ptrPlayer->nDirCheck = 4;
-            move_sprite(5, 92, 82);
         }
         
         // DOWN
@@ -183,7 +180,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 2;
             ptrPlayer->nDirCheck = 6;
-            move_sprite(5, 80, 94);
         }
         
         // LEFT
@@ -191,7 +187,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 4;
             ptrPlayer->nDirCheck = 3;
-            move_sprite(5, 68, 82);
         }
         
         
@@ -200,7 +195,6 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             ptrPlayer->nDirection = 6;
             ptrPlayer->nDirCheck = 1;
-            move_sprite(5, 80, 70);
         }
 
         // On A Button click, fire the spray bullet.
@@ -220,18 +214,53 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         // Move the player along the x axis only, moving between 3 set positions.
 
         // On Left Joypad input
-        if (nPressed & J_LEFT) {
-            if (ptrPlayer->nX == 80)  ptrPlayer->nX = 32;           // Move to: LEFT
-            else if (ptrPlayer->nX == 128) ptrPlayer->nX = 80;      // Move to: MIDDLE
-            else ptrPlayer->nX = 32;                                // Move to: STAY LEFT
+        if (nPressed & J_LEFT || nPressed & J_B) {
+            
+            // Move to: LEFT
+            if (ptrPlayer->nX == 80)
+            {
+                ptrPlayer->nX = 52; 
+                ptrPlayer->nSprayX = 56;
+            }  
+            
+            // Move to: MIDDLE
+            else if (ptrPlayer->nX == 108)
+            {
+                ptrPlayer->nX = 80;
+                ptrPlayer->nSprayX = 84;
+            }
+
+            // Move to: STAY LEFT
+            else 
+            {
+                ptrPlayer->nX = 52;
+                ptrPlayer->nSprayX = 56;
+            }
         }
 
         // On Right Joypad input
-        if (nPressed & J_RIGHT) 
+        if (nPressed & J_RIGHT || nPressed & J_A) 
         {
-            if (ptrPlayer->nX == 32)  ptrPlayer->nX = 80;           // Move to: MIDDLE
-            else if (ptrPlayer->nX == 80)  ptrPlayer->nX = 128;     // Move to: RIGHT
-            else ptrPlayer->nX = 128;                               // Most to: STAY RIGHT
+            // Move to: MIDDLE
+            if (ptrPlayer->nX == 52)
+            {
+                ptrPlayer->nX = 80;
+                ptrPlayer->nSprayX = 84;
+            }
+
+            // Move to: RIGHT
+            else if (ptrPlayer->nX == 52)
+            {
+                ptrPlayer->nX = 108;
+                ptrPlayer->nSprayX = 112;
+            }
+            
+            // Most to: STAY RIGHT
+            else
+            {
+                ptrPlayer->nX = 108;
+                ptrPlayer->nSprayX = 112;
+            }
         }
     }
 
@@ -256,14 +285,17 @@ void FireSprayBullet(Player* ptrPlayer)
     // Play spray sound.
     NR41_REG = 0x2D; NR42_REG = 0x81; NR43_REG = 0x10; NR44_REG = 0x80;
 
+    // Increase shots taken count for grade calculation.
+    ptrPlayer->nTotalShotsTaken++;
+
     // Store direction check val for easier access.
     UINT8 d = ptrPlayer->nDirCheck;
 
     // Update the position and direction of the bullet.
-    ptrPlayer->nSprayX      = m_anSpraySpawnPosX[d];
-    ptrPlayer->nSprayY      = m_anSpraySpawnPosY[d];
-    ptrPlayer->nSprayDirX   = m_anSprayDirX[d];
-    ptrPlayer->nSprayDirY   = m_anSprayDirY[d];
+    ptrPlayer->nSprayX = m_anSpraySpawnPosX[d];
+    ptrPlayer->nSprayY = m_anSpraySpawnPosY[d];
+    ptrPlayer->nSprayDirX = m_anSprayDirX[d];
+    ptrPlayer->nSprayDirY = m_anSprayDirY[d];
 
     // Mark the bullet as active, there can only be one.
     ptrPlayer->bSprayActive = TRUE;
@@ -285,8 +317,8 @@ void UpdateSprayBullet(Player* ptrPlayer)
     if (!ptrPlayer->bSprayActive) return;
 
     // Update the position of the bullet based on direction.
-    ptrPlayer->nSprayX += ptrPlayer->nSprayDirX << 1;
-    ptrPlayer->nSprayY += ptrPlayer->nSprayDirY << 1;
+    ptrPlayer->nSprayX += ptrPlayer->nSprayDirX << 2;
+    ptrPlayer->nSprayY += ptrPlayer->nSprayDirY << 2;
 
     // Set the boundary of the bullet, if it gets to the screen
     // edge we want to despawn, reset for next fire.
@@ -294,10 +326,57 @@ void UpdateSprayBullet(Player* ptrPlayer)
         ptrPlayer->nSprayY < 44 || ptrPlayer->nSprayY > 138)
     {
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 99);
+        set_sprite_tile(5, 111);
         return;
     }
 
     // Update the position of the sprite.
     move_sprite(5, ptrPlayer->nSprayX, ptrPlayer->nSprayY);
+}
+
+//--------------------------------------------------------------------------------------
+// ShowSprayEffect: Show the spray sprite next to the player on enemy kills.
+//
+// Params:
+//      ptrPlayer: Pointer of the player object, for passing in the main player object.
+//      bShowSpray: To show the spray or not.
+//--------------------------------------------------------------------------------------
+void ShowSprayEffect(Player* ptrPlayer, BOOLEAN bShowSpray)
+{
+    // On bShowSpray, update the sprite of the
+    // spray object, setting the sprite based on current
+    // player direction, showing each different angle of 
+    // the spray.
+    if (bShowSpray)
+    {
+        // Ensure we only update the spray one at a time.
+        if (!m_bIsSprayShowing)
+        {
+            // Mark button as pressed.
+            m_bIsSprayShowing = TRUE;
+
+            // Play the spray sound
+            NR41_REG = 0x2D;
+            NR42_REG = 0x81;
+            NR43_REG = 0x10;
+            NR44_REG = 0x80;
+
+            // Set the sprite active.
+            set_sprite_tile(5, m_ansprayTileIDs[ptrPlayer->nDirCheck]);
+            move_sprite(5, ptrPlayer->nSprayX, ptrPlayer->nSprayY);
+            return;
+        }
+
+        // Disable the spray
+        set_sprite_tile(5, 111);
+    }
+
+    // Else done spraying, reset for next use.
+    else
+    {
+        m_bIsSprayShowing = FALSE;
+    
+        // Set the spray to a blank object when not needed.
+        set_sprite_tile(5, 111);
+    }
 }

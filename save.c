@@ -13,71 +13,90 @@
 #define SAVE_MAGIC 0x55AA
 //--------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------
-// SaveGameData: Store the passed score and shotTaken data to memory.
-//
-// Params:
-//      nScore: The score from the player.
-//      nShotsTaken: The total shots taken by the player.
-//--------------------------------------------------------------------------------------
-void SaveGameData(UINT16 nScore, UINT16 nShotsTaken) 
+
+
+
+// These are your runtime cached values (in WRAM)
+UINT16 m_nHighScoreA = 0;
+UINT16 m_nHighScoreB = 0;
+UINT16 m_nSavedShotsB = 0;
+
+
+
+
+
+
+void InitSaveData(void)
 {
-    // Declare for later use.
-    static UINT16 highScore = 0;
-    static UINT16 savedShots = 0;
+    // Enable SRAM - raw version, always works
+    *((volatile UINT8*)0x0000) = 0x0A;
 
-    // Ensure the data is actually different before saving.
-    if (nScore > highScore || nShotsTaken != savedShots) 
+    volatile UINT16 *sram = (volatile UINT16*)0xA000;
+
+    if (sram[0] == SAVE_MAGIC)
     {
-        highScore = nScore;
-        savedShots = nShotsTaken;
+        m_nHighScoreA  = sram[1];
+        m_nHighScoreB  = sram[2];
+        m_nSavedShotsB = sram[3];
+    }
+    else
+    {
+        // First boot ever - clear everything
+        m_nHighScoreA = m_nHighScoreB = m_nSavedShotsB = 0;
 
-         // Enable SRAM
+        sram[0] = SAVE_MAGIC;
+        sram[1] = 0;
+        sram[2] = 0;
+        sram[3] = 0;
+    }
+
+    // Disable SRAM
+    *((volatile UINT8*)0x0000) = 0x00;
+}
+
+void SaveGameData(BOOLEAN bMode, UINT16 nScore, UINT16 nShotsTaken)
+{
+    UINT8 need_save = 0;
+
+    if (bMode == 0)  // Mode A
+    {
+        if (nScore > m_nHighScoreA)
+        {
+            m_nHighScoreA = nScore;
+            need_save = 1;
+        }
+    }
+    else  // Mode B
+    {
+        if (nScore > m_nHighScoreB)
+        {
+            m_nHighScoreB = nScore;
+            m_nSavedShotsB = nShotsTaken;
+            need_save = 1;
+        }
+    }
+
+    if (need_save)
+    {
         *((volatile UINT8*)0x0000) = 0x0A;
-        volatile UINT16* sram = (volatile UINT16*)0xA000;
+        volatile UINT16 *sram = (volatile UINT16*)0xA000;
 
-        // Store the data.
-        sram[0] = SAVE_MAGIC;    // magic number
-        sram[1] = highScore;     // high score
-        sram[2] = savedShots;    // shots taken
+        sram[0] = SAVE_MAGIC;
+        sram[1] = m_nHighScoreA;
+        sram[2] = m_nHighScoreB;
+        sram[3] = m_nSavedShotsB;
 
-         // Disable SRAM
         *((volatile UINT8*)0x0000) = 0x00;
     }
 }
 
-//--------------------------------------------------------------------------------------
-// LoadGameData: Load saved data stored in memory, setting that data to passed pointers.
-//
-// Params:
-//      nScore: Pointer to the loaded score variable to store during runtime.
-//      nShotsTaken: Pointer to the loaded shotsTaken variable to store during runtime. 
-//--------------------------------------------------------------------------------------
-void LoadGameData(UINT16* nScore, UINT16* nShotsTaken)
- {
-     // Enable SRAM
-    *((volatile UINT8*)0x0000) = 0x0A;
-    volatile UINT16* sram = (volatile UINT16*)0xA000;
-
-    // Check memory for data.
-    if (sram[0] == SAVE_MAGIC) 
+void LoadGameData(BOOLEAN bMode, UINT16* nScore, UINT16* nShotsTaken)
+{
+    if (bMode == 0)
+        *nScore = m_nHighScoreA;
+    else
     {
-        // Get the data.
-        *nScore = sram[1];
-        *nShotsTaken = sram[2];
-    } 
-
-    // Else if nothing
-    else 
-    {
-        // Set data to blank values
-        *nScore = 0;
-        *nShotsTaken = 0;
-        sram[0] = SAVE_MAGIC;
-        sram[1] = 0;
-        sram[2] = 0;
+        *nScore = m_nHighScoreB;
+        *nShotsTaken = m_nSavedShotsB;
     }
-
-     // Disable SRAM
-    *((volatile UINT8*)0x0000) = 0x00;
 }
