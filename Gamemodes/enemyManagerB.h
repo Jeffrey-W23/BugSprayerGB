@@ -15,11 +15,6 @@
 
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
-// Const ints for magic numbers used through out spawn logic.
-#define NUM_SPAWNPOINTS 8
-#define SPAWN_QUEUE_SIZEB 64
-#define MAX_SPEED 8
-
 // New unsigned int 8 for keeping track of the current spawn tick.
 extern UINT8 m_nSpawnTimer;
 

@@ -8,7 +8,7 @@
    Section       : 
    Bank          : 0
    Map size      : 20 x 18
-   Tile set      : C:\Users\Thomas Wiltshire\Documents\GitHub\DiggingSimulator1989\Gbtd-Gbmb\startscreen.gbr
+   Tile set      : C:\Users\Thomas Wiltshire\Documents\GitHub\BugSprayerGB\Gbtd-Gbmb\startscreen.gbr
    Plane count   : 1 plane (8 bits)
    Plane order   : Tiles are continues
    Tile offset   : 0

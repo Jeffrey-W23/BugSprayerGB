@@ -1,6 +1,6 @@
 /*
 
- GAMESELECTTILES.H
+ LETTERS.H
 
  Include File.
 
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 81
+  Tiles                : 0 to 39
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -22,14 +22,14 @@
 
 */
 
-#ifndef __GameSelectTiles_h_INCLUDE
-#define __GameSelectTiles_h_INCLUDE
+#ifndef __Letters_h_INCLUDE
+#define __Letters_h_INCLUDE
 
 /* Bank of tiles. */
-#define m_caGameSelectTilesBank 0
+#define m_caLettersBank 0
 /* Start of tile array. */
-extern const unsigned char m_caGameSelectTiles[];
+extern const unsigned char m_caLetters[];
 
 #endif
 
-/* End of GAMESELECTTILES.H */
+/* End of LETTERS.H */

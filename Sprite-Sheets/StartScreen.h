@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 126
+  Tiles                : 0 to 98
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -26,7 +26,7 @@
 #define __StartScreen_h_INCLUDE
 
 /* Bank of tiles. */
-#define StartScreenBank 0
+#define m_caStartScreenTilesBank 0
 /* Start of tile array. */
 extern const unsigned char m_caStartScreenTiles[];
 

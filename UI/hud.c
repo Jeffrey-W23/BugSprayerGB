@@ -11,8 +11,9 @@
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
 // Const ints for easily letter setting for the HUD.
-#define TILE_0     74
-#define TILE_COLON 86
+#define TILE_0     154
+#define TILE_COLON 164
+#define TILE_HEART 99
 
 // New static unisigned int 16 for the current health of the hud.
 static UINT16 m_nCurrentHealth = 998;
@@ -45,8 +46,8 @@ void SetHealth(UINT16 nHealth)
     UINT8 tiles[4];
 
     // Set each of the letters, and health in display order.
-    tiles[0] = 84;
-    tiles[1] = 86;
+    tiles[0] = TILE_HEART;
+    tiles[1] = TILE_COLON;
     tiles[2] = TILE_0 + tens;
     tiles[3] = TILE_0 + ones;
 
@@ -70,19 +71,19 @@ void SetHealthHearts(UINT8 nHealth)
     UINT8 tiles[7];
 
     // Set each of the letters, and health in display order.
-    tiles[0] = 84;
-    tiles[1] = 86;
+    tiles[0] = TILE_HEART;
+    tiles[1] = TILE_COLON;
 
     // Loop through amount of heart slots
     for (o = 0; o < 5; o++) 
     {
         // Apply heart in slot
         if (o < nHealth)
-            tiles[o+2] = 122;
+            tiles[o+2] = 97;
 
         // Apply empty slot
         else
-            tiles[o+2] = 121;
+            tiles[o+2] = 98;
     }
 
     // Update the background sprite layer.
@@ -105,8 +106,8 @@ void SetScore(UINT16 nScore)
 
     // Set each of the letters, and score in display order.
     UINT8 tiles[7];
-    tiles[0] = 90;
-    tiles[1] = 91;
+    tiles[0] = 100;
+    tiles[1] = 101;
     tiles[2] = TILE_COLON;
     tiles[3] = TILE_0 + thousands;
     tiles[4] = TILE_0 + hundreds;

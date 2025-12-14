@@ -12,6 +12,11 @@
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
+// Const ints for magic numbers used through out spawn logic.
+#define NUM_SPAWNPOINTS 8
+#define SPAWN_QUEUE_SIZEB 64
+#define MAX_SPEED 8
+
 // New array of unsigned int 8s for the spawn queue.
 static UINT8 m_anSpawnQueue[SPAWN_QUEUE_SIZEB];
 

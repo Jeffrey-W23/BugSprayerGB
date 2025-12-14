@@ -12,9 +12,6 @@
 
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
-// Const ints for magic numbers used through out spawn logic.
-#define MAX_ENEMIES 16
-
 // New unsigned int 8 for storing the next avaliable spriteID, used during spawning.
 UINT8 m_nNextSpriteID = 7;
 
@@ -88,7 +85,7 @@ void UpdateEnemyModeA(UINT8 nEnemyIndex, Player* ptrPlayer)
         UINT8 progress = ptrEnemy->nEnterCounter;
 
         // Set the sprite of the enemy to a turn for a few frame as it enters its lane.
-        if(progress > 46) set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber+1);
+        if(progress > 46) set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber+2);
 
         // If entering the lane move the playher along the x axis.
         if(progress < 50) ptrEnemy->nX = 160 - ((160 - ptrEnemy->nTargetX) * progress) / 50; 
@@ -237,7 +234,7 @@ void UpdateEnemyModeB(UINT8 nEnemyIndex, Player* ptrPlayer)
 
             // Reset the bullet for next fire.
             ptrPlayer->bSprayActive = FALSE;
-            set_sprite_tile(5, 111);
+            set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
             move_sprite(5, 0, 0);
             
             // Break out of the method.
@@ -319,25 +316,25 @@ INT8 GetSprite(INT8 nRandNumber)
     switch (nRandNumber)
     {
         // BEATLE
-        case 0: return 47; break;
+        case 0: return 56; break;
         
         // SPIDER
-        case 1: return 63; break;
+        case 1: return 64; break;
         
         // CENTIPEDE
-        case 2: return 71; break;
+        case 2: return 72; break;
         
         // FLY
-        case 3: return 55; break;
+        case 3: return 47; break;
         
         // MOTH
-        case 4: return 79; break;
+        case 4: return 50; break;
 
         // MOSQUITO
-        case 5: return 87; break;
+        case 5: return 53; break;
         
         // DEFAULT
-        default: return 47; break;
+        default: return 56; break;
     }
 }
 

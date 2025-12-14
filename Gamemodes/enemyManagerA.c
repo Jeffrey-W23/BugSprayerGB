@@ -15,6 +15,12 @@
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
+// Const ints for magic numbers used through out spawn logic.
+#define SPAWN_QUEUE_SIZEA 100
+#define ROUND_KILL_THRESHOLD 100
+#define SPEED_STEPS 5
+#define SPAWN_STEPS 4
+
 // New unsigned int 8 for keeping track of the current sub tick to make a single spawn tick.
 static UINT8 m_nSubTickCounter = 0;
 
@@ -55,6 +61,10 @@ static const UINT8 m_anSpawnPositionsMode1[3] =
     {84},   // MIDDLE 
     {112}   // RIGHT
 };
+
+// Each enemy will have a base speed based on
+// their enemy type randomly assigned during queuing.
+const UINT8 m_anBaseSpeeds[3] = {5, 2, 9};
 
 // Const array of unsigned int 8s, used for storing the speed throughout each round.
 const UINT8 m_anRoundSpeeds[20][5] = 
@@ -352,26 +362,22 @@ void SpawnEnemyInLane(UINT8 nLane, UINT8 nType)
     ptrEnemy->nSpriteID = m_nNextSpriteID++;
     ptrEnemy->nSubPixelY = 0;
 
-    // Each enemy will have a base speed based on
-    // their enemy type randomly assigned during queuing.
-    const UINT8 nBaseSpeeds[3] = {5, 2, 9};
-    
     // Get the current speed multipler based on progress in the round.
     UINT8 nSpeedMultiplier = GetCurrentSpeedMultiplier();
 
     // Apply the base speed plus multipler to new Enemy object.
-    ptrEnemy->nSpeed = nBaseSpeeds[nType] + nSpeedMultiplier;
+    ptrEnemy->nSpeed = m_anBaseSpeeds[nType] + nSpeedMultiplier;
     
     // If the next sprite id ends up too large we can reset.
     if(m_nNextSpriteID >= 38) m_nNextSpriteID = 7;
 
     // Get a sprite tile from a type position in the enemey sprite 
     // area of the sprite sheet. Store this as the main sprite.
-    ptrEnemy->nSpriteNumber = GetSprite(nType+3) + 6;
+    ptrEnemy->nSpriteNumber = GetSprite(nType+3) + 1;
     
     // Move sprite into position, set the sprite to the 
     // left facing sprite for inital spawn
-    set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber-2);
+    set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber-1);
     move_sprite(ptrEnemy->nSpriteID, ptrEnemy->nX, ptrEnemy->nY);
 }
 

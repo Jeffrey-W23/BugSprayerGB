@@ -42,6 +42,7 @@ typedef struct
 //--------------------------------------------------------------------------------------
 // Const ints for magic numbers used through out spawn logic.
 #define MAX_ENEMIES 16
+#define SPRITE_SHEET_EMPTY_SLOT 81
 
 // New unsigned int 8 for storing the next avaliable spriteID, used during spawning.
 extern UINT8 m_nNextSpriteID;

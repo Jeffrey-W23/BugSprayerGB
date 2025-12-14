@@ -12,15 +12,6 @@
 // includes, using, etc
 #include <gb/gb.h>
 
-// PUBLIC VARIABLES //
-//--------------------------------------------------------------------------------------
-// Const ints for magic numbers used through out spawn logic.
-#define SPAWN_QUEUE_SIZEA 100
-#define ROUND_KILL_THRESHOLD 100
-#define SPEED_STEPS 5
-#define SPAWN_STEPS 4
-//--------------------------------------------------------------------------------------
-
 //--------------------------------------------------------------------------------------
 // InitiateSpawner: Initiate the spawner for this gameMode.
 //--------------------------------------------------------------------------------------

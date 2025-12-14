@@ -9,6 +9,9 @@
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
+// Const int for setting the empty slot for sprite sheet.
+#define SPRITE_SHEET_EMPTY_SLOT 81
+
 // New bool for if the spary is currently showing.
 static BOOLEAN m_bIsSprayShowing = FALSE;
 
@@ -56,7 +59,7 @@ void InitPlayer(BYTE bMode, Player* ptrPlayer)
 
         // Set the inital values of the spray bullet.
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 111);
+        set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
         move_sprite(5, 0, 0);
     }
 
@@ -326,7 +329,7 @@ void UpdateSprayBullet(Player* ptrPlayer)
         ptrPlayer->nSprayY < 44 || ptrPlayer->nSprayY > 138)
     {
         ptrPlayer->bSprayActive = FALSE;
-        set_sprite_tile(5, 111);
+        set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
         return;
     }
 
@@ -368,7 +371,7 @@ void ShowSprayEffect(Player* ptrPlayer, BOOLEAN bShowSpray)
         }
 
         // Disable the spray
-        set_sprite_tile(5, 111);
+        set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
     }
 
     // Else done spraying, reset for next use.
@@ -377,6 +380,6 @@ void ShowSprayEffect(Player* ptrPlayer, BOOLEAN bShowSpray)
         m_bIsSprayShowing = FALSE;
     
         // Set the spray to a blank object when not needed.
-        set_sprite_tile(5, 111);
+        set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
     }
 }

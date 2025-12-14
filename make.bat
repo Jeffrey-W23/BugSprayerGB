@@ -1,21 +1,47 @@
 @echo off
-echo Building BugSprayer ROM ...
+echo Building BugSprayer ROM...
+
+set GBDK=c:\gbdk2020
+set LCC=%GBDK%\bin\lcc
+set HUGEDIR=hugedriver
 
 REM
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Entities/player.o Entities/player.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Entities/enemies.o Entities/enemies.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Gamemodes/enemyManagerA.o Gamemodes/enemyManagerA.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Gamemodes/enemyManagerB.o Gamemodes/enemyManagerB.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o UI/hud.o UI/hud.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Data-Systems/save.o Data-Systems/save.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o Music-Sounds/song1.o Music-Sounds/song1.c
-c:\gbdk2020\bin\lcc -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -Ihugedriver/include -c -o main.o main.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Gamemodes\gamemodes.o Gamemodes\gamemodes.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Data-Systems\helpers.o Data-Systems\helpers.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o UI\menuScreens.o UI\menuScreens.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Music-Sound\soundManager.o Music-Sound\soundManager.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Entities\player.o Entities\player.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Entities\enemies.o Entities\enemies.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Gamemodes\enemyManagerA.o Gamemodes\enemyManagerA.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Gamemodes\enemyManagerB.o Gamemodes\enemyManagerB.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o UI\hud.o UI\hud.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Data-Systems\save.o Data-Systems\save.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Music-Sound\song1.o Music-Sound\song1.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o main.o main.c
 
 REM
-c:\gbdk2020\bin\lcc -Wm-yt3 -Wl-lhugedriver/gbdk/hUGEDriver.lib -o BugSprayer main.o Entities/player.o Entities/enemies.o Gamemodes/enemyManagerA.o Gamemodes/enemyManagerB.o UI/hud.o Data-Systems/save.o Music-Sounds/song1.o
+REM
+REM
 
 REM
-c:\gbdk2020\bin\lcc -Wm-yt3 -Wm-yoA -Wm-ya1 -Wl-lhugedriver/gbdk/hUGEDriver.lib -o BugSprayer.gb main.o Entities/player.o Entities/enemies.o Gamemodes/enemyManagerA.o Gamemodes/enemyManagerB.o UI/hud.o Data-Systems/save.o Music-Sounds/song1.o
+%LCC% -Wm-yt0x1B -Wm-yo4 -Wm-ya4 -autobank -Wl-j -Wl-l%HUGEDIR%/gbdk/hUGEDriver.lib -o BugSprayer.gb ^
+  main.o ^
+  Gamemodes\gamemodes.o ^
+  Data-Systems\helpers.o ^
+  UI\menuScreens.o ^
+  Music-Sound\soundManager.o ^
+  Entities\player.o ^
+  Entities\enemies.o ^
+  Gamemodes\enemyManagerA.o ^
+  Gamemodes\enemyManagerB.o ^
+  UI\hud.o ^
+  Data-Systems\save.o ^
+  Music-Sound\song1.o
 
-echo Done! BugSprayer.gb created.
+REM
+REM
+REM
+
+echo.
+echo Success, BugSprayer.gb created!
 pause

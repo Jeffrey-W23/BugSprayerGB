@@ -11,17 +11,18 @@
 // includes, using, etc
 #include <gb/gb.h>
 
-// PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
-// New unsigned int 16 for temp storing the highscore data for gameModeA
-extern UINT16 m_nHighScoreA;
-
-// New unsigned int 16 for temp storing the highscore data for gameModeB
-extern UINT16 m_nHighScoreB;
-
-// New unsigned int 16 for temp storing the data for shots taken.
-extern UINT16 m_nSavedShotsB;
+// HighScoreData struct for setting/getting all the highscore data.
 //--------------------------------------------------------------------------------------
+typedef struct HighScoreData
+{
+    UINT16 nHighScoreAEasy;
+    UINT16 nHighScoreAHard;
+    UINT16 nHighScoreBEasy;
+    UINT16 nHighScoreBHard;
+    UINT16 nShotsTakenEasy;
+    UINT16 nShotsTakenHard;
+} HighScoreData;
 
 //--------------------------------------------------------------------------------------
 // InitSaveData: Initiate the saving/loading system.
@@ -33,19 +34,21 @@ void InitSaveData(void);
 //
 // Params:
 //      bMode: The current mode trying to save highscore.
-//      nScore: The score from the player.
+//      bDiff: The difficulty mode selected for a certain gamemode.
+//      nScoreEasy: The score from the player.
 //      nShotsTaken: The total shots taken by the player.
 //--------------------------------------------------------------------------------------
-void SaveGameData(BOOLEAN bMode, UINT16 nScore, UINT16 nShotsTaken);
+void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTaken);
 
 //--------------------------------------------------------------------------------------
 // LoadGameData: Load saved data stored in memory, setting that data to passed pointers.
 //
 // Params:
 //      bMode: The current mode trying to load highscore.
+//      bDiff: The difficulty mode selected for a certain gamemode.
 //      nScore: Pointer to the loaded score variable to store during runtime.
-//      nShotsTaken: Pointer to the loaded shotsTaken variable to store during runtime. 
+//      nShotsTakenEasy: Pointer to the loaded shotsTaken variable to store during runtime. 
 //--------------------------------------------------------------------------------------
-void LoadGameData(BOOLEAN bMode, UINT16* nScore, UINT16* nShotsTaken);
+void LoadGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16* nScore, UINT16* nShotsTaken);
 
 #endif
