@@ -31,6 +31,12 @@ static UINT16 m_nSavedShotsBEasy = 0;
 static UINT16 m_nSavedShotsBHard = 0;
 //--------------------------------------------------------------------------------------
 
+// PUBLIC VARIABLES //
+//--------------------------------------------------------------------------------------
+// New HighScoreData object for storing all the current score data.
+HighScoreData m_oHighScoreData;
+//--------------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------------
 // InitSaveData: Initiate the saving/loading system.
 //--------------------------------------------------------------------------------------
@@ -88,7 +94,7 @@ void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTake
     // If MODE A
     if (bMode == 0)
     {
-        if (bDiff)
+        if (bDiff == 0)
         {
             // Ensure we even need to save the score.
             if (nScore > m_nHighScoreAEasy)
@@ -118,7 +124,7 @@ void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTake
     // Else MODE B
     else
     {
-        if (bDiff)
+        if (bDiff == 0)
         {
             // Ensure we even need to save the score.
             if (nScore > m_nHighScoreBEasy)
@@ -182,14 +188,14 @@ void LoadGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16* nScore, UINT16* nShotsTa
     // If ModeA, get just highscore A
     if (bMode == 0)
     {
-        if (bDiff) *nScore = m_nHighScoreAEasy;
+        if (bDiff == 0) *nScore = m_nHighScoreAEasy;
         else *nScore = m_nHighScoreAHard;
     }
     
     // Else if ModeB, we need both highscore and shots.
     else 
     {
-        if (bDiff)
+        if (bDiff == 0)
         {
             *nScore = m_nHighScoreBEasy; 
             *nShotsTaken = m_nSavedShotsBEasy; 
@@ -201,4 +207,32 @@ void LoadGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16* nScore, UINT16* nShotsTa
             *nShotsTaken = m_nSavedShotsBHard; 
         }
     }
+}
+
+//--------------------------------------------------------------------------------------
+// LoadAllHighScoreData: Load all the highscore data from previous game sessions.
+//--------------------------------------------------------------------------------------
+void LoadAllHighScoreData(void)
+{
+    // Delcare temp vars for setting.
+    UINT16 nLoadedScoreAEasy = 0;
+    UINT16 nLoadedScoreAHard = 0;
+    UINT16 nLoadedScoreBEasy = 0;
+    UINT16 nLoadedScoreBHard = 0;
+    UINT16 nLoadedShotsTakenEasy = 0;
+    UINT16 nLoadedShotsTakenHard = 0;
+
+    // Load the game data from memory
+    LoadGameData(0, 0, &nLoadedScoreAEasy, &nLoadedShotsTakenEasy);
+    LoadGameData(0, 1, &nLoadedScoreAHard, &nLoadedShotsTakenHard);
+    LoadGameData(1, 0, &nLoadedScoreBEasy, &nLoadedShotsTakenEasy);
+    LoadGameData(1, 1, &nLoadedScoreBHard, &nLoadedShotsTakenHard);
+
+    // Set the load values in the main.c
+    m_oHighScoreData.nShotsTakenEasy = nLoadedShotsTakenEasy;
+    m_oHighScoreData.nShotsTakenHard = nLoadedShotsTakenHard;
+    m_oHighScoreData.nHighScoreAEasy = nLoadedScoreAEasy;
+    m_oHighScoreData.nHighScoreAHard = nLoadedScoreAHard;
+    m_oHighScoreData.nHighScoreBEasy = nLoadedScoreBEasy;
+    m_oHighScoreData.nHighScoreBHard = nLoadedScoreBHard;
 }

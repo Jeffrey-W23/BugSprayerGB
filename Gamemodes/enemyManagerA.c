@@ -119,8 +119,11 @@ const UINT8 m_anRoundSpawnRates[20][4] =
 
 //--------------------------------------------------------------------------------------
 // InitiateSpawner: Initiate the spawner for this gameMode.
+//
+// Params:
+//      bDiff: The difficulty setting select, 0 meaning easy mode.
 //--------------------------------------------------------------------------------------
-void InitiateSpawner(void) 
+void InitiateSpawner(BYTE bDiff) 
 {
     // Reset all values.
     m_nSubTickCounter = 0;
@@ -129,9 +132,21 @@ void InitiateSpawner(void)
     m_nCurrentRound = 0;
     m_nCurrentSpeedStep = 0;
     m_nCurrentSpawnStep = 0;
-    m_nCurrentRoundSpeedsPos = 0;
-    m_nCurrentRoundSpawnRatesPos = 0;
     m_nSeed = 1;
+
+    // Set difficulty for Easy
+    if (bDiff == 0)
+    {
+        m_nCurrentRoundSpeedsPos = 0;
+        m_nCurrentRoundSpawnRatesPos = 0;
+    }
+
+    // Set difficulty for Hard
+    else
+    {
+        m_nCurrentRoundSpeedsPos = 8;
+        m_nCurrentRoundSpawnRatesPos = 8;
+    }
 
     // Reset the queue arrays.
     for (UINT8 i = 0; i < SPAWN_QUEUE_SIZEA; i++) { m_anQueue[i] = 0; }

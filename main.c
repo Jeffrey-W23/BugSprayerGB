@@ -27,38 +27,7 @@ extern BYTE m_bCurrentGameMode = 0;
 
 // New byte for keeping track of the current set difficulty.
 extern BYTE m_bCurrentDifficulty = 0;
-
-// New HighScoreData object for storing all the current score data.
-HighScoreData m_oHighScoreData;
 //--------------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------------
-// LoadHighScoreData: Load highscore data from previous game sessions.
-//--------------------------------------------------------------------------------------
-void LoadHighScoreData(void)
-{
-    // Delcare temp vars for setting.
-    UINT16 nLoadedScoreAEasy = 0;
-    UINT16 nLoadedScoreAHard = 0;
-    UINT16 nLoadedScoreBEasy = 0;
-    UINT16 nLoadedScoreBHard = 0;
-    UINT16 nLoadedShotsTakenEasy = 0;
-    UINT16 nLoadedShotsTakenHard = 0;
-
-    // Load the game data from memory
-    LoadGameData(0, 0, &nLoadedScoreAEasy, &nLoadedShotsTakenEasy);
-    LoadGameData(0, 1, &nLoadedScoreAHard, &nLoadedShotsTakenHard);
-    LoadGameData(1, 0, &nLoadedScoreBEasy, &nLoadedShotsTakenEasy);
-    LoadGameData(1, 1, &nLoadedScoreBHard, &nLoadedShotsTakenHard);
-
-    // Set the load values in the main.c
-    m_oHighScoreData.nShotsTakenEasy = nLoadedShotsTakenEasy;
-    m_oHighScoreData.nShotsTakenHard = nLoadedShotsTakenHard;
-    m_oHighScoreData.nHighScoreAEasy = nLoadedScoreAEasy;
-    m_oHighScoreData.nHighScoreAHard = nLoadedScoreAHard;
-    m_oHighScoreData.nHighScoreBEasy = nLoadedScoreBEasy;
-    m_oHighScoreData.nHighScoreBHard = nLoadedScoreBHard;
-}
 
 //--------------------------------------------------------------------------------------
 // Initialize: Prepare the application for launch.
@@ -72,7 +41,17 @@ void Initialize(void)
 
     // Load highscore data
     InitSaveData();
-    LoadHighScoreData();
+    LoadAllHighScoreData();
+
+    // DEBUG // UNCOMMENT FOR EASY WAY TO VERIFY SAVE DATA //
+    //printf("M0D0: %u", m_oHighScoreData.nHighScoreAEasy); printf(" \n");
+    //printf("M0D1: %u", m_oHighScoreData.nHighScoreAHard); printf(" \n");
+    //printf("M1D0: %u", m_oHighScoreData.nHighScoreBEasy); printf(" \n");
+    //printf("M1D1: %u", m_oHighScoreData.nHighScoreBHard); printf(" \n");
+    //printf("M1SD0: %u", m_oHighScoreData.nShotsTakenEasy); printf(" \n");
+    //printf("M1SD1: %u", m_oHighScoreData.nShotsTakenHard); printf(" \n");
+    //PerformantDelay(3000);
+    // DEBUG // UNCOMMENT FOR EASY WAY TO VERIFY SAVE DATA //
 
     // Display the splash screen background
     DisplaySplashScreen();
@@ -88,10 +67,10 @@ void Initialize(void)
     SHOW_SPRITES;
 
     // Display the GameSelect/MainMenu
-    ShowGameSelectMenu(&m_bCurrentGameMode, &m_bCurrentDifficulty, &m_oHighScoreData);
-
-    // Hide the background while things load.
-    HIDE_BKG;
+    ShowGameSelectMenu(&m_bCurrentGameMode, &m_bCurrentDifficulty);
+    
+    // Show loading screen incase slow random generation.
+    ShowLoadingScreen();
 
     // Used for better random gen
     VBK_REG = 0;
@@ -103,7 +82,7 @@ void Initialize(void)
     initrand(DIV_REG | (LY_REG << 8));
 
     // Initalizxe desired gamemode based on selection.
-    InitializeGamemode(m_bCurrentGameMode);
+    InitializeGamemode(m_bCurrentGameMode, m_bCurrentDifficulty);
 }
 
 //--------------------------------------------------------------------------------------

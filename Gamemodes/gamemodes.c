@@ -76,11 +76,14 @@ static const UINT8 m_anPieSpriteIDs[4] = {41, 42, 43, 44};
 // New const array of unsigned int 8s for each tile of the oven area of the background. Used to set back after extra life.
 static const UINT8 m_anDefaultOvenTiles[8] = {36, 37, 38, 39, 55, 56, 57, 58};
 
+// New menuCursor object, used for showing the pause menu cursor.
+static MenuCursor m_oPauseCursor;
+
 // New byte for keeping track of the current set gameMode.
 static BYTE m_bCurrentGameMode = 0;
 
-// New menuCursor object, used for showing the pause menu cursor.
-static MenuCursor m_oPauseCursor;
+// New byte for keeping track of the current set difficulty.
+static BYTE m_bCurrentDifficulty = 0;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -88,15 +91,18 @@ static MenuCursor m_oPauseCursor;
 //
 // Params:
 //      bMode: The gamemode to be initialized.
+//      bDiff: The difficulty of the gamemode.
 //--------------------------------------------------------------------------------------
-void InitializeGamemode(BYTE bMode)
+void InitializeGamemode(BYTE bMode, BYTE bDiff)
 {
     // Delcare Iterator needed 
     // for for loop in method.
     UINT8 i;
     
-    // Set the current gamemode for later reference.
+    // Set the current gamemode and difficulty 
+    // for later reference.
     m_bCurrentGameMode = bMode;
+    m_bCurrentDifficulty = bDiff;
 
     // Start initalizing gameMode A
     if (bMode == 0)
@@ -113,7 +119,7 @@ void InitializeGamemode(BYTE bMode)
         }
 
         // Initiate the Enemies spawner.
-        InitiateSpawner();
+        InitiateSpawner(bDiff);
 
         // Set the damage to player when getting hit
         // by an enemy to 1 as the player has hearts
@@ -135,9 +141,26 @@ void InitializeGamemode(BYTE bMode)
             InitEnemy(i);
         }
 
+        // Set the initial difficulty
+        SetInitDifficulty(bDiff);
+
         // Prepare spawn quque for enemies.
         InitEnemiesSpawnQueue();
     }
+
+    // Perform a slight delay to
+    // ensure we see the loading
+    // for a least a moment, looks
+    // much better.
+    PerformantDelay(100);
+
+    // Hide the window layer
+    // which is currently showing
+    // the loading text.
+    HIDE_WIN;
+        
+    // Hide the background while things load.
+    HIDE_BKG;
 
     // Set the level background data, and load.
     set_bkg_data(0, 103, m_caBgTiles);
@@ -190,11 +213,19 @@ void AnimatePie(void)
 //--------------------------------------------------------------------------------------
 void UpdateExtraLife(void) 
 {
+    // Amount of points required to
+    // spawn a new life.
+    UINT16 nScoreToLife = 200;
+
+    // If the player gets over 1000
+    // we want the lives to be rarer
+    if (m_oPlayer.nScore >= 1001) nScoreToLife = 400;
+
     // Check if score crossed a multiple of 200 threshold.
     // Ensure we only check this if score actually changes,
     // and ensure that the life isn't currently showing and
     // the player isn't already at the maximum health value.
-    if (m_oPlayer.nScore > m_nPrevScore && m_oPlayer.nScore % 200 == 0 && !m_bExtraLifeActive && m_oPlayer.nHealth < 5) 
+    if (m_oPlayer.nScore > m_nPrevScore && m_oPlayer.nScore % nScoreToLife == 0 && !m_bExtraLifeActive && m_oPlayer.nHealth < 5) 
     {
         // Prepare the tiles needed to show the pie in the oven.
         UINT8 tiles[8] = {77, 78, 79, 80, 81, 82, 83, 84};
@@ -203,6 +234,7 @@ void UpdateExtraLife(void)
         // this way the player isn't covering
         // the new spawned life, and is clear.
         m_oPlayer.nX = 80;
+        UpdatePlayer(&m_oPlayer);
 
         // Kill all enemies in the scene. 
         KillAllEnemies();
@@ -313,8 +345,8 @@ void PauseGame(void)
         }
 
         // Show text on the Window layer for buttons.
-        PrintTextToWindow(3, 1, "RESUME");
-        PrintTextToWindow(13, 1, "QUIT");
+        PrintTextToLayer(1, 3, 1, "RESUME");
+        PrintTextToLayer(1, 13, 1, "QUIT");
 
         // Initiate the cursor used for pause screen.
         SetupPauseCursor();
@@ -403,6 +435,71 @@ void UpdatePauseMenu(void)
 }
 
 //--------------------------------------------------------------------------------------
+// PrepareGameOver: Prepare the gameover screen, updating highscore data and showing UI.
+//--------------------------------------------------------------------------------------
+void PrepareGameOver(void)
+{
+    // GAME MODE A
+    if (m_bCurrentGameMode == 0)
+    {
+        // EASY MODE
+        if (m_bCurrentDifficulty == 0)
+        {
+            // Check if the previous highscore was beat
+            if (m_oPlayer.nScore > m_oHighScoreData.nHighScoreAEasy) 
+            {
+                // Save the new score data and reload.
+                SaveGameData(0, 0, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                LoadAllHighScoreData();
+            }
+        }
+
+        // HARD MODE
+        else
+        {
+            // Check if the previous highscore was beat
+            if (m_oPlayer.nScore > m_oHighScoreData.nHighScoreAHard) 
+            {
+                // Save the new score data and reload.
+                SaveGameData(0, 1, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                LoadAllHighScoreData();
+            }
+        }
+    }
+
+    // GAME MODE B
+    else
+    {
+        // EASY MODE
+        if (m_bCurrentDifficulty == 0)
+        {
+            // Check if the previous highscore was beat
+            if (m_oPlayer.nScore > m_oHighScoreData.nHighScoreBEasy) 
+            {
+                // Save the new score data and reload.
+                SaveGameData(1, 0, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                LoadAllHighScoreData();
+            }
+        }
+
+        // HARD MODE
+        else
+        {
+            // Check if the previous highscore was beat
+            if (m_oPlayer.nScore > m_oHighScoreData.nHighScoreBHard) 
+            {
+                // Save the new score data and reload.
+                SaveGameData(1, 1, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+                LoadAllHighScoreData();
+            }
+        }
+    }
+
+    // Show the game over screen.
+    DisplayGameOverScreen(m_bCurrentGameMode, m_bCurrentDifficulty, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
+}
+
+//--------------------------------------------------------------------------------------
 // UpdateEnemies: Update all the enemies currently alive in the scene.
 //--------------------------------------------------------------------------------------
 void UpdateEnemies(BYTE bMode)
@@ -449,16 +546,8 @@ void UpdateLoopGameModeA(void)
             // Set in case not quite 0.
             SetHealthHearts(0);
 
-            // Check if the previous highscore was beat
-            //if (m_oPlayer.nScore > m_nLoadedScore) 
-            //{
-                // Save the new score data and reload.
-                //SaveGameData(0, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
-                //LoadHighScoreData(0);
-            //}
-
-            // Show the game over screen.
-            //DisplayGameOverScreen(0, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken, m_nLoadedScore, m_nLoadedShotsTaken);
+            // Prepare for Gameover.
+            PrepareGameOver();
         }
 
         // Get the joypad inputs.
@@ -544,7 +633,7 @@ void UpdateLoopGameModeA(void)
 
                 // Set the enemy that damaged the player
                 // over the table where the pie sprite is
-                set_sprite_tile(5, m_bEnemyHurtPlayer-2);
+                set_sprite_tile(5, m_bEnemyHurtPlayer-1);
                 move_sprite(5, 88, 26);
 
                 // Update the health UI in the hud.
@@ -617,16 +706,8 @@ void UpdateLoopGameModeB(void)
             // Set in case not quite 0.
             SetHealth(0);
 
-            // Check if the previous highscore was beat
-            //if (m_oPlayer.nScore > m_nLoadedScore) 
-            //{
-                // Save the new score data and reload.
-                //SaveGameData(1, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken);
-                //LoadHighScoreData(1);
-            //}
-
-            // Show the game over screen.
-            //DisplayGameOverScreen(1, m_oPlayer.nScore, m_oPlayer.nTotalShotsTaken, m_nLoadedScore, m_nLoadedShotsTaken);
+            // Prepare for Gameover.
+            PrepareGameOver();
         }
 
         // Get the joypad inputs.

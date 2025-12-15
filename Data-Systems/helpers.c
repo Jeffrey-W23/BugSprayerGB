@@ -12,142 +12,118 @@
 #include <string.h>
 #include "../Data-Systems/helpers.h"
 
+// PRIVATE VARIABLES //
+//--------------------------------------------------------------------------------------
+// New unsigned int 8 used for keeping track of the current animated frame of a menu cursor.
+static UINT8 m_nCursorAniFrame = 0;
+
+// New unsigned int 8 used for ticking the animation of a menu cursor.
+static UINT8 m_nCursorAniCounter = 0;
+//--------------------------------------------------------------------------------------
+
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
-// New static unsigned int 8 used for the current tick in blinking the screen.
+// New unsigned int 8 used for the current tick in blinking the screen.
 UINT8 m_nBlinkTimer = 0;
 
-// New static unsigned int 8 for the current state of blinking for blicking the screen.
+// New unsigned int 8 for the current state of blinking for blicking the screen.
 UINT8 m_nBlinkState = 0;
 //--------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-UINT8 nCursorAniFrame = 0;
-UINT8 nCursorAniCounter = 0;
-    
-
-
-// Call once when opening a menu
-void InitMenuCursor(MenuCursor* c) 
+//--------------------------------------------------------------------------------------
+// InitMenuCursor: Prepare sprites to be used for a new cursor for a menu.
+//
+// Params:
+//      ptrCursor: Pointer to a menu cursor object.
+//--------------------------------------------------------------------------------------
+void InitMenuCursor(MenuCursor* ptrCursor) 
 {
-    set_sprite_tile(c->nSpriteID, c->nTileID);
-    set_sprite_tile(c->nSpriteID+1, SPRITE_SHEET_EMPTY_SLOT);
-    move_sprite(c->nSpriteID, c->nStartX + (c->nIndex * c->nStepX), c->nStartY + (c->nIndex * c->nStepY));
+    set_sprite_tile(ptrCursor->nSpriteID, ptrCursor->nTileID);
+    set_sprite_tile(ptrCursor->nSpriteID+1, SPRITE_SHEET_EMPTY_SLOT);
+    move_sprite(ptrCursor->nSpriteID+1, 0, 0);
+    move_sprite(ptrCursor->nSpriteID, ptrCursor->nStartX + 
+        (ptrCursor->nIndex * ptrCursor->nStepX), ptrCursor->nStartY + 
+        (ptrCursor->nIndex * ptrCursor->nStepY));
 }
 
-// Call every frame while menu is active
-void UpdateMenuCursor(MenuCursor* c, UINT8 joy, BOOLEAN bShowTwo) 
+//--------------------------------------------------------------------------------------
+// UpdateMenuCursor: Update the position and state of a cursor object of an active menu.
+//
+// Params:
+//      ptrCursor: Pointer to a menu cursor object.
+//      nJoy: The Joypad for checking input.
+//      bShowTwo: Bool value for if two sprites are needed for cursor.
+//--------------------------------------------------------------------------------------
+void UpdateMenuCursor(MenuCursor* ptrCursor, UINT8 nJoy, BOOLEAN bShowTwo) 
 {
-
-    UINT8 movedPrev;
-    UINT8 movedNext;
-
-    
-
+    // Variables decalred for later use.
+    UINT8 nPrevMove = 0;
+    UINT8 nNextMove = 0;
     UINT8 nOffset;
 
-    movedPrev = 0;
-    movedNext = 0;
-
-    if (c->nBtnCount != 0)
+    // Ensure there is at least one button before moving.
+    if (ptrCursor->nBtnCount != 0)
     {
-        // Any of these = previous option
-        if ((joy & J_UP)   && !(c->nPrevJoy & J_UP))   movedPrev = 1;
-        if ((joy & J_LEFT) && !(c->nPrevJoy & J_LEFT)) movedPrev = 1;
+        // Move cursor UP
+        if ((nJoy & J_UP)   && !(ptrCursor->nPrevJoy & J_UP))   nPrevMove = 1;
+        if ((nJoy & J_LEFT) && !(ptrCursor->nPrevJoy & J_LEFT)) nPrevMove = 1;
 
-        // Any of these = next option
-        if ((joy & J_DOWN)  && !(c->nPrevJoy & J_DOWN))  movedNext = 1;
-        if ((joy & J_RIGHT) && !(c->nPrevJoy & J_RIGHT)) movedNext = 1;
+        // Move cursor DOWN
+        if ((nJoy & J_DOWN)  && !(ptrCursor->nPrevJoy & J_DOWN))  nNextMove = 1;
+        if ((nJoy & J_RIGHT) && !(ptrCursor->nPrevJoy & J_RIGHT)) nNextMove = 1;
     }
 
-    if (movedPrev) {
-        if (c->nIndex > 0) {
-            c->nIndex--;
-        } else {
-            c->nIndex = c->nBtnCount - 1;  // wrap if you want
-        }
+    // Update the index position of the cursor, which is the logical posiiton. 
+    if (nPrevMove) 
+    {
+        if (ptrCursor->nIndex > 0) ptrCursor->nIndex--;
+        else ptrCursor->nIndex = ptrCursor->nBtnCount - 1;
     }
 
-    if (movedNext) {
-        if (c->nIndex + 1 < c->nBtnCount) {
-            c->nIndex++;
-        } else {
-            c->nIndex = 0;                 // wrap if you want
-        }
+    if (nNextMove)
+    {
+        if (ptrCursor->nIndex + 1 < ptrCursor->nBtnCount) ptrCursor->nIndex++;
+        else ptrCursor->nIndex = 0;
     }
 
-    move_sprite(
-        c->nSpriteID,
-        c->nStartX + (c->nIndex * c->nStepX),
-        c->nStartY + (c->nIndex * c->nStepY)
-    );
+    // Increase the aniCounter
+    m_nCursorAniCounter++;
 
+    // Wait certain amount of frames 
+    if (m_nCursorAniCounter >= 20) 
+    {   
+        // Reset the counter
+        m_nCursorAniCounter = 0;
 
-
-
-
-        // Increase the aniCounter
-        nCursorAniCounter++;
-
-        // Wait certain amount of frames 
-        if (nCursorAniCounter >= 20) 
-        {   
-            // Reset the counter
-            nCursorAniCounter = 0;
-
-            // Advance the cursor animation frame.
-            nCursorAniFrame++;
-            
-            // Reset the cursor animation frame back to 0
-            if (nCursorAniFrame >= 4) nCursorAniFrame = 0;
-        }
-
-        // Determine offset of the cursors
-        if(nCursorAniFrame == 0) nOffset = 0;
-        else if(nCursorAniFrame == 1) nOffset = 1;
-        else if(nCursorAniFrame == 2) nOffset = 2;
-        else nOffset = 1;
-
-        // Move the selector arrows on each side of buttons
-        move_sprite(c->nSpriteID,  c->nStartX + (c->nIndex * c->nStepX) + nOffset, c->nStartY + (c->nIndex * c->nStepY));
+        // Advance the cursor animation frame.
+        m_nCursorAniFrame++;
         
-        if (bShowTwo)
-        {
-            set_sprite_tile(c->nSpriteID+1, c->nTileID+1);
-            move_sprite(c->nSpriteID+1,  c->nStartX + (c->nIndex * c->nStepX) + nOffset + c->nDistance, c->nStartY + (c->nIndex * c->nStepY));
-        }
-        else
-        {
-            set_sprite_tile(c->nSpriteID+1, SPRITE_SHEET_EMPTY_SLOT);
-            move_sprite(c->nSpriteID+1, 0,0);
-        }
+        // Reset the cursor animation frame back to 0
+        if (m_nCursorAniFrame >= 4) m_nCursorAniFrame = 0;
+    }
 
+    // Determine offset of the cursors
+    if(m_nCursorAniFrame == 0) nOffset = 0;
+    else if(m_nCursorAniFrame == 1) nOffset = 1;
+    else if(m_nCursorAniFrame == 2) nOffset = 2;
+    else nOffset = 1;
 
+    // Move the left facing cursor sprite, by default if only one sprite needed we use left.
+    move_sprite(ptrCursor->nSpriteID,  ptrCursor->nStartX + (ptrCursor->nIndex * ptrCursor->nStepX)
+     + nOffset, ptrCursor->nStartY + (ptrCursor->nIndex * ptrCursor->nStepY));
+    
+    // If two sprites are needed.
+    if (bShowTwo)
+    {
+        // Update the sprite on the right side of buttons.
+        set_sprite_tile(ptrCursor->nSpriteID+1, ptrCursor->nTileID+1);
+        move_sprite(ptrCursor->nSpriteID+1,  ptrCursor->nStartX + (ptrCursor->nIndex * ptrCursor->nStepX)
+         + nOffset + ptrCursor->nDistance, ptrCursor->nStartY + (ptrCursor->nIndex * ptrCursor->nStepY));
+    }
 
-    c->nPrevJoy = joy;
+    // Update the previous joypad for cursor.
+    ptrCursor->nPrevJoy = nJoy;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 //--------------------------------------------------------------------------------------
 // CharToTile: Getter function for getting the tile number from a passed in charater.
@@ -161,7 +137,7 @@ void UpdateMenuCursor(MenuCursor* c, UINT8 joy, BOOLEAN bShowTwo)
 UINT8 CharToTile(char cCharacter) 
 {
     // Space: using a blank tile.
-    if (cCharacter == ' ') return 169;
+    if (cCharacter == ' ') return 168;
 
     // Convert letters and return.
     if (cCharacter >= 'a' && cCharacter <= 'z') cCharacter = cCharacter - 'a' + 'A';
@@ -170,8 +146,14 @@ UINT8 CharToTile(char cCharacter)
     // Convert numbers and return.
     if (cCharacter >= '0' && cCharacter <= '9') return 128 + 26 + (cCharacter - '0');
 
+    // Convert symbols and return. 
+    if (cCharacter == ':') return 128 + 26 + 10;
+    if (cCharacter == '-') return 128 + 26 + 11;
+    if (cCharacter == '+') return 128 + 26 + 12;
+    if (cCharacter == '.') return 128 + 26 + 13;
+
     // Return 0 if any issues.
-    return 0;
+    return 168;
 }
 
 //--------------------------------------------------------------------------------------
@@ -184,44 +166,41 @@ UINT8 CharToTile(char cCharacter)
 //--------------------------------------------------------------------------------------
 void PrintIntToWindow(UINT8 nX, UINT8 nY, INT16 nValue) 
 {
-    // varaibles for converting.
-    char caText[5] = "0000";
-    UINT8 nPos = 3;
+    // Break up int into digits, allow for text to show
+    // 4 digits no mater the number. If a player manages
+    // to get over 10000 then good job to them!
     
-    // Extract thousands digit
-    if (nValue >= 1000) {
-        caText[nPos--] = '0' + (nValue / 1000);
-        nValue %= 1000;
-    }
+    char caText[5];
     
-    // Extract hundreds digit  
-    if (nValue >= 100) {
-        caText[nPos--] = '0' + (nValue / 100);
-        nValue %= 100;
-    }
-    
-    // Extract tens digit
-    if (nValue >= 10) {
-        caText[nPos--] = '0' + (nValue / 10);
-        nValue %= 10;
-    }
-    
-    // Extract units digit
-    caText[nPos] = '0' + nValue;
-    
+    if (nValue < 0)      nValue = 0;
+    else if (nValue > 9999) nValue = 9999;
+
+    caText[0] = '0' + (nValue / 1000);
+    nValue %= 1000;
+
+    caText[1] = '0' + (nValue / 100);
+    nValue %= 100;
+
+    caText[2] = '0' + (nValue / 10);
+    nValue %= 10;
+
+    caText[3] = '0' + nValue;
+    caText[4] = '\0';
+
     // Pass the conveertion to the window layer.
-    PrintTextToWindow(nX, nY, caText);
+    PrintTextToLayer(1, nX, nY, caText);
 }
 
 //--------------------------------------------------------------------------------------
-// PrintTextToWindow: Print text to the screen using the loaded letters sprite sheet.
+// PrintTextToLayer: Print text to the screen using the loaded letters sprite sheet.
 //
 // Params:
+//      bLayer: The layer that text will be displayed on.
 //      nX: Starting position on the x axis.
 //      nY: Starting position on the y axis.
 //      ptrText: pointer to the characters to show on screen.
 //--------------------------------------------------------------------------------------
-void PrintTextToWindow(UINT8 nX, UINT8 nY, const char *ptrText) 
+void PrintTextToLayer(BYTE bLayer, UINT8 nX, UINT8 nY, const char *ptrText) 
 {
     // variables for later use.
     UINT8 nlength, i;
@@ -236,8 +215,19 @@ void PrintTextToWindow(UINT8 nX, UINT8 nY, const char *ptrText)
     // Loop through all the characters and get the tile numbers.
     for (i = 0; i < nlength; i++) naTiles[i] = CharToTile(ptrText[i]);
 
-    // Set the tiles on the window.
-    set_win_tiles(nX, nY, nlength, 1, naTiles);
+    // BACKGROUND LAYER
+    if (bLayer == 0)
+    {    
+        // Set the tiles on the window.
+        set_bkg_tiles(nX, nY, nlength, 1, naTiles);
+    }
+    
+    // WINDOW LAYER
+    else
+    {    
+        // Set the tiles on the window.
+        set_win_tiles(nX, nY, nlength, 1, naTiles);
+    }
 }
 
 //--------------------------------------------------------------------------------------

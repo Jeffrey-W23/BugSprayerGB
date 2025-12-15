@@ -48,6 +48,19 @@ void PlayPlayerDamageSound(void)
 }
 
 //--------------------------------------------------------------------------------------
+// PlayGameOverSound: Play the sound associated with the players death.
+//--------------------------------------------------------------------------------------
+void PlayPlayerDeathSound(void)
+{
+    hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
+
+    // Play death sound.
+    NR41_REG = 0x15; NR42_REG = 0xFF; NR43_REG = 0x73; NR44_REG = 0xC0;
+
+    hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+}
+
+//--------------------------------------------------------------------------------------
 // PlaySplashScreenSound: Play the sound associated with the splashscreen.
 //--------------------------------------------------------------------------------------
 void PlaySplashScreenSound(void)
@@ -56,4 +69,20 @@ void PlaySplashScreenSound(void)
     NR10_REG = 0x78; NR11_REG = 0x81; NR12_REG = 0x42; NR13_REG = 0x9E; NR14_REG = 0x87; PerformantDelay(10);
     NR10_REG = 0x78; NR11_REG = 0x81; NR12_REG = 0x42; NR13_REG = 0x72; NR14_REG = 0x86; PerformantDelay(8);
     NR10_REG = 0x78; NR11_REG = 0x81; NR12_REG = 0x42; NR13_REG = 0xAA; NR14_REG = 0x85;
+}
+
+//--------------------------------------------------------------------------------------
+// PlayGameOverSound: Play the sound associated with the gameover sequence.
+//--------------------------------------------------------------------------------------
+void PlayGameOverSound(void)
+{
+    // Play the gameover jingle note by note.
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x20; NR14_REG = 0x83; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0xB0; NR14_REG = 0x84; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x90; NR14_REG = 0x81; PerformantDelay(15);
+    NR10_REG = 0x7C; NR11_REG = 0xC5; NR12_REG = 0x53; NR13_REG = 0x78; NR14_REG = 0x85;
 }

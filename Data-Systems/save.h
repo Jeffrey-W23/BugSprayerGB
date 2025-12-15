@@ -24,6 +24,12 @@ typedef struct HighScoreData
     UINT16 nShotsTakenHard;
 } HighScoreData;
 
+// PUBLIC VARIABLES //
+//--------------------------------------------------------------------------------------
+// New HighScoreData object for storing all the current score data.
+extern HighScoreData m_oHighScoreData;
+//--------------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------------
 // InitSaveData: Initiate the saving/loading system.
 //--------------------------------------------------------------------------------------
@@ -50,5 +56,10 @@ void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTake
 //      nShotsTakenEasy: Pointer to the loaded shotsTaken variable to store during runtime. 
 //--------------------------------------------------------------------------------------
 void LoadGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16* nScore, UINT16* nShotsTaken);
+
+//--------------------------------------------------------------------------------------
+// LoadAllHighScoreData: Load all the highscore data from previous game sessions.
+//--------------------------------------------------------------------------------------
+void LoadAllHighScoreData(void);
 
 #endif

@@ -41,32 +41,23 @@ typedef struct MenuCursor
     UINT8 nDistance;
 } MenuCursor;
 
+//--------------------------------------------------------------------------------------
+// InitMenuCursor: Prepare sprites to be used for a new cursor for a menu.
+//
+// Params:
+//      ptrCursor: Pointer to a menu cursor object.
+//--------------------------------------------------------------------------------------
+void InitMenuCursor(MenuCursor* ptrCursor);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-void InitMenuCursor(MenuCursor* c);
-void UpdateMenuCursor(MenuCursor* c, UINT8 joy, BOOLEAN bShowTwo);
-
-
-
-
-
-
-
-
-
-
+//--------------------------------------------------------------------------------------
+// UpdateMenuCursor: Update the position and state of a cursor object of an active menu.
+//
+// Params:
+//      ptrCursor: Pointer to a menu cursor object.
+//      nJoy: The Joypad for checking input.
+//      bShowTwo: Bool value for if two sprites are needed for cursor.
+//--------------------------------------------------------------------------------------
+void UpdateMenuCursor(MenuCursor* ptrCursor, UINT8 nJoy, BOOLEAN bShowTwo);
 
 //--------------------------------------------------------------------------------------
 // CharToTile: Getter function for getting the tile number from a passed in charater.
@@ -90,14 +81,15 @@ UINT8 CharToTile(char cCharacter);
 void PrintIntToWindow(UINT8 nX, UINT8 nY, INT16 nValue);
 
 //--------------------------------------------------------------------------------------
-// PrintTextToWindow: Print text to the screen using the loaded letters sprite sheet.
+// PrintTextToLayer: Print text to the screen using the loaded letters sprite sheet.
 //
 // Params:
+//      bLayer: The layer that text will be displayed on.
 //      nX: Starting position on the x axis.
 //      nY: Starting position on the y axis.
 //      ptrText: pointer to the characters to show on screen.
 //--------------------------------------------------------------------------------------
-void PrintTextToWindow(UINT8 nX, UINT8 nY, const char *ptrText);
+void PrintTextToLayer(BYTE bLayer, UINT8 nX, UINT8 nY, const char *ptrText);
 
 //--------------------------------------------------------------------------------------
 // PerformantDelay: A function for delaying the system based on screen draws

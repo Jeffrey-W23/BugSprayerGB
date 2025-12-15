@@ -28,9 +28,19 @@ void PlayEnemyDeathSound(void);
 void PlayPlayerDamageSound(void);
 
 //--------------------------------------------------------------------------------------
+// PlayGameOverSound: Play the sound associated with the players death.
+//--------------------------------------------------------------------------------------
+void PlayPlayerDeathSound(void);
+
+//--------------------------------------------------------------------------------------
 // PlaySplashScreenSound: Play the sound associated with the splashscreen.
 //--------------------------------------------------------------------------------------
 void PlaySplashScreenSound(void);
+
+//--------------------------------------------------------------------------------------
+// PlayGameOverSound: Play the sound associated with the gameover sequence.
+//--------------------------------------------------------------------------------------
+void PlayGameOverSound(void);
 
 // Close the Header.
 #endif

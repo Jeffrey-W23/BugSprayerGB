@@ -146,6 +146,29 @@ void InitEnemiesSpawnQueue(void)
 }
 
 //--------------------------------------------------------------------------------------
+// SetInitDifficulty: Set the inital difficulty of the gamemode based on Easy or Hard.
+//
+// Params:
+//      bDiff: The difficulty setting select, 0 meaning easy mode.
+//--------------------------------------------------------------------------------------
+void SetInitDifficulty(BYTE bMode)
+{
+    // Set difficulty for Easy 
+    if (bMode == 0)
+    {    
+        m_nCurrentSpeed = 1;
+        m_nSpawnDelay = 100;
+    }
+
+    // Set difficulty for Hard
+    else
+    {    
+        m_nCurrentSpeed = 7;
+        m_nSpawnDelay = 23;
+    }
+}
+
+//--------------------------------------------------------------------------------------
 // GetNextSpawnIndex: Get the next spawn position in the queue.
 //
 // Returns:

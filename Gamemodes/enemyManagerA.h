@@ -14,8 +14,11 @@
 
 //--------------------------------------------------------------------------------------
 // InitiateSpawner: Initiate the spawner for this gameMode.
+//
+// Params:
+//      bDiff: The difficulty setting select, 0 meaning easy mode.
 //--------------------------------------------------------------------------------------
-void InitiateSpawner(void);
+void InitiateSpawner(BYTE bDiff);
 
 //--------------------------------------------------------------------------------------
 // RefillQueue: Refill the spawn queue after a complete round. 

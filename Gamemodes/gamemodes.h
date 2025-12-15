@@ -10,6 +10,7 @@
 #define GAMEMODES_H
 
 // includes, using, etc
+#include "../Data-Systems/save.h"
 #include <gb/gb.h>
 
 //--------------------------------------------------------------------------------------
@@ -17,8 +18,9 @@
 //
 // Params:
 //      bMode: The gamemode to be initialized.
+//      bDiff: The difficulty of the gamemode.
 //--------------------------------------------------------------------------------------
-void InitializeGamemode(BYTE bMode);
+void InitializeGamemode(BYTE bMode, BYTE bDiff);
 
 //--------------------------------------------------------------------------------------
 // SetScoreOnHud: Universal mode for both modes, updates the score on the
@@ -50,6 +52,11 @@ void SetupPauseCursor(void);
 // UpdatePauseMenu: Update method for the slid down pause menu.
 //--------------------------------------------------------------------------------------
 void UpdatePauseMenu(void);
+
+//--------------------------------------------------------------------------------------
+// PrepareGameOver: Prepare the gameover screen, updating highscore data and showing UI.
+//--------------------------------------------------------------------------------------
+void PrepareGameOver(void);
 
 //--------------------------------------------------------------------------------------
 // UpdateEnemies: Update all the enemies currently alive in the scene.

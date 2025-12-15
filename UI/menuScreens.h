@@ -33,59 +33,60 @@ void DisplaySplashScreen(void);
 //--------------------------------------------------------------------------------------
 void DisplayStartScreen(void);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//--------------------------------------------------------------------------------------
+// SetupMainMenuCursor: Prepare a new cursor to use for the main menu.
+//--------------------------------------------------------------------------------------
 void SetupGameSelectCursor(void);
 
+//--------------------------------------------------------------------------------------
+// SetupModeSelectCursor: Prepare a new cursor to use for the difficulty menu.
+//--------------------------------------------------------------------------------------
 void SetupModeSelectCursor(UINT16 nScore);
 
-void ShowGameSelectMenu(BYTE* bMode, BYTE* bDiff, HighScoreData* oHighScoreData);
+//--------------------------------------------------------------------------------------
+// ShowGameSelectMenu: Show the Menu UI for selecting Gamemodes A or B.
+//
+// Params:
+//      bMode: Pointer to the current gameMode, used for setting gamemode.
+//      bDiff: Pointer to the current difficulty, used for setting the difficulty.
+//--------------------------------------------------------------------------------------
+void ShowGameSelectMenu(BYTE* bMode, BYTE* bDiff);
 
-void ShowGameModeSelectionScreen(BYTE bMode, UINT8 nJoy, UINT8 nPrevJoy, HighScoreData* ptrHighScoreData, BYTE* bDiff);
+//--------------------------------------------------------------------------------------
+// ShowDifficultySelectMenu: Show the Menu UI for selecting a difficulty for a gamemode.
+//
+// Params:
+//      bMode: The current gamemode that is selected.
+//      nJoy: The Joypad for checking input.
+//      nPrevJoy: The last Joypad input.
+//--------------------------------------------------------------------------------------
+void ShowDifficultySelectMenu(BYTE bMode, UINT8 nJoy, UINT8 nPrevJoy);
 
-
-
-
-
-
-
-
-
-
-
-
+//--------------------------------------------------------------------------------------
+// ShowLoadingScreen: Show the loading screen during gamemode initialization.
+//--------------------------------------------------------------------------------------
+void ShowLoadingScreen(void);
 
 //--------------------------------------------------------------------------------------
 // ShowScoreGrade: Determine and show the grade based on the shots taken and kills.
 //
 // Params:
+//      cCharacterOut: Pointer to char, used to set the string as we cant return char*.
 //      nScore: The score value from player or highscore.
 //      nShotsTaken: Shots taken from player or highscore.
 //--------------------------------------------------------------------------------------
-void ShowScoreGrade(UINT16 nScore, UINT16 nShotsTaken);
+void GetScoreGrade(char* cCharacterOut, UINT16 nScore, UINT16 nShotsTaken);
 
 //--------------------------------------------------------------------------------------
 // DisplayGameOverScreen: Set data and display everything needed for the GameOver Screen.
 //
 // Params:
 //      bMode: The gamemode triggering the gameover.
+//      bDiff: The difficulty of the gamemode.
 //      nScore: The score value from player or highscore.
 //      nShotsTaken: Shots taken from player or highscore.
-//      nLoadedScore: The score value loaded from memory.
-//      nLoadedShotsTaken: Shots taken value loaded from memory.
 //--------------------------------------------------------------------------------------
-void DisplayGameOverScreen(BOOLEAN bMode, UINT16 nScore, UINT16 nShotsTaken, UINT16 nLoadedScore, UINT16 nLoadedShotsTaken);
+void DisplayGameOverScreen(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTaken);
 
 // Close the Header.
 #endif
