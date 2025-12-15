@@ -133,7 +133,8 @@ void PlayLifeCollectSound(void)
 void PlayHealthRecoverSound(void)
 {
     // Play the sound for life collection.
-    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x24; NR14_REG = 0x84; PerformantDelay(2);
-    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x88; NR14_REG = 0x85; PerformantDelay(2);
-    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xEC; NR14_REG = 0x85; PerformantDelay(3);
+    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x24; NR14_REG = 0x84;
+    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0x88; NR14_REG = 0x85;
+    NR10_REG = 0x78; NR11_REG = 0x82; NR12_REG = 0x44; NR13_REG = 0xEC; NR14_REG = 0x85;
+    PerformantDelay(3);
 }
