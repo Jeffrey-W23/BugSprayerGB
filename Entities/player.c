@@ -136,6 +136,10 @@ void UpdatePlayer(Player* ptrPlayer)
 //--------------------------------------------------------------------------------------
 void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy) 
 {
+    // Declare variables
+    // for later use.
+    UINT8 nPressed;
+
     // If it is gamemode 0
     if (bMode == 0)
     {
@@ -212,7 +216,7 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
     {
 
         // Determine last pressed.
-        UINT8 nPressed = nJoy & ~m_nPrevJoy;
+        nPressed = nJoy & ~m_nPrevJoy;
         
         // Move the player along the x axis only, moving between 3 set positions.
 
@@ -291,20 +295,17 @@ void FireSprayBullet(Player* ptrPlayer)
     // Increase shots taken count for grade calculation.
     ptrPlayer->nTotalShotsTaken++;
 
-    // Store direction check val for easier access.
-    UINT8 d = ptrPlayer->nDirCheck;
-
     // Update the position and direction of the bullet.
-    ptrPlayer->nSprayX = m_anSpraySpawnPosX[d];
-    ptrPlayer->nSprayY = m_anSpraySpawnPosY[d];
-    ptrPlayer->nSprayDirX = m_anSprayDirX[d];
-    ptrPlayer->nSprayDirY = m_anSprayDirY[d];
+    ptrPlayer->nSprayX = m_anSpraySpawnPosX[ptrPlayer->nDirCheck];
+    ptrPlayer->nSprayY = m_anSpraySpawnPosY[ptrPlayer->nDirCheck];
+    ptrPlayer->nSprayDirX = m_anSprayDirX[ptrPlayer->nDirCheck];
+    ptrPlayer->nSprayDirY = m_anSprayDirY[ptrPlayer->nDirCheck];
 
     // Mark the bullet as active, there can only be one.
     ptrPlayer->bSprayActive = TRUE;
 
     // Set the sprite based on direction and move sprite into position.
-    set_sprite_tile(5, m_ansprayTileIDs[d]);
+    set_sprite_tile(5, m_ansprayTileIDs[ptrPlayer->nDirCheck]);
     move_sprite(5, ptrPlayer->nSprayX, ptrPlayer->nSprayY);
 }
 

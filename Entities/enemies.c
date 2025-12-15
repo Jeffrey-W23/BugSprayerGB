@@ -61,6 +61,10 @@ void InitEnemy(UINT8 nEnemyIndex)
 //--------------------------------------------------------------------------------------
 void UpdateEnemyModeA(UINT8 nEnemyIndex, Player* ptrPlayer) 
 {
+    // Declare variables for
+    // later use.
+    UINT8 nProgress;
+
     // Get the current enemy being updated.
     Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
     
@@ -82,13 +86,13 @@ void UpdateEnemyModeA(UINT8 nEnemyIndex, Player* ptrPlayer)
         ptrEnemy->nEnterCounter++;
         
         // Store the enterCounter for easier use.
-        UINT8 progress = ptrEnemy->nEnterCounter;
+        nProgress = ptrEnemy->nEnterCounter;
 
         // Set the sprite of the enemy to a turn for a few frame as it enters its lane.
-        if(progress > 46) set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber+2);
+        if(nProgress > 46) set_sprite_tile(ptrEnemy->nSpriteID, ptrEnemy->nSpriteNumber+2);
 
         // If entering the lane move the playher along the x axis.
-        if(progress < 50) ptrEnemy->nX = 160 - ((160 - ptrEnemy->nTargetX) * progress) / 50; 
+        if(nProgress < 50) ptrEnemy->nX = 160 - ((160 - ptrEnemy->nTargetX) * nProgress) / 50; 
         
         // Once in position for its lane
         else 
@@ -154,7 +158,12 @@ void UpdateEnemyModeA(UINT8 nEnemyIndex, Player* ptrPlayer)
 //      ptrPlayer: Pointer of the player object, for passing in the main player object.
 //--------------------------------------------------------------------------------------
 void UpdateEnemyModeB(UINT8 nEnemyIndex, Player* ptrPlayer) 
-{  
+{
+    // Declare variables for
+    // later use.
+    UINT8 nSprayX;
+    UINT8 nSprayY;
+    
     // Get the current enemy being updated.
     Enemy* ptrEnemy = &m_aoEnemies[nEnemyIndex];
 
@@ -222,8 +231,8 @@ void UpdateEnemyModeB(UINT8 nEnemyIndex, Player* ptrPlayer)
     if (ptrPlayer->bSprayActive)
     {
         // Get the current position of the bullet.
-        UINT8 nSprayX = ptrPlayer->nSprayX;
-        UINT8 nSprayY = ptrPlayer->nSprayY;
+        nSprayX = ptrPlayer->nSprayX;
+        nSprayY = ptrPlayer->nSprayY;
 
         // Check to see if the bullet has hit the enemy.
         if (nSprayX >= ptrEnemy->nX - 4 && nSprayX <= ptrEnemy->nX + 12 &&

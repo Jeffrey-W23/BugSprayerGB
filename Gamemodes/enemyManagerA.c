@@ -125,6 +125,11 @@ const UINT8 m_anRoundSpawnRates[20][4] =
 //--------------------------------------------------------------------------------------
 void InitiateSpawner(BYTE bDiff) 
 {
+    // Declare variables
+    // for later use
+    UINT8 i;
+    UINT8 o;
+
     // Reset all values.
     m_nSubTickCounter = 0;
     m_bNewTick = FALSE;
@@ -149,8 +154,8 @@ void InitiateSpawner(BYTE bDiff)
     }
 
     // Reset the queue arrays.
-    for (UINT8 i = 0; i < SPAWN_QUEUE_SIZEA; i++) { m_anQueue[i] = 0; }
-    for (UINT8 i = 0; i < SPAWN_QUEUE_SIZEA; i++) { m_anQueueType[i] = 0; }
+    for (i = 0; i < SPAWN_QUEUE_SIZEA; i++) { m_anQueue[i] = 0; }
+    for (o = 0; o < SPAWN_QUEUE_SIZEA; o++) { m_anQueueType[o] = 0; }
 
     // Fill the first rounds spawn queue.
     RefillQueue();
@@ -377,11 +382,8 @@ void SpawnEnemyInLane(UINT8 nLane, UINT8 nType)
     ptrEnemy->nSpriteID = m_nNextSpriteID++;
     ptrEnemy->nSubPixelY = 0;
 
-    // Get the current speed multipler based on progress in the round.
-    UINT8 nSpeedMultiplier = GetCurrentSpeedMultiplier();
-
     // Apply the base speed plus multipler to new Enemy object.
-    ptrEnemy->nSpeed = m_anBaseSpeeds[nType] + nSpeedMultiplier;
+    ptrEnemy->nSpeed = m_anBaseSpeeds[nType] + GetCurrentSpeedMultiplier();
     
     // If the next sprite id ends up too large we can reset.
     if(m_nNextSpriteID >= 38) m_nNextSpriteID = 7;

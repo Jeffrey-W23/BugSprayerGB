@@ -76,6 +76,9 @@ static const UINT8 m_anPieSpriteIDs[4] = {41, 42, 43, 44};
 // New const array of unsigned int 8s for each tile of the oven area of the background. Used to set back after extra life.
 static const UINT8 m_anDefaultOvenTiles[8] = {36, 37, 38, 39, 55, 56, 57, 58};
 
+// New const array of unsigned int 8s for tiles needed to show the pie in the oven.
+UINT8 m_anOvenOpenTiles[8] = {77, 78, 79, 80, 81, 82, 83, 84};
+
 // New menuCursor object, used for showing the pause menu cursor.
 static MenuCursor m_oPauseCursor;
 
@@ -227,9 +230,6 @@ void UpdateExtraLife(void)
     // the player isn't already at the maximum health value.
     if (m_oPlayer.nScore > m_nPrevScore && m_oPlayer.nScore % nScoreToLife == 0 && !m_bExtraLifeActive && m_oPlayer.nHealth < 5) 
     {
-        // Prepare the tiles needed to show the pie in the oven.
-        UINT8 tiles[8] = {77, 78, 79, 80, 81, 82, 83, 84};
-        
         // Set the player to the middle lane.
         // this way the player isn't covering
         // the new spawned life, and is clear.
@@ -252,7 +252,7 @@ void UpdateExtraLife(void)
         // plays we will just keep the animation simple and move the sprite
         // and then delay the game, and then move again. Once complete contiune
         // the game again.
-        set_bkg_tiles(4, 2, 4, 2, tiles); set_sprite_tile(39, 41); move_sprite(39, 52, 38);
+        set_bkg_tiles(4, 2, 4, 2, m_anOvenOpenTiles); set_sprite_tile(39, 41); move_sprite(39, 52, 38);
         PerformantDelay(15); set_sprite_tile(39, SPRITE_SHEET_EMPTY_SLOT); PerformantDelay(15);
         set_sprite_tile(39, 41); PerformantDelay(15); set_sprite_tile(39, SPRITE_SHEET_EMPTY_SLOT);
         PerformantDelay(15); set_sprite_tile(39, 41); PerformantDelay(50);
@@ -297,6 +297,8 @@ void PauseGame(void)
     // for later use 
     UINT8 nX, nY;
     UINT8 nWindowBackup[5 * 20];
+    UINT8 nTile;
+    UINT8 anTiles[20 * 18];
 
     // Play the pausing sound (backwards start sound).
     PlayStartSound();
@@ -314,9 +316,6 @@ void PauseGame(void)
         hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
         hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
 
-        // array of ints to temp store background
-        UINT8 anTiles[20 * 18];
-
         // Clone the current background to the window layer.
         get_bkg_tiles(0, 0, 20, 18, anTiles);
         set_win_tiles(0, 0, 20, 18, anTiles);
@@ -329,8 +328,6 @@ void PauseGame(void)
         // Show the Window Layer.
         SHOW_WIN;
 
-        UINT8 tile = 127;
-
         // Slide down the Pause Menu.
         // This is done by replacing the top
         // part of the Window line by line
@@ -338,7 +335,8 @@ void PauseGame(void)
         {
             for (nX = 0; nX < 20; nX++) 
             {
-                set_win_tiles(nX, nY, 1, 1, &tile);
+                nTile = 127;
+                set_win_tiles(nX, nY, 1, 1, &nTile);
             }
 
             PerformantDelay(2);
@@ -372,8 +370,8 @@ void PauseGame(void)
         {
             for (nX = 0; nX < 20; nX++) 
             {
-                UINT8 tile = nWindowBackup[nY * 20 + nX];
-                set_win_tiles(nX, nY, 1, 1, &tile);
+                nTile = nWindowBackup[nY * 20 + nX];
+                set_win_tiles(nX, nY, 1, 1, &nTile);
             }
 
             PerformantDelay(2);

@@ -85,7 +85,7 @@ void InitSaveData(void)
 //      nScoreEasy: The score from the player.
 //      nShotsTaken: The total shots taken by the player.
 //--------------------------------------------------------------------------------------
-void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTaken)
+void SaveGameData(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsTaken)
 {
     // Int for if we need to 
     // save or not this session.
@@ -183,7 +183,7 @@ void SaveGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTake
 //      nScore: Pointer to the loaded score variable to store during runtime.
 //      nShotsTakenEasy: Pointer to the loaded shotsTaken variable to store during runtime. 
 //--------------------------------------------------------------------------------------
-void LoadGameData(BOOLEAN bMode, BOOLEAN bDiff, UINT16* nScore, UINT16* nShotsTaken)
+void LoadGameData(BYTE bMode, BYTE bDiff, UINT16* nScore, UINT16* nShotsTaken)
 {
     // If ModeA, get just highscore A
     if (bMode == 0)

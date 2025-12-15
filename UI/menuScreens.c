@@ -484,7 +484,7 @@ void GetScoreGrade(char* cCharacterOut, UINT16 nScore, UINT16 nShotsTaken)
 //      nScore: The score value from player or highscore.
 //      nShotsTaken: Shots taken from player or highscore.
 //--------------------------------------------------------------------------------------
-void DisplayGameOverScreen(BOOLEAN bMode, BOOLEAN bDiff, UINT16 nScore, UINT16 nShotsTaken)
+void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsTaken)
 {
     // Declare variables 
     // for later use.
