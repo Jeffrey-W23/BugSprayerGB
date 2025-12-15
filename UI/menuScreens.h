@@ -12,15 +12,11 @@
 // includes, using, etc
 #include <gb/gb.h>
 #include "../Data-Systems/save.h"
-#include "hUGEDriver.h"
 
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
 // Const int for setting the empty slot for sprite sheet.
 #define SPRITE_SHEET_EMPTY_SLOT 81
-
-// New const huge song variable for the main song file of the game.
-extern const hUGESong_t m_sSong1;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------

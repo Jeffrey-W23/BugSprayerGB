@@ -10,6 +10,7 @@
 #include <gb/gb.h>
 #include <rand.h>
 #include <string.h>
+#include "hUGEDriver.h"
 
 // includes for main gameObject.
 #include "Gamemodes/gamemodes.h"
@@ -69,6 +70,9 @@ void Initialize(void)
     // Display the GameSelect/MainMenu
     ShowGameSelectMenu(&m_bCurrentGameMode, &m_bCurrentDifficulty);
     
+    // Mute the main channel that other audio plays on.
+    hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
+
     // Show loading screen incase slow random generation.
     ShowLoadingScreen();
 

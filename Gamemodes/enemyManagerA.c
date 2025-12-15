@@ -12,6 +12,7 @@
 #include <gb/gb.h>
 #include <rand.h>
 #include "../Entities/enemies.h"
+#include "../Music-Sound/soundManager.h"
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------

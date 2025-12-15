@@ -17,6 +17,7 @@ REM
 %LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o UI\hud.o UI\hud.c
 %LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Data-Systems\save.o Data-Systems\save.c
 %LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Music-Sound\song1.o Music-Sound\song1.c
+%LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o Music-Sound\loseLife.o Music-Sound\loseLife.c
 %LCC% -Wa-l -Wl-m -Wl-j -DUSE_SFR_FOR_REG -I%HUGEDIR%/include -c -o main.o main.c
 
 REM
@@ -36,7 +37,8 @@ REM
   Gamemodes\enemyManagerB.o ^
   UI\hud.o ^
   Data-Systems\save.o ^
-  Music-Sound\song1.o
+  Music-Sound\song1.o ^
+  Music-Sound\loseLife.o
 
 REM
 REM

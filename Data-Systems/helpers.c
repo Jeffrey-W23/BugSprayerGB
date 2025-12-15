@@ -11,6 +11,7 @@
 #include <rand.h>
 #include <string.h>
 #include "../Data-Systems/helpers.h"
+#include "../Music-Sound/soundManager.h"
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
@@ -65,12 +66,23 @@ void UpdateMenuCursor(MenuCursor* ptrCursor, UINT8 nJoy, BOOLEAN bShowTwo)
     if (ptrCursor->nBtnCount != 0)
     {
         // Move cursor UP
-        if ((nJoy & J_UP)   && !(ptrCursor->nPrevJoy & J_UP))   nPrevMove = 1;
-        if ((nJoy & J_LEFT) && !(ptrCursor->nPrevJoy & J_LEFT)) nPrevMove = 1;
+        if ((nJoy & J_UP)   && !(ptrCursor->nPrevJoy & J_UP)){ nPrevMove = 1; PlayButtonMoveSound(); }
+        if ((nJoy & J_LEFT) && !(ptrCursor->nPrevJoy & J_LEFT)) { nPrevMove = 1; PlayButtonMoveSound(); }
 
         // Move cursor DOWN
-        if ((nJoy & J_DOWN)  && !(ptrCursor->nPrevJoy & J_DOWN))  nNextMove = 1;
-        if ((nJoy & J_RIGHT) && !(ptrCursor->nPrevJoy & J_RIGHT)) nNextMove = 1;
+        if ((nJoy & J_DOWN)  && !(ptrCursor->nPrevJoy & J_DOWN)) { nNextMove = 1; PlayButtonMoveSound(); }
+        if ((nJoy & J_RIGHT) && !(ptrCursor->nPrevJoy & J_RIGHT)) { nNextMove = 1; PlayButtonMoveSound(); }
+    }
+
+    // Else if cant move
+    else
+    {
+        // Check for any input
+        if ((nJoy & J_UP) && !(ptrCursor->nPrevJoy & J_UP) || (nJoy & J_LEFT) && !(ptrCursor->nPrevJoy & J_LEFT) 
+        || (nJoy & J_DOWN)  && !(ptrCursor->nPrevJoy & J_DOWN) || (nJoy & J_RIGHT) && !(ptrCursor->nPrevJoy & J_RIGHT)) 
+        { 
+            PlayBonkSound(); 
+        }
     }
 
     // Update the index position of the cursor, which is the logical posiiton. 

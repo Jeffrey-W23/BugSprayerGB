@@ -6,6 +6,7 @@
 
 // includes, using, etc
 #include "../Entities/player.h"
+#include "../Music-Sound/soundManager.h"
 
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------

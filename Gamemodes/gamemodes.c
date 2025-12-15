@@ -53,10 +53,10 @@ static UINT8 m_nDamgeToPlayer = 25;
 static BOOLEAN m_bPaused = FALSE;
 
 // New static unsigned int 16 for the current amount of time before health can recovery for gamemode B.
-static UINT16 m_nDamgeTimer = 400;
+static UINT16 m_nDamgeTimer = 0;
 
 // New bool value for if the health can recover after not taking damage for gamemode B.
-static BOOLEAN m_bRecoverHealth = FALSE;
+static BOOLEAN m_bRecoverHealth = TRUE;
 
 // New bool value for if the extra life pie in the oven is currently showing for gamemode A.
 static BOOLEAN m_bExtraLifeActive = FALSE;
@@ -243,7 +243,7 @@ void UpdateExtraLife(void)
         // this will ensure we see the death
         // sprite for a moment. Just keep the
         // logic simple here.
-        PerformantDelay(30);
+        PerformantDelay(45);
         
         // Complete kill all request.
         CompleteKillAllEnemies();
@@ -252,10 +252,10 @@ void UpdateExtraLife(void)
         // plays we will just keep the animation simple and move the sprite
         // and then delay the game, and then move again. Once complete contiune
         // the game again.
-        set_bkg_tiles(4, 2, 4, 2, m_anOvenOpenTiles); set_sprite_tile(39, 41); move_sprite(39, 52, 38);
+        set_bkg_tiles(4, 2, 4, 2, m_anOvenOpenTiles); set_sprite_tile(39, 41); move_sprite(39, 52, 38); PlayLifeSpawnSound();
         PerformantDelay(15); set_sprite_tile(39, SPRITE_SHEET_EMPTY_SLOT); PerformantDelay(15);
-        set_sprite_tile(39, 41); PerformantDelay(15); set_sprite_tile(39, SPRITE_SHEET_EMPTY_SLOT);
-        PerformantDelay(15); set_sprite_tile(39, 41); PerformantDelay(50);
+        set_sprite_tile(39, 41); PlayLifeSpawnSound(); PerformantDelay(15); set_sprite_tile(39, SPRITE_SHEET_EMPTY_SLOT);
+        PerformantDelay(15); set_sprite_tile(39, 41); PlayLifeSpawnSound(); PerformantDelay(50);
         
         // Set the extra life as ready for collection.
         m_bExtraLifeActive = TRUE;
@@ -277,6 +277,9 @@ void UpdateExtraLife(void)
             // Increase the player health
             m_oPlayer.nHealth++;
             SetHealthHearts(m_oPlayer.nHealth);
+
+            // Play collect sound
+            PlayLifeCollectSound();
         }
     }
 
@@ -300,9 +303,6 @@ void PauseGame(void)
     UINT8 nTile;
     UINT8 anTiles[20 * 18];
 
-    // Play the pausing sound (backwards start sound).
-    PlayStartSound();
-
     // Start pause logic.
     m_bPaused = !m_bPaused;
     m_nBlinkTimer = 0;
@@ -312,9 +312,11 @@ void PauseGame(void)
     // WHEN PAUSED
     if (m_bPaused)
     {
+        // Play the pausing sound.
+        PlayStartSound();
+
         // Paused the music.
         hUGE_mute_channel(HT_CH3, HT_CH_MUTE);
-        hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
 
         // Clone the current background to the window layer.
         get_bkg_tiles(0, 0, 20, 18, anTiles);
@@ -353,9 +355,11 @@ void PauseGame(void)
     // WHEN UNPAUSED
     else
     {
+        // Play the pausing sound.
+        PlayStartSoundReversed();
+
         // Unpaused the music.
         hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
-        hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
 
         // Reset positions.
         nX = 0; nY = 0;
@@ -587,7 +591,7 @@ void UpdateLoopGameModeA(void)
             if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
             {
                 // Play the Enemy death sound.
-                PlayEnemyDeathSound();
+                PlayBonkSound();
 
                 // Mark sound as played for next request.
                 m_bPlayKillSoundEffect = FALSE;
@@ -605,6 +609,18 @@ void UpdateLoopGameModeA(void)
             // Play the damage audio
             if (m_oPlayer.bTakenDamage)
             {
+                // Stop the main game music
+                hUGE_mute_channel(HT_CH1,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH2,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH3,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH4,HT_CH_MUTE);
+
+                __critical 
+                {
+                    // Init and play the losing life song file.
+                    hUGE_init(&m_sLoseLife);
+                }
+
                 // Make sure we keep the health capped
                 // limit the possibility of overflow.
                 m_oPlayer.nHealth = (m_oPlayer.nHealth < 1 || 
@@ -654,13 +670,27 @@ void UpdateLoopGameModeA(void)
                 move_sprite(5, 88, 26); PerformantDelay(30); move_sprite(5, 86, 26);
                 PerformantDelay(30); move_sprite(5, 88, 26); PerformantDelay(30);
                 move_sprite(5, 86, 26); PerformantDelay(30); move_sprite(5, 88, 26);
-                PerformantDelay(30);
-
-                // Unmute music, damage has finished.
-                hUGE_mute_channel(HT_CH3, HT_CH_PLAY);
+                PerformantDelay(100);
 
                 // Mark damage false again.
                 m_oPlayer.bTakenDamage = FALSE;
+
+                // Stop the losing life song.
+                hUGE_mute_channel(HT_CH1,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH2,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH3,HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH4,HT_CH_MUTE);
+
+                __critical 
+                {
+                    // Init and play the main game song again.
+                    hUGE_init(&m_sSong1);
+                }
+
+                // Mute all the channels, only using channel 3 in gameplay.
+                hUGE_mute_channel(HT_CH1, HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH2, HT_CH_MUTE);
+                hUGE_mute_channel(HT_CH4, HT_CH_MUTE);
             }
 
             // Set the score, only if changed.
@@ -760,7 +790,7 @@ void UpdateLoopGameModeB(void)
             if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
             {
                 // Play the Enemy death sound.
-                PlayEnemyDeathSound();
+                PlayBonkSound();
 
                 // Mark sound as played for next request.
                 m_bPlayKillSoundEffect = FALSE;
@@ -783,21 +813,20 @@ void UpdateLoopGameModeB(void)
                 // Reset damage counter,
                 // disable any health recovery
                 m_nDamgeTimer = 400;
-                m_bRecoverHealth = FALSE;
             }
 
             // Only tick the damage timer while we're not taking damage.
-            if (!m_bRecoverHealth && m_nDamgeTimer > 0) 
+            if (m_nDamgeTimer > 0) 
             {
                 m_nDamgeTimer--;
+
+                // Cannot recover while damaged.
+                m_bRecoverHealth = FALSE;
             }
 
             // Once damage timer is 0 and not already recovering.
-            if (m_nDamgeTimer == 0 && !m_bRecoverHealth) 
+            if (m_nDamgeTimer == 0)
             {
-                // Enable the health recovery mode.
-                m_bRecoverHealth = TRUE;
-
                 // Increase the health of the player.
                 m_oPlayer.nHealth += 1;
 
@@ -807,9 +836,16 @@ void UpdateLoopGameModeB(void)
                     m_oPlayer.nHealth = 998;
                 }
 
-                // Recovery done, allow timer to 
-                // run again next time you take damage
-                m_bRecoverHealth = FALSE;
+                // Play audio to indicate health recovery
+                if (!m_bRecoverHealth)
+                {
+                    PlayHealthRecoverSound();
+                    PlayHealthRecoverSound();
+                    PlayHealthRecoverSound();
+
+                    // Ensure we only play audio once.
+                    m_bRecoverHealth = TRUE;
+                }
             }
 
             // Prepare score and health for displaying.

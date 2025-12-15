@@ -9,6 +9,7 @@
 #include "../Entities/enemies.h"
 #include "../Gamemodes/enemyManagerA.h"
 #include "../Gamemodes/enemyManagerB.h"
+#include "../Music-Sound/soundManager.h"
 
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
@@ -355,6 +356,9 @@ void KillAllEnemies(void)
     // Delcare Iterator needed 
     // for for loop in method.
     UINT8 o;
+
+    // Play kill all sound
+    PlayKillAllEnemySound();
 
     // Loop through each enemy avaliable.
     for (o = 0; o < MAX_ENEMIES; o++) 

@@ -250,6 +250,9 @@ void ShowGameSelectMenu(BYTE* bMode, BYTE* bDiff)
             // Store the cursor position for when we return to game select menu
             m_nGameSelectCursorPos = m_oMainMenuCursor.nIndex;
 
+            // Play button accept sound.
+            PlayStartSound();
+
             // Open difficulty select menu based on gamemode.
             ShowDifficultySelectMenu(m_oMainMenuCursor.nIndex, nJoy, nPrevJoy);
 
@@ -281,9 +284,6 @@ void ShowGameSelectMenu(BYTE* bMode, BYTE* bDiff)
         // Add a slight delay to ensure cursor updates.
         PerformantDelay(1);
     }
-
-    // Play the start sound after button press
-    PlayStartSound();
     
     // Small delay to allow sound to play
     PerformantDelay(10);
@@ -401,17 +401,29 @@ void ShowDifficultySelectMenu(BYTE bMode, UINT8 nJoy, UINT8 nPrevJoy)
         // MAKE SELECTION
         if (nJoy & J_A && !(nPrevJoy & J_A) || nJoy & J_START && !(nPrevJoy & J_START)) 
         {
+            // Set modes
             m_bSelectedDifficulty = m_oMainMenuCursor.nIndex;
             m_bSelectedGamemode = bMode;
+            
+            // Exit loop
             bAwaitingInput = FALSE;
+            
+            // Play button accept sound.
+            PlayStartSound();
         }
 
         // GO BACK TO GAME MENU
         if (nJoy & J_B && !(nPrevJoy & J_B)) 
         {
+            // Set modes as null
             m_bSelectedDifficulty = 2;
             m_bSelectedGamemode = 2;
+
+            // Exit loop
             bAwaitingInput = FALSE;
+
+            // Play back sound.
+            PlayStartSoundReversed();
         }
 
         // Store the current joypad input to compare next frame.
@@ -515,6 +527,9 @@ void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsT
     
     // Small delay to allow sound to play
     PerformantDelay(60);
+
+    // Play just the noise channel for music.
+    hUGE_mute_channel(HT_CH4, HT_CH_PLAY);
 
     // Fade out the sprite layer
     FadeDrawLayer(1, 1, 0xE4, 0x90, 0x40, 0x00, 15);
