@@ -218,7 +218,7 @@ void UpdateExtraLife(void)
 {
     // Amount of points required to
     // spawn a new life.
-    UINT16 nScoreToLife = 10;
+    UINT16 nScoreToLife = 200;
 
     // If the player gets over 1000
     // we want the lives to be rarer
