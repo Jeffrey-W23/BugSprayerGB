@@ -62,7 +62,7 @@ void Initialize(void)
 
     // Set sprite data based on spritesheet
     SPRITES_8x8; 
-    set_sprite_data(0, 82, m_caSprites);
+    set_sprite_data(0, 83, m_caSprites);
 
     // Display the sprite layer
     SHOW_SPRITES;

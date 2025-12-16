@@ -32,7 +32,7 @@
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
 // Const ints for magic numbers used through out spawn logic.
-#define SPRITE_SHEET_EMPTY_SLOT 81
+#define SPRITE_SHEET_EMPTY_SLOT 82
 
 // New Player object for storing and setting player information.
 static Player m_oPlayer;
@@ -218,7 +218,7 @@ void UpdateExtraLife(void)
 {
     // Amount of points required to
     // spawn a new life.
-    UINT16 nScoreToLife = 200;
+    UINT16 nScoreToLife = 10;
 
     // If the player gets over 1000
     // we want the lives to be rarer
@@ -784,7 +784,7 @@ void UpdateLoopGameModeB(void)
             {
                 set_sprite_tile(5, SPRITE_SHEET_EMPTY_SLOT);
             }
-            
+
             // Check if an enemy sound effect is needed.
             // Play once per frame instead of every enemy.
             if (m_bPlayKillSoundEffect && !m_oPlayer.bTakenDamage)
@@ -839,7 +839,6 @@ void UpdateLoopGameModeB(void)
                 // Play audio to indicate health recovery
                 if (!m_bRecoverHealth)
                 {
-                    PlayHealthRecoverSound();
                     PlayHealthRecoverSound();
                     PlayHealthRecoverSound();
 

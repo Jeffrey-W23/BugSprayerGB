@@ -14,7 +14,7 @@
 // PUBLIC VARIABLES //
 //--------------------------------------------------------------------------------------
 // Const int for setting the empty slot for sprite sheet.
-#define SPRITE_SHEET_EMPTY_SLOT 81
+#define SPRITE_SHEET_EMPTY_SLOT 82
 
 // New static unsigned int 8 used for the current tick in blinking the screen.
 extern UINT8 m_nBlinkTimer;

@@ -212,7 +212,7 @@ void ShowGameSelectMenu(BYTE* bMode, BYTE* bDiff)
     UINT8 nJoy; UINT8 nPrevJoy;
 
     // Set data and tiles for the game select background layer
-    set_bkg_data(0, 82, m_caGameSelectTiles);
+    set_bkg_data(0, 81, m_caGameSelectTiles);
     set_bkg_tiles(0, 0, 20, 18, m_caGameSelect);
 
     // Set the Game Select title text
@@ -305,10 +305,10 @@ void ShowDifficultySelectMenu(BYTE bMode, UINT8 nJoy, UINT8 nPrevJoy)
     BOOLEAN bAwaitingInput = TRUE;
     
     // Set the data of the window layer.   
-    set_win_data(0, 82, m_caGameSelectTiles);
+    set_win_data(0, 81, m_caGameSelectTiles);
     
     // Loop through all window tiles and set to blank.
-    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 81);
+    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 80);
 
     // Show text on the Window layer for buttons.
     PrintTextToLayer(1, 5, 8, "HIGH SCORE");
@@ -444,7 +444,7 @@ void ShowLoadingScreen(void)
     UINT8 nX, nY;
 
     // Loop through all window tiles and set to blank.
-    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 81);
+    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 80);
 
     // Show Loading text on the window layer.
     PrintTextToLayer(1, 6, 11, "LOADING.");
@@ -539,16 +539,14 @@ void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsT
     // Wait a little and then scroll up the scores
     PerformantDelay(100);
 
-
-    //
+    // Hide the background
     HIDE_BKG;
 
-
     // Set the data of the window layer.   
-    set_win_data(0, 82, m_caGameSelectTiles);
+    set_win_data(0, 81, m_caGameSelectTiles);
     
     // Loop through all window tiles and set to blank.
-    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 81);
+    for(nY = 0; nY < 18; ++nY) for(nX = 0; nX < 20; ++nX) set_win_tile_xy(nX, nY, 80);
 
     // Show text on the Window layer for buttons.
     PrintTextToLayer(1, 5, 13, "HIGH SCORE");

@@ -11,7 +11,7 @@
 // PRIVATE VARIABLES //
 //--------------------------------------------------------------------------------------
 // Const int for setting the empty slot for sprite sheet.
-#define SPRITE_SHEET_EMPTY_SLOT 81
+#define SPRITE_SHEET_EMPTY_SLOT 82
 
 // New bool for if the spary is currently showing.
 static BOOLEAN m_bIsSprayShowing = FALSE;
@@ -210,6 +210,10 @@ void HandlePlayerInput(BYTE bMode, Player* ptrPlayer, UINT8 nJoy)
         {
             FireSprayBullet(ptrPlayer);
         }
+
+        // Set the crosshair sprite
+        set_sprite_tile(6, 81);
+        move_sprite(6, m_anSpraySpawnPosX[ptrPlayer->nDirCheck], m_anSpraySpawnPosY[ptrPlayer->nDirCheck]);
     }
 
     // If is gamemode 1
