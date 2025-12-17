@@ -321,7 +321,6 @@ void PauseGame(void)
         // Clone the current background to the window layer.
         get_bkg_tiles(0, 0, 20, 18, anTiles);
         set_win_tiles(0, 0, 20, 18, anTiles);
-        set_win_tiles(0, 0, 20, 18, anTiles);
 
         // Position the Window layer.
         WX_REG = 7;

@@ -153,18 +153,13 @@ void InitEnemiesSpawnQueue(void)
 //--------------------------------------------------------------------------------------
 void SetInitDifficulty(BYTE bMode)
 {
-    // Set difficulty for Easy 
-    if (bMode == 0)
-    {    
-        m_nCurrentSpeed = 1;
-        m_nSpawnDelay = 100;
-    }
-
     // Set difficulty for Hard
-    else
+    if (bMode == 1)
     {    
         m_nCurrentSpeed = 7;
         m_nSpawnDelay = 23;
+        m_nKillsForNextSpeed = 900;
+        m_nKillsForNextSpawnRate = 400;
     }
 }
 

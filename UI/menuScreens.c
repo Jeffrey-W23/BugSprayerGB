@@ -461,7 +461,8 @@ void ShowLoadingScreen(void)
 void GetScoreGrade(char* cCharacterOut, UINT16 nScore, UINT16 nShotsTaken)
 {
     // Declare accuracy int
-    UINT16 nAccuracy = 0;
+    UINT32 nAccuracy = 0;
+    UINT32 nScore32 = 0;
 
     // Declare chars used to make up the grade.
     char cGrade = 'F';
@@ -471,7 +472,8 @@ void GetScoreGrade(char* cCharacterOut, UINT16 nScore, UINT16 nShotsTaken)
     if (nShotsTaken != 0)
     {
         // Calculate the accuracy of shots.
-        nAccuracy = (nScore * 100) / nShotsTaken;
+        nScore32 = nScore;
+        nAccuracy = (nScore32 * 100) / nShotsTaken;
     }
 
     // Determine the grade based on the accuracy and return.
@@ -501,6 +503,7 @@ void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsT
     // Declare variables 
     // for later use.
     UINT8 nX, nY;
+    UINT8 anTiles[20 * 18];
 
     // Small delay for affect.
     PerformantDelay(10);
@@ -511,12 +514,15 @@ void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsT
     // Small delay to allow sound to play
     PerformantDelay(50);
     
-    // Change screen color to indicate defeat.
-    FadeDrawLayer(0, 1, 0xE4, 0x90, 0x40, 0x00, 15);
+    // Clone the current background to the window layer.
+    get_bkg_tiles(0, 0, 20, 18, anTiles);
+    set_win_tiles(0, 0, 20, 18, anTiles);
 
-    // Print various bits of text to make the game over screen.
-    printf(" \n"); printf(" \n"); printf(" \n"); printf(" \n");
-    printf("     GAME  OVER     \n"); printf(" \n");
+    // Show the Window Layer.
+    SHOW_WIN;
+
+    // Show text on the Window layer for gameover.
+    PrintTextToLayer(1, 5, 10, "GAME  OVER");
     
     // Fade back in the gameover screen.
     PerformantDelay(20);
@@ -539,8 +545,9 @@ void DisplayGameOverScreen(BYTE bMode, BYTE bDiff, UINT16 nScore, UINT16 nShotsT
     // Wait a little and then scroll up the scores
     PerformantDelay(100);
 
-    // Hide the background
+    // Hide the background/window
     HIDE_BKG;
+    HIDE_WIN;
 
     // Set the data of the window layer.   
     set_win_data(0, 81, m_caGameSelectTiles);
