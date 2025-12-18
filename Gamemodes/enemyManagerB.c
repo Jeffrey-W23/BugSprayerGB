@@ -24,7 +24,7 @@ static UINT8 m_anSpawnQueue[SPAWN_QUEUE_SIZEB];
 static UINT8 m_nSpawnQueuePos = 0;
 
 // New Unsigned int 8 for keeping track of kill requirements for speed increase
-static UINT16 m_nKillsForNextSpeed = 15;
+static UINT16 m_nKillsForNextSpeed = 250;
 
 // New unsigned int 8 for keeping track of the kill requirements for spawn increase
 static UINT16 m_nKillsForNextSpawnRate = 15;
@@ -64,7 +64,7 @@ static const INT8 m_anMovementDirY[8] = {1,  1,  1,  0,  0, -1, -1, -1};
 UINT8 m_nSpawnTimer = 0;
 
 // New unsigned int 8 for keeping track of the current spawn delay for all enemies.
-UINT8 m_nSpawnDelay = 100;
+UINT8 m_nSpawnDelay = 60;
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -279,15 +279,15 @@ void IncreaseDifficulty(UINT8* nDamgeToPlayer)
         if (m_nTotalKilled != m_nLastSpawnRateKillCount) 
         {
             // Change the spawnRate depending on how many total kills.
-            if (m_nTotalKilled < 150) m_nSpawnDelay -= 5;
-            else if (m_nTotalKilled < 300) m_nSpawnDelay -= 2;
+            if (m_nTotalKilled < 16) m_nSpawnDelay -= 5;
+            else if (m_nTotalKilled < 136) m_nSpawnDelay -= 2;
             else m_nSpawnDelay -= 1;
 
             // Change the kills required to change the kill rate. really want to slow it down.
-            if (m_nTotalKilled < 450) m_nKillsForNextSpawnRate = 15;
-            else if (m_nTotalKilled < 650) { m_nKillsForNextSpawnRate = 200; *nDamgeToPlayer = 40; }
-            else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 400; *nDamgeToPlayer = 50; }
-            else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 500; m_nCurrentSpeed = 9; }
+            if (m_nTotalKilled < 350) m_nKillsForNextSpawnRate = 15;
+            else if (m_nTotalKilled < 950) { m_nKillsForNextSpawnRate = 100; *nDamgeToPlayer = 40; }
+            else if (m_nTotalKilled < 1500) { m_nKillsForNextSpawnRate = 200; *nDamgeToPlayer = 55; }
+            else if (m_nTotalKilled < 2000) { m_nKillsForNextSpawnRate = 300; m_nCurrentSpeed = 9; }
             else { m_bMaxSpawnRateReached= TRUE; m_nCurrentSpeed = 10; }
 
             // Save last processed kill count

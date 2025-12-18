@@ -70,51 +70,51 @@ const UINT8 m_anBaseSpeeds[3] = {5, 2, 9};
 // Const array of unsigned int 8s, used for storing the speed throughout each round.
 const UINT8 m_anRoundSpeeds[20][5] = 
 {
-    {5, 6, 7, 8, 8},        // ROUND 1 (0-100 points)
-    {5, 6, 7, 8, 9},        // ROUND 2 (100-200 points)
-    {6, 7, 8, 9, 9},        // ROUND 3 (200-300 points)
-    {6, 7, 8, 9, 10},       // ROUND 4 (300-400 points)
-    {7, 8, 9, 10, 10},      // ROUND 5 (500-600 points)
-    {7, 8, 9, 10, 11},      // ROUND 6 (600-700 points)
-    {8, 9, 10, 11, 11},     // ROUND 7 (700-800 points)
-    {8, 9, 10, 11, 12},     // ROUND 8 (800-900 points)
-    {9, 10, 11, 12, 12},    // ROUND 9 (900-1000 points)
-    {9, 10, 11, 12, 13},    // ROUND 10 (1000-1100 points)
-    {10, 11, 12, 13, 13},   // ROUND 11 (1100-1200 points)
-    {10, 11, 12, 13, 14},   // ROUND 12 (1200-1300 points)
-    {11, 12, 13, 14, 14},   // ROUND 13 (1300-1400 points)
-    {11, 12, 13, 14, 15},   // ROUND 14 (1400-1500 points)
-    {12, 13, 14, 15, 15},   // ROUND 15 (1500-1600 points)
-    {12, 13, 14, 15, 16},   // ROUND 16 (1600-1700 points)
-    {13, 14, 15, 16, 16},   // ROUND 17 (1700-1800 points)
-    {13, 14, 15, 16, 17},   // ROUND 18 (1800-1900 points)
-    {14, 15, 16, 17, 17},   // ROUND 19 (1900-2000 points)
-    {14, 15, 16, 17, 18},   // ROUND 20 (2000-2100 points)
+    {7, 8, 9, 10, 10},      // ROUND 1 (100-200 points)
+    {7, 8, 9, 10, 11},      // ROUND 2 (200-300 points)
+    {8, 9, 10, 11, 11},     // ROUND 3 (300-400 points)
+    {8, 9, 10, 11, 12},     // ROUND 4 (400-500 points)
+    {9, 10, 11, 12, 12},    // ROUND 5 (500-600 points)
+    {9, 10, 11, 12, 13},    // ROUND 6 (600-700 points)
+    {10, 11, 12, 13, 13},   // ROUND 7 (700-800 points)
+    {10, 11, 12, 13, 14},   // ROUND 8 (800-900 points)
+    {11, 12, 13, 14, 14},   // ROUND 9 (900-1000 points)
+    {11, 12, 13, 14, 15},   // ROUND 10 (1000-1100 points)
+    {12, 13, 14, 15, 15},   // ROUND 11 (1100-1200 points)
+    {12, 13, 14, 15, 16},   // ROUND 12 (1200-1300 points)
+    {13, 14, 15, 16, 16},   // ROUND 13 (1300-1400 points)
+    {13, 14, 15, 16, 17},   // ROUND 14 (1400-1500 points)
+    {13, 15, 16, 17, 17},   // ROUND 15 (1500-1600 points)
+    {13, 16, 17, 17, 18},   // ROUND 16 (1600-1700 points)
+    {13, 16, 17, 17, 18},   // ROUND 17 (1700-1800 points)
+    {14, 16, 17, 17, 18},   // ROUND 18 (1800-1900 points)
+    {14, 16, 17, 17, 18},   // ROUND 19 (1900-2000 points)
+    {15, 17, 17, 18, 19}    // ROUND 20 (2000-2100 points)
 };
 
 // Const array of unsigned int 8s, used for storing the spawn rate throughout each round.
 const UINT8 m_anRoundSpawnRates[20][4] = 
 {
-    {20, 16, 16, 14},       // ROUND 1 (0-100 points)
-    {18, 16, 16, 14},       // ROUND 2 (100-200 points)
-    {16, 14, 14, 12},       // ROUND 3 (200-300 points)
-    {14, 12, 12, 10},       // ROUND 4 (300-400 points)
-    {12, 10, 10, 10},       // ROUND 5 (500-600 points)
-    {12, 10, 8, 8},         // ROUND 6 (600-700 points)
-    {10, 10, 8, 6},         // ROUND 7 (700-800 points)
-    {10, 8, 8, 6},          // ROUND 8 (800-900 points)
-    {8, 8, 6, 6},           // ROUND 9 (900-1000 points)
-    {8, 8, 6, 4},           // ROUND 10 (1000-1100 points)
-    {7, 6, 6, 4},           // ROUND 11 (1100-1200 points)
-    {7, 6, 5, 4},           // ROUND 12 (1200-1300 points)
-    {6, 5, 4, 4},           // ROUND 13 (1300-1400 points)
-    {6, 5, 4, 3},           // ROUND 14 (1400-1500 points)
-    {5, 5, 4, 3},           // ROUND 15 (1500-1600 points)
-    {5, 4, 4, 3},           // ROUND 16 (1600-1700 points)
+    {12, 10, 10, 10},       // ROUND 1 (100-200 points)
+    {12, 10, 8, 8},         // ROUND 2 (200-300 points)
+    {10, 10, 8, 6},         // ROUND 3 (300-400 points)
+    {10, 8, 8, 6},          // ROUND 4 (400-500 points)
+    {8, 8, 6, 6},           // ROUND 5 (500-600 points)
+    {8, 8, 6, 4},           // ROUND 6 (600-700 points)
+    {7, 6, 6, 4},           // ROUND 7 (700-800 points)
+    {7, 6, 5, 4},           // ROUND 8 (800-900 points)
+    {6, 5, 4, 4},           // ROUND 9 (900-1000 points)
+    {6, 5, 4, 3},           // ROUND 10 (1000-1100 points)
+    {5, 5, 4, 3},           // ROUND 11 (1100-1200 points)
+    {5, 4, 4, 3},           // ROUND 12 (1200-1300 points)
+    {5, 4, 4, 3},           // ROUND 13 (1300-1400 points)
+    {4, 4, 4, 3},           // ROUND 14 (1400-1500 points)
+    {4, 4, 4, 3},           // ROUND 15 (1500-1600 points)
+    {4, 4, 4, 3},           // ROUND 16 (1600-1700 points)
     {4, 4, 3, 3},           // ROUND 17 (1700-1800 points)
-    {4, 4, 3, 2},           // ROUND 18 (1800-1900 points)
-    {3, 3, 2, 2},           // ROUND 19 (1900-2000 points)
-    {3, 3, 2, 1}            // ROUND 20 (2000-2100 points)
+    {4, 4, 3, 3},           // ROUND 18 (1800-1900 points)
+    {4, 4, 3, 2},           // ROUND 19 (1900-2000 points)
+    {4, 3, 3, 2}            // ROUND 20 (2000-2100 points)
 };
 //--------------------------------------------------------------------------------------
 
@@ -150,8 +150,8 @@ void InitiateSpawner(BYTE bDiff)
     // Set difficulty for Hard
     else
     {
-        m_nCurrentRoundSpeedsPos = 8;
-        m_nCurrentRoundSpawnRatesPos = 8;
+        m_nCurrentRoundSpeedsPos = 7;
+        m_nCurrentRoundSpawnRatesPos = 7;
     }
 
     // Reset the queue arrays.

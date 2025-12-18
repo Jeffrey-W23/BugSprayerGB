@@ -20,7 +20,7 @@ UINT8 m_nNextSpriteID = 7;
 Enemy m_aoEnemies[MAX_ENEMIES];
 
 // New unsigned int 8 for the current speed of all enemies in the game.
-UINT8 m_nCurrentSpeed = 1;
+UINT8 m_nCurrentSpeed = 4;
 
 // New unsigned int 16 for tracking the total enemies killed in the game.
 UINT16 m_nTotalKilled = 0;
