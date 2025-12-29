@@ -25,7 +25,7 @@ REM
 REM
 
 REM
-%LCC% -Wm-yt0x1B -Wm-yo4 -Wm-ya4 -autobank -Wl-j -Wl-l%HUGEDIR%/gbdk/hUGEDriver.lib -o BugSprayer.gb ^
+%LCC% -Wm-yt0x03 -Wm-yo2 -Wm-ya1 -autobank -Wl-j -Wl-l%HUGEDIR%/gbdk/hUGEDriver.lib -o BugSprayer.gb ^
   main.o ^
   Gamemodes\gamemodes.o ^
   Data-Systems\helpers.o ^
